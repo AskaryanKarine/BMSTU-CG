@@ -23,6 +23,8 @@ private slots:
 
     void on_pushButton_exit_clicked();
 
+    void on_pushButton_add_dot_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
