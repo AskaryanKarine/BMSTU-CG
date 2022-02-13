@@ -29,5 +29,6 @@ void MainWindow::on_pushButton_author_info_clicked()
 
 void MainWindow::on_pushButton_exit_clicked()
 {
+    QMessageBox::warning(this, "Предупреждние!", "Работа с программой будет завершена");
     QApplication::quit();
 }
