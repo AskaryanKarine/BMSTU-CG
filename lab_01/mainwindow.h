@@ -29,6 +29,12 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QStandardItemModel *model;
-    int N;
+//    int N;
+    struct
+    {
+        int N;
+        QPointF *arr;
+        double coef;
+    } data;
 };
 #endif // MAINWINDOW_H

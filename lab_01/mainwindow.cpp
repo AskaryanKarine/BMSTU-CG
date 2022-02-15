@@ -18,16 +18,13 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);/*
-    model = new QStandardItemModel(100, 2, this);
-    ui->tableView->setModel(model);
-    model->setHeaderData(0, Qt::Horizontal, "x");
-    model->setHeaderData(1, Qt::Horizontal, "y");*/
+    ui->setupUi(this);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete [] data.arr;
     delete model;
 }
 
@@ -52,24 +49,37 @@ void MainWindow::on_pushButton_exit_clicked()
 void MainWindow::on_lineEdit_returnPressed()
 {
     bool ok;
-    int N;
     QString text_N = ui->lineEdit->text();
     if (text_N.length() == 0)
     {
-        ui->textEdit->setTextColor(QColor(194, 24, 7));
+        ui->textEdit->setTextColor(QColor(194, 24, 7)); // red
         ui->textEdit->setText("Пустой ввод: Введите количество точек\n");
     }
     else
     {
-        N = text_N.toInt(&ok);
+        data.N = text_N.toInt(&ok);
         if (!ok)
-            QMessageBox::warning(this, "Предупреждение!", "Введите два целых числа");
+        {
+            ui->textEdit->setTextColor(QColor(194, 24, 7));
+            ui->textEdit->setText("Ошибка ввода: Введите целое число точек\n");
+        }
         else
         {
-            model = new QStandardItemModel(N, 2, this);
-            ui->tableView->setModel(model);
-            model->setHeaderData(0, Qt::Horizontal, "x");
-            model->setHeaderData(1, Qt::Horizontal, "y");
+            if (data.N <= 0)
+            {
+                ui->textEdit->setTextColor(QColor(194, 24, 7)); //green
+                ui->textEdit->setText("Ошибка ввода: Введите целое число точек\n");
+            }
+            else
+            {
+                model = new QStandardItemModel(data.N, 2, this);
+                ui->tableView->setModel(model);
+                model->setHeaderData(0, Qt::Horizontal, "x");
+                model->setHeaderData(1, Qt::Horizontal, "y");
+                ui->textEdit->setTextColor(QColor(24, 134, 45));
+                ui->textEdit->setText("Ввод успешен\n");
+                data.arr = new QPointF[data.N];
+            }
         }
     }
 
