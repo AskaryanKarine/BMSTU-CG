@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStandardItemModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,9 +24,11 @@ private slots:
 
     void on_pushButton_exit_clicked();
 
-    void on_pushButton_add_dot_clicked();
+    void on_lineEdit_returnPressed();
 
 private:
     Ui::MainWindow *ui;
+    QStandardItemModel *model;
+    int N;
 };
 #endif // MAINWINDOW_H
