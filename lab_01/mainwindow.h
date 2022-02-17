@@ -2,7 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QStandardItemModel>
+#include <QTableWidgetItem>
+//#include <QStandardItemModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,23 +19,25 @@ public:
 
 private slots:
 
-    void on_pushButton_app_info_clicked();
+    void author_info_show();
 
-    void on_pushButton_author_info_clicked();
+    void app_info_show();
 
-    void on_pushButton_exit_clicked();
+    void exit_show();
 
     void on_lineEdit_returnPressed();
 
+    void on_tableWidget_cellClicked(int row, int column);
+
+    void on_tableWidget_itemChanged(QTableWidgetItem *item);
+
 private:
     Ui::MainWindow *ui;
-    QStandardItemModel *model;
-//    int N;
     struct
     {
-        int N;
-        QPointF *arr;
-        double coef;
+        int N = 0;
+        QPointF *arr = NULL;
+        double coef = 1.0;
     } data;
 };
 #endif // MAINWINDOW_H
