@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QTableWidgetItem>
-//#include <QStandardItemModel>
+#include <QGraphicsScene>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,8 +31,15 @@ private slots:
 
     void on_tableWidget_itemChanged(QTableWidgetItem *item);
 
+    void mousePressEvent(QMouseEvent *event);
+
+    void print_warning(QString str);
+
+    void print_succses(QString str);
+
 private:
     Ui::MainWindow *ui;
+    QGraphicsScene *scene;
     struct
     {
         int N = 0;
