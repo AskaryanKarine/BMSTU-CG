@@ -164,3 +164,31 @@ void MainWindow::mousePressEvent(QMouseEvent *event) // есть заглушк�
 
 
 }
+
+void MainWindow::on_pushButton_del_dot_clicked() // есть заглушка
+{
+    QTableWidgetItem *cur_item = ui->tableWidget->currentItem();
+    if (cur_item)
+    {
+        int row = ui->tableWidget->row(cur_item);
+        ui->tableWidget->removeRow(row);
+        ui->tableWidget->insertRow(row);
+        // стереть точку с поля
+        // хз что делать с массивом
+    }
+    else
+        print_warning("Выберите точку");
+}
+
+void MainWindow::on_pushButton_clear_clicked()
+{
+    if (data.N > 0)
+    {
+        ui->tableWidget->clear();
+        if (data.arr)
+        {
+            delete [] data.arr;
+            data.arr = new QPointF[data.N];
+        }
+    }
+}

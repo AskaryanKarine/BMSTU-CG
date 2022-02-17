@@ -37,6 +37,10 @@ private slots:
 
     void print_succses(QString str);
 
+    void on_pushButton_del_dot_clicked();
+
+    void on_pushButton_clear_clicked();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
