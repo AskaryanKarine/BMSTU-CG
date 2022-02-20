@@ -287,11 +287,11 @@ void MainWindow::drawing_cirles(QPointF a, QPointF b, double r1, double r2)
     QPainter p(&image);
     image.fill(QColor(255,255,255));
 
-    p.setBrush(QColor(200,0,0));
-    p.setPen(QColor(200,0,0));
+    p.setBrush(QColor(200, 0, 0, 0));
+    p.setPen(QColor(200,0, 0));
     p.drawEllipse(a, r1, r1);
-    p.setBrush(QColor(0,200,0));
-    p.setPen(QColor(0,200,0));
+    p.setBrush(QColor(0, 200, 0, 0));
+    p.setPen(QColor(0, 200, 0));
     p.drawEllipse(b, r2, r2);
 
     p.setBrush(QColor(0,0,0));
@@ -316,6 +316,8 @@ void MainWindow::on_pushButton_result_clicked()
     QPointF min_c1;
     QPointF min_c2;
     double min_r1, min_r2;
+    min_r1 = -1.0;
+    min_r2 = -1.0;
 
     if (data.N < 4)
         print_warning("Невозможно решить поставленую задачу, нужно больше точек");
@@ -347,21 +349,28 @@ void MainWindow::on_pushButton_result_clicked()
                                     {
                                         r2 = find_center_radius(a2, b2, c2, &center2);
                                         square2 = M_PI * r2 * r2;
-                                        if (min_sum < 0)
+                                        if (center1 != center2 && r1 != r2)
                                         {
-                                            min_sum = square1 + square2;
-                                            min_c1 = center1;
-                                            min_c2 = center2;
-                                            min_r1 = r1;
-                                            min_r2 = r2;
-                                        }
-                                        else if (min_sum > 0 && min_sum > (square1 + square2))
-                                        {
-                                            min_sum = square1 + square2;
-                                            min_c1 = center1;
-                                            min_c2 = center2;
-                                            min_r1 = r1;
-                                            min_r2 = r2;
+                                            double d = (center1.x() - center2.x()) * (center1.x() - center2.x()) + (center1.y() - center2.y()) * (center1.y() - center2.y());
+                                            if ((r1 + r2) > sqrt(d))
+                                            {
+                                                if (min_sum < 0)
+                                                {
+                                                    min_sum = square1 + square2;
+                                                    min_c1 = center1;
+                                                    min_c2 = center2;
+                                                    min_r1 = r1;
+                                                    min_r2 = r2;
+                                                }
+                                                else if (min_sum > 0 && min_sum > (square1 + square2))
+                                                {
+                                                    min_sum = square1 + square2;
+                                                    min_c1 = center1;
+                                                    min_c2 = center2;
+                                                    min_r1 = r1;
+                                                    min_r2 = r2;
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -371,10 +380,14 @@ void MainWindow::on_pushButton_result_clicked()
                 }
             }
         }
-        drawing_cirles(min_c1, min_c2, min_r1, min_r2);
-//        if (min_c1 == min_c2)
-//            print_warning("Совпали");
-        ui->textEdit->setText(QString("c1[%1, %2], r1 = %3, c2[%4,%5], r2 = %6").arg(min_c1.x()).arg(min_c1.y()).arg(min_r1).arg(min_c2.x()).arg(min_c2.y()).arg(min_r2));
+        if (min_r1 < 0 || min_r2 < 0)
+            print_warning("Окружностей, удовлетоворяющих условию задачи нет");
+        else
+        {
+            drawing_cirles(min_c1, min_c2, min_r1, min_r2);
+            ui->textEdit->setText(QString("c1[%1, %2], r1 = %3, c2[%4,%5], r2 = %6").arg(min_c1.x()).arg(min_c1.y()).arg(min_r1).arg(min_c2.x()).arg(min_c2.y()).arg(min_r2));
+        }
+
     }
 }
 
