@@ -41,6 +41,8 @@ private slots:
 
     void on_pushButton_clear_clicked();
 
+    void drawing_points();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;

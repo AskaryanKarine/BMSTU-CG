@@ -4,6 +4,11 @@
 #include <QMouseEvent>
 #include <iostream>
 #include <algorithm>
+#include <QtMath>
+#include <QBrush>
+#include <QPen>
+#include <QImage>
+#include <QPainter>
 
 #define MAX_POINTS 100
 
@@ -12,9 +17,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    //
+
+    // создание сцены
     scene = new QGraphicsScene();
     ui->graphicsView->setScene(scene);
+
     // Настройка пунктов меню
     QAction *AboutProgAction = ui->menubar->addAction("О программе");
     connect(AboutProgAction, SIGNAL(triggered()), this, SLOT(app_info_show()));
@@ -28,13 +35,14 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete [] data.arr;
+    delete scene;
 }
 
 
 void MainWindow::app_info_show()
 {
     QMessageBox::information(this, "О программе","Задача на геометрические преобразования\n\n\
-На плоскости задано множество из N точек.\nНайти две пересекающиеся окружности,\nплощадь пересечения которых будет минимальна.\n\
+На плоскости задано множество из N точек.\nНайти две пересекающиеся окружности,\nсуммарная площадь которых будет минимальна.\n\
 Вывести площадь области пересечения двух\nокружностей.\n");
 }
 
@@ -88,13 +96,39 @@ void MainWindow::on_lineEdit_returnPressed()
                 if (data.arr != NULL)
                     delete [] data.arr;
                 data.arr = new QPointF[data.N];
+                for (int i = 0; i < data.N; i++)
+                {
+                    data.arr[i].setX(qQNaN());
+                    data.arr[i].setY(qQNaN());
+                }
             }
         }
     }
 }
 
+// функция отрисовки
+void MainWindow::drawing_points()
+{
+    QImage image = QImage(600, 600, QImage::Format_RGB32);
+    QPainter p(&image);
+    p.setBrush(QColor(0,0,0));
+    p.setPen(QColor(0,0,0));
+    image.fill(QColor(255,255,255));
+//    pixmap.fill();
+    for (int i = 0; i < data.N; i++)
+    {
+        if (data.arr[i].x() != qQNaN())
+            p.drawEllipse(data.arr[i].x(), data.arr[i].y(), data.coef * 2, data.coef * 2);
+    }
+
+    QPixmap pixmap = QPixmap::fromImage(image);
+    scene->addPixmap(pixmap);
+}
+
+
 void MainWindow::on_tableWidget_cellClicked(int row, int column) // заглушка
 {
+
     // выделение точки цветом
 }
 
@@ -127,8 +161,11 @@ void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item) // есть 
             if (!second_item)
                 print_warning("Невозможно построить данную точку: введите обе координаты\n");
             else
+            {
                 print_succses(QString("x = %1 y = %2\n").arg(data.arr[row].x()).arg(data.arr[row].y())); // заглушка
-                // тут надо точку построить
+                drawing_points();
+                // сюда функцию отрисовки поля
+            }
         }
     }
 }
@@ -146,13 +183,15 @@ void MainWindow::mousePressEvent(QMouseEvent *event) // есть заглушк�
             if (!item_x && !item_y)
             {
                 flag = 0;
-                ui->textEdit->setText(QString("Можно ввести точку на строчку %1").arg(i));
                 // заглушка
-                if (std::find(data.arr, data.arr + data.N, event->pos()) != (data.arr + data.N))
+                QPointF point = QPointF(event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height());
+                if (std::find(data.arr, data.arr + data.N, point) != (data.arr + data.N))
                     print_warning("Эта точка уже существует");
                 else
                 {
-                    data.arr[i] = event->pos();
+                    // пересчитать координаты, рисовать точки
+                    data.arr[i].setX(event->pos().x() - view.x());
+                    data.arr[i].setY(event->pos().y() - view.y() - menuBar()->geometry().height());
                     ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::number(data.arr[i].x())));
                     ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(data.arr[i].y())));
                 }
@@ -161,8 +200,6 @@ void MainWindow::mousePressEvent(QMouseEvent *event) // есть заглушк�
         if (flag)
             print_warning("Нельзя поставить точку: превышено максимальное количество");
     }
-
-
 }
 
 void MainWindow::on_pushButton_del_dot_clicked() // есть заглушка
@@ -173,22 +210,32 @@ void MainWindow::on_pushButton_del_dot_clicked() // есть заглушка
         int row = ui->tableWidget->row(cur_item);
         ui->tableWidget->removeRow(row);
         ui->tableWidget->insertRow(row);
-        // стереть точку с поля
-        // хз что делать с массивом
+        data.arr[row].setX(qQNaN());
+        data.arr[row].setY(qQNaN());
+        drawing_points();
+        // перерисовать все поле снова
     }
     else
         print_warning("Выберите точку");
 }
 
-void MainWindow::on_pushButton_clear_clicked()
+void MainWindow::on_pushButton_clear_clicked() // есть заглушка
 {
     if (data.N > 0)
     {
         ui->tableWidget->clear();
+        // очистить сцену
         if (data.arr)
         {
             delete [] data.arr;
             data.arr = new QPointF[data.N];
+            for (int i = 0; i < data.N; i++)
+            {
+                data.arr[i].setX(qQNaN());
+                data.arr[i].setY(qQNaN());
+            }
+            drawing_points();
         }
     }
 }
+
