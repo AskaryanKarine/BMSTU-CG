@@ -264,9 +264,9 @@ double MainWindow::find_center_radius(QPointF a, QPointF b, QPointF c, QPointF *
     bc = sqrt((b.x() - c.x()) * (b.x() - c.x()) + (b.y() - c.y()) * (b.y() - c.y()));
     ca = sqrt((c.x() - a.x()) * (c.x() - a.x()) + (c.y() - a.y()) * (c.y() - a.y()));
     ab = sqrt((a.x() - b.x()) * (a.x() - b.x()) + (a.y() - b.y()) * (a.y() - b.y()));
-    double p = 0.5 * (sqrt(ab) + sqrt(bc) + sqrt(ca));
+    double p = 0.5 * (ab + bc + ca);
 
-    double rad = sqrt(ab * bc * ca) / (4 * sqrt(p * (p - sqrt(ab)) * (p - sqrt(bc)) * (p - sqrt(ca))));
+    double rad = (ab * bc * ca) / (4 * sqrt(p * (p - ab) * (p - bc) * (p - ca)));
     return rad;
 }
 
@@ -285,15 +285,7 @@ void MainWindow::drawing_cirles(QPointF a, QPointF b, double r1, double r2)
 {
     QImage image = QImage(600, 600, QImage::Format_RGB32);
     QPainter p(&image);
-    p.setBrush(QColor(0,0,0));
-    p.setPen(QColor(0,0,0));
     image.fill(QColor(255,255,255));
-
-    for (int i = 0; i < data.N; i++)
-    {
-        if (data.arr[i].x() != qQNaN())
-            p.drawEllipse(data.arr[i].x(), data.arr[i].y(), data.coef * 2, data.coef * 2);
-    }
 
     p.setBrush(QColor(200,0,0));
     p.setPen(QColor(200,0,0));
@@ -301,6 +293,14 @@ void MainWindow::drawing_cirles(QPointF a, QPointF b, double r1, double r2)
     p.setBrush(QColor(0,200,0));
     p.setPen(QColor(0,200,0));
     p.drawEllipse(b, r2, r2);
+
+    p.setBrush(QColor(0,0,0));
+    p.setPen(QColor(0,0,0));
+    for (int i = 0; i < data.N; i++)
+    {
+        if (data.arr[i].x() != qQNaN())
+            p.drawEllipse(data.arr[i].x(), data.arr[i].y(), data.coef * 2, data.coef * 2);
+    }
 
     QPixmap pixmap = QPixmap::fromImage(image);
     scene->addPixmap(pixmap);
@@ -372,8 +372,9 @@ void MainWindow::on_pushButton_result_clicked()
             }
         }
         drawing_cirles(min_c1, min_c2, min_r1, min_r2);
-        if (min_c1 == min_c2)
-            print_warning("Совпали");
+//        if (min_c1 == min_c2)
+//            print_warning("Совпали");
+        ui->textEdit->setText(QString("c1[%1, %2], r1 = %3, c2[%4,%5], r2 = %6").arg(min_c1.x()).arg(min_c1.y()).arg(min_r1).arg(min_c2.x()).arg(min_c2.y()).arg(min_r2));
     }
 }
 
