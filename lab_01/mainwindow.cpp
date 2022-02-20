@@ -239,3 +239,145 @@ void MainWindow::on_pushButton_clear_clicked() // есть заглушка
     }
 }
 
+double MainWindow::find_center_radius(QPointF a, QPointF b, QPointF c, QPointF *center)
+{
+    /*
+    bc = (xb*xb + yb*yb - xc*xc - yc*yc)
+    ca = (xc*xc + yc*yc - xa*xa - ya*ya)
+    ab = (xa*xa + ya*ya - xb*xb - yb*yb)
+    d = 2(xa(yb-yc) + xb(yc-ya) + xc(ya-yb))
+
+    x0 = ya*bc + yb*ca + yc*ab / -d
+    y0 = xa*bc + xb*ca + xc*ab / d
+    */
+
+    double ab = a.x() * a.x() + a.y() * a.y() - b.x() * b.x() - b.y() * b.y();
+    double bc = b.x() * b.x() + b.y() * b.y() - c.x() * c.x() - c.y() * c.y();
+    double ca = c.x() * c.x() + c.y() * c.y() - a.x() * a.x() - a.y() * a.y();
+
+    double d = 2.0 * (a.x() * (b.y() - c.y()) + b.x() * (c.y() - a.y()) + c.x() * (a.y() - b.y()));
+
+    center->setX((a.y() * bc + b.y() * ca + c.y() * ab) / (-d));
+    center->setY((a.x() * bc + b.x() * ca + c.x() * ab) / d);
+
+    // semi perimetr
+    bc = sqrt((b.x() - c.x()) * (b.x() - c.x()) + (b.y() - c.y()) * (b.y() - c.y()));
+    ca = sqrt((c.x() - a.x()) * (c.x() - a.x()) + (c.y() - a.y()) * (c.y() - a.y()));
+    ab = sqrt((a.x() - b.x()) * (a.x() - b.x()) + (a.y() - b.y()) * (a.y() - b.y()));
+    double p = 0.5 * (sqrt(ab) + sqrt(bc) + sqrt(ca));
+
+    double rad = sqrt(ab * bc * ca) / (4 * sqrt(p * (p - sqrt(ab)) * (p - sqrt(bc)) * (p - sqrt(ca))));
+    return rad;
+}
+
+bool MainWindow::check_triangle(QPointF a, QPointF b, QPointF c)
+{
+    double bc = sqrt((b.x() - c.x()) * (b.x() - c.x()) + (b.y() - c.y()) * (b.y() - c.y()));
+    double ca = sqrt((c.x() - a.x()) * (c.x() - a.x()) + (c.y() - a.y()) * (c.y() - a.y()));
+    double ab = sqrt((a.x() - b.x()) * (a.x() - b.x()) + (a.y() - b.y()) * (a.y() - b.y()));
+
+    if ((ab < (bc + ca)) || (bc < (ab + ca) || ca < (ab + bc)))
+        return true;
+    return false;
+}
+
+void MainWindow::drawing_cirles(QPointF a, QPointF b, double r1, double r2)
+{
+    QImage image = QImage(600, 600, QImage::Format_RGB32);
+    QPainter p(&image);
+    p.setBrush(QColor(0,0,0));
+    p.setPen(QColor(0,0,0));
+    image.fill(QColor(255,255,255));
+
+    for (int i = 0; i < data.N; i++)
+    {
+        if (data.arr[i].x() != qQNaN())
+            p.drawEllipse(data.arr[i].x(), data.arr[i].y(), data.coef * 2, data.coef * 2);
+    }
+
+    p.setBrush(QColor(200,0,0));
+    p.setPen(QColor(200,0,0));
+    p.drawEllipse(a, r1, r1);
+    p.setBrush(QColor(0,200,0));
+    p.setPen(QColor(0,200,0));
+    p.drawEllipse(b, r2, r2);
+
+    QPixmap pixmap = QPixmap::fromImage(image);
+    scene->addPixmap(pixmap);
+}
+
+void MainWindow::on_pushButton_result_clicked()
+{
+    QPointF a1, b1, c1, center1; // 3 точки первой окружности
+    QPointF a2, b2, c2, center2; // 3 точки второй окружности
+    double r1, square1;
+    double r2, square2;
+    double min_sum = -1.0;
+    QPointF min_c1;
+    QPointF min_c2;
+    double min_r1, min_r2;
+
+    if (data.N < 4)
+        print_warning("Невозможно решить поставленую задачу, нужно больше точек");
+    else
+    {
+        for (int i = 0; i < data.N - 2; i++)
+        {
+            a1 = data.arr[i];
+            for (int j = i + 1; j < data.N - 1; j++)
+            {
+                b1 = data.arr[j];
+                for (int m = j + 1; m < data.N; m++)
+                {
+                    c1 = data.arr[m];
+                    if (check_triangle(a1, b1, c1))
+                    {
+                        r1 = find_center_radius(a1, b1, c1, &center1);
+                        square1 = M_PI * r1 * r1;
+                        for (int i1 = 1; i1 < data.N - 2; i1++)
+                        {
+                            a2 = data.arr[i1];
+                            for (int j1 = i1 + 1; j1 < data.N - 1; j1++)
+                            {
+                                b2 = data.arr[j1];
+                                for (int m1 = j1 + 1; m1 < data.N; m1++)
+                                {
+                                    c2 = data.arr[m1];
+                                    if (check_triangle(a2, b2, c2))
+                                    {
+                                        r2 = find_center_radius(a2, b2, c2, &center2);
+                                        square2 = M_PI * r2 * r2;
+                                        if (min_sum < 0)
+                                        {
+                                            min_sum = square1 + square2;
+                                            min_c1 = center1;
+                                            min_c2 = center2;
+                                            min_r1 = r1;
+                                            min_r2 = r2;
+                                        }
+                                        else if (min_sum > 0 && min_sum > (square1 + square2))
+                                        {
+                                            min_sum = square1 + square2;
+                                            min_c1 = center1;
+                                            min_c2 = center2;
+                                            min_r1 = r1;
+                                            min_r2 = r2;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        drawing_cirles(min_c1, min_c2, min_r1, min_r2);
+        if (min_c1 == min_c2)
+            print_warning("Совпали");
+    }
+}
+
+
+
+
+
