@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTableWidgetItem>
 #include <QGraphicsScene>
+#include <QStack>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,19 +31,31 @@ private slots:
     void print_succses(QString str);
     void on_pushButton_del_dot_clicked();
     void on_pushButton_clear_clicked();
-    void drawing_points();
+    void drawing_points(int sel);
     void on_pushButton_result_clicked();
     bool check_triangle(QPointF a, QPointF b, QPointF c);
     double find_center_radius(QPointF a, QPointF b, QPointF c, QPointF *center);
-    void drawing_cirles(QPointF a, QPointF b, double r1, double r2);
+    void drawing_cirles(QPointF a, QPointF b, double r1, double r2, int sel);
+    void on_pushButton_cancel_clicked();
+    double find_square_between(double r1, double r2, QPointF c1, QPointF c2);
+    void drawing_axis(QPainter *p);
+    void from_abs_coordinates(double x, double y, double *res_x, double *res_y);
+    void to_abs_coordinates(double x, double y, double *res_x, double *res_y);
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
-    struct
+    struct points
     {
         int N = 0;
         QPointF *arr = NULL;
-        double coef = 1.0;
+        bool soluted = false;
+        QPointF min_c1;
+        QPointF min_c2;
+        double min_r1, min_r2;
+        double min_x, min_y;
+        double max_x, max_y;
     } data;
+    QStack <struct points> cancel;
+
 };
 #endif // MAINWINDOW_H
