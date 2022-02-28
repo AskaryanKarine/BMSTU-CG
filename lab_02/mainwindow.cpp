@@ -11,8 +11,8 @@
 #define RED QColor(200,0, 0)
 #define GREEN QColor(0, 200, 0)
 #define FIELD 0.05
-#define MAX 300
-#define MIN -300
+#define MAX 1000
+#define MIN -1000
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -31,9 +31,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView_2->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     scene = new QGraphicsScene();
+    ui->graphicsView_2->setScene(scene);
     min_x = min_y = MIN;
     max_x = max_y = MAX;
     init_watch();
+    drawing_whatch();
+
 }
 
 MainWindow::~MainWindow()
@@ -60,6 +63,64 @@ void MainWindow::exit_show()
     qApp->quit();
 }
 
+void MainWindow::to_abs_coor(int x, int y, int *res_x, int *res_y)
+{
+    int fx = (max_x - min_x) * FIELD;
+    int fy = (max_y - min_y) * FIELD;
+    int nmax_x = max_x + fx;
+    int nmin_x = min_x - fx;
+    int nmax_y = max_y + fy;
+    int nmin_y = min_y - fy;
+
+    double xk = (double) (nmax_x - nmin_x) / ui->graphicsView_2->width();
+    double xb = nmin_x;
+    double yk = (double) (nmax_y - nmin_y) / ui->graphicsView_2->height();
+    double yb = nmin_y;
+
+    *res_x = x * xk + xb;
+    *res_y = y * yk + yb;
+}
+
+// перевод из абсолютных координат
+void MainWindow::from_abs_coor(int x, int y, int *res_x, int *res_y)
+{
+    int fx = (max_x - min_x) * FIELD;
+    int fy = (max_y - min_y) * FIELD;
+    int nmax_x = max_x + fx;
+    int nmin_x = min_x - fx;
+    int nmax_y = max_y + fy;
+    int nmin_y = min_y - fy;
+
+    double xk = (double) ui->graphicsView_2->width() / (nmax_x - nmin_x);
+    double xb = -xk * nmin_x;
+    double yk = (double) ui->graphicsView_2->height() / (nmax_y - nmin_y);
+    double yb = -yk * nmin_y;
+
+    *res_x = x * xk + xb;
+    *res_y = y * yk + yb;
+}
+
+void MainWindow::drawing_axis(QPainter *p)
+{
+    p->setBrush(BLACK);
+    p->setPen(BLACK);
+
+    int rx, ry;
+    from_abs_coor(0, 0, &rx, &ry);
+
+    int h = ui->graphicsView_2->height()-5;
+    int w = ui->graphicsView_2->width()-5;
+
+    // Oy
+    p->drawLine(rx, 0, rx, h);
+    p->drawLine(rx, h, rx - 5,  h - 5);
+    p->drawLine(rx, h, rx + 5,  h - 5);
+
+    // Ox
+    p->drawLine(0, ry, w, ry);
+    p->drawLine(w, ry, w - 5,  ry - 5);
+    p->drawLine(w, ry, w - 5,  ry + 5);
+}
 
 void MainWindow::init_points()
 {
@@ -135,7 +196,11 @@ void MainWindow::init_points()
     data.points.push_back(QPoint(284, 241)); // 70
 
     for (size_t i = 0; i < data.points.size(); i++)
-        data.points[i] -= QPoint(167, 226);
+    {
+        data.points[i].setX(data.points[i].x() - 167);
+        data.points[i].setY(data.points[i].y() - 226);
+    }
+//        data.points[i] -= QPoint(167, 226);
 }
 
 void MainWindow::init_watch()
@@ -196,4 +261,34 @@ void MainWindow::init_watch()
     data.connet.push_back({37, 38});
     data.connet.push_back({39, 40});
     data.connet.push_back({38, 40});
+}
+
+void MainWindow::drawing_whatch()
+{
+    QImage image = QImage(ui->graphicsView_2->geometry().width(), ui->graphicsView_2->geometry().height(), QImage::Format_RGB32);
+    QPainter p(&image);
+    image.fill(QColor(255, 255, 255));
+    drawing_axis(&p);
+    p.setBrush(QColor(QColor(123,104,238)));
+    p.setPen(QPen(QColor(123,104,238), 2));
+//    for (size_t i = 0; i < data.connet.size(); i++)
+//    {
+//        int x1 = data.points[data.connet[i].p1 - 1].x();
+//        int y1 = data.points[data.connet[i].p1 - 1].y();
+
+//        int x2 = data.points[data.connet[i].p2 - 1].x();
+//        int y2 = data.points[data.connet[i].p2 - 1].y();*/
+
+//        int real_x1, real_y1;
+//        from_abs_coor(x1, y1, &real_x1, &real_y1);
+
+//        int real_x2, real_y2;
+//        from_abs_coor(x2, y2, &real_x2, &real_y2);
+
+//        p.drawLine(real_x1, real_y1, real_x2, real_y2);
+//        p.drawLine(x1, y1, x2, y2);/*
+//
+    QPixmap pixmap = QPixmap::fromImage(image);
+    scene->addPixmap(pixmap);
+
 }

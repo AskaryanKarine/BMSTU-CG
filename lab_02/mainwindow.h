@@ -34,7 +34,10 @@ private slots:
     void exit_show();
     void init_points();
     void init_watch();
-
+    void drawing_axis(QPainter *p);
+    void to_abs_coor(int x, int y, int *res_x, int *res_y);
+    void from_abs_coor(int x, int y, int *res_x, int *res_y);
+    void drawing_whatch();
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
