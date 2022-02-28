@@ -39,6 +39,15 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete scene;
+    cancel = std::stack <struct watch_t>();
+}
+
+static void copy(struct watch_t **a, struct watch_t *b)
+{
+    for (size_t i = 0; i < b->points.size(); i++)
+        (*a)->points.push_back(b->points[i]);
+    for (size_t i = 0; i < b->connet.size(); i++)
+        (*a)->connet.push_back(b->connet[i]);
 }
 
 // информационные функции
@@ -382,7 +391,9 @@ void MainWindow::on_pushButton_scaling_clicked()
             print_warning("Ошибка ввода: некорректный ввод");
         else
         {
-            // пушить в стек для отмены
+            struct watch_t *c = new struct watch_t;
+            copy(&c, &data);
+            cancel.push(*c);
             zoom(x_center, y_center, kx, ky);
             ui->lineEdit_2->clear();
             ui->lineEdit_3->clear();
@@ -424,7 +435,9 @@ void MainWindow::on_pushButton_shift_clicked()
             print_warning("Ошибка ввода: некорректный ввод");
         else
         {
-            // пушить в стек для отмены
+            struct watch_t *c = new struct watch_t;
+            copy(&c, &data);
+            cancel.push(*c);
             move(dx, dy);
             ui->lineEdit_6->clear();
             ui->lineEdit_7->clear();
@@ -468,7 +481,9 @@ void MainWindow::on_pushButton_turn_clicked()
             print_warning("Ошибка ввода: некорректный ввод");
         else
         {
-            // пушить в стек для отмены
+            struct watch_t *c = new struct watch_t;
+            copy(&c, &data);
+            cancel.push(*c);
             rotate(x_center, y_center, angle);
             ui->lineEdit_8->clear();
             ui->lineEdit_9->clear();
@@ -483,7 +498,28 @@ void MainWindow::on_pushButton_clear_2_clicked()
 {
     data.points.clear();
     data.connet.clear();
+    cancel = std::stack <struct watch_t>();
     init_watch();
     drawing_whatch();
     print_succses("Успешно очищено");
+}
+
+void MainWindow::on_pushButton_cancel_2_clicked()
+{
+    if (cancel.empty())
+        print_warning("Отменять нечего: часы уже в исходном состоянии");
+    else
+    {
+        data = cancel.top();
+        cancel.pop();
+        drawing_whatch();
+        print_succses("Отмена успешна: вы вернули часы в предыдущее состояние");
+    }
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QMainWindow::resizeEvent(event);
+    drawing_whatch();
+    print_succses("Вы изменили размер окна");
 }

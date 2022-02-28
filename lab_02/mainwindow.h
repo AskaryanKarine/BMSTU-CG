@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QGraphicsScene>
+#include <stack>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,6 +29,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void showEvent(QShowEvent *ev);
+    void resizeEvent(QResizeEvent *event);
 
 private slots:
     void app_info_show();
@@ -50,11 +52,14 @@ private slots:
     void rotate(int cx, int cy, int angle);
     void on_pushButton_clear_2_clicked();
 
+    void on_pushButton_cancel_2_clicked();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
     struct watch_t data;
     int min_x, max_x;
     int min_y, max_y;
+    std::stack <struct watch_t> cancel;
 };
 #endif // MAINWINDOW_H
