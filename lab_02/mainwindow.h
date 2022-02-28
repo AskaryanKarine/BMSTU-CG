@@ -42,6 +42,14 @@ private slots:
     void print_warning(QString str);
     void print_succses(QString str);
     void windowShown();
+    void on_pushButton_scaling_clicked();
+    void zoom(int cx, int cy, double kx, double ky);
+    void on_pushButton_shift_clicked();
+    void move(int dx, int dy);
+    void on_pushButton_turn_clicked();
+    void rotate(int cx, int cy, int angle);
+    void on_pushButton_clear_2_clicked();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;

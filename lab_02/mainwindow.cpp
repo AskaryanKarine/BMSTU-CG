@@ -7,10 +7,7 @@
 #include <QTimer>
 
 #define BLACK QColor(0, 0, 0)
-#define GRAY QColor(50, 50, 50)
 #define BLUE QColor(0, 191, 255)
-#define RED QColor(200,0, 0)
-#define GREEN QColor(0, 200, 0)
 #define FIELD 0.05
 #define MAX 300
 #define MIN -300
@@ -324,11 +321,9 @@ void MainWindow::drawing_whatch()
     QPainter p(&image);
     image.fill(QColor(255, 255, 255));
     drawing_axis(&p);
-    p.setBrush(QColor(QColor(123,104,238)));
-    p.setPen(QPen(QColor(123,104,238), 2));
+    p.setBrush(BLUE);
+    p.setPen(QPen(BLUE, 2));
 
-    p.setBrush(QColor(QColor(123,104,238)));
-    p.setPen(QPen(QColor(123,104,238), 2));
     for (size_t i = 0; i < data.connet.size(); i++)
     {
         int x1 = data.points[data.connet[i].p1 - 1].x();
@@ -346,8 +341,149 @@ void MainWindow::drawing_whatch()
         p.drawLine(real_x1, real_y1, real_x2, real_y2);
     }
 
-
     QPixmap pixmap = QPixmap::fromImage(image);
     scene->addPixmap(pixmap);
 
+}
+
+void MainWindow::zoom(int cx, int cy, double kx, double ky)
+{
+    for (size_t i = 0; i < data.points.size(); i++)
+        {
+            int x = data.points[i].x();
+            int y = data.points[i].y();
+            double x1 = kx * x + (1 - kx) * cx;
+            double y1 = ky * y + (1 - ky) * cy;
+            data.points[i].setX(x1);
+            data.points[i].setY(y1);
+        }
+        drawing_whatch();
+}
+
+void MainWindow::on_pushButton_scaling_clicked()
+{
+    QString str_x_center = ui->lineEdit_2->text();
+    QString str_y_center = ui->lineEdit_3->text();
+    QString str_kx = ui->lineEdit_4->text();
+    QString str_ky = ui->lineEdit_5->text();
+
+    if (str_y_center.length() == 0 || str_y_center.length() == 0 || str_kx.length() == 0 || str_ky.length() == 0)
+        print_warning("Ошибка ввода: пустой ввод");
+    else
+    {
+        bool flag_x_center, flag_y_center, flag_kx, flag_ky;
+        int x_center, y_center;
+        double kx, ky;
+        x_center = str_x_center.toInt(&flag_x_center);
+        y_center = str_y_center.toInt(&flag_y_center);
+        kx = str_kx.toDouble(&flag_kx);
+        ky = str_ky.toDouble(&flag_ky);
+        if (!flag_x_center || !flag_y_center || !flag_kx || !flag_ky)
+            print_warning("Ошибка ввода: некорректный ввод");
+        else
+        {
+            // пушить в стек для отмены
+            zoom(x_center, y_center, kx, ky);
+            ui->lineEdit_2->clear();
+            ui->lineEdit_3->clear();
+            ui->lineEdit_4->clear();
+            ui->lineEdit_5->clear();
+            print_succses("Операция упешна: часы изменили свой размер");
+        }
+
+    }
+
+}
+
+void MainWindow::move(int dx, int dy)
+{
+    for (size_t i = 0; i < data.points.size(); i++)
+    {
+        int x1 = data.points[i].x() + dx;
+        int y1 = data.points[i].y() + dy;
+        data.points[i].setX(x1);
+        data.points[i].setY(y1);
+    }
+    drawing_whatch();
+}
+
+void MainWindow::on_pushButton_shift_clicked()
+{
+    QString str_dx = ui->lineEdit_6->text();
+    QString str_dy = ui->lineEdit_7->text();
+
+    if (str_dx.length() == 0 || str_dy.length() == 0)
+        print_warning("Ошибка ввода: пустой ввод");
+    else
+    {
+        bool flag_dx, flag_dy;
+        int dx, dy;
+        dx = str_dx.toInt(&flag_dx);
+        dx = str_dy.toInt(&flag_dy);
+        if (!flag_dx || !flag_dy)
+            print_warning("Ошибка ввода: некорректный ввод");
+        else
+        {
+            // пушить в стек для отмены
+            move(dx, dy);
+            ui->lineEdit_6->clear();
+            ui->lineEdit_7->clear();
+            print_succses("Операция упешна: часы куда-то ушли");
+        }
+
+    }
+}
+
+void MainWindow::rotate(int cx, int cy, int angle)
+{
+    for (size_t i = 0; i < data.points.size(); i++)
+    {
+        int x = data.points[i].x();
+        int y = data.points[i].y();
+        double rad = (double) angle * ((double) 3.141592 / 180.0);
+        double x1 = cx + (double) (x - cx) * cos(rad) + (y - cy) * sin(rad);
+        double y1 = cy - (double) (x - cx) * sin(rad) + (y - cy) * cos(rad);
+        data.points[i].setX(x1);
+        data.points[i].setY(y1);
+    }
+    drawing_whatch();
+}
+
+void MainWindow::on_pushButton_turn_clicked()
+{
+    QString str_x_center = ui->lineEdit_8->text();
+    QString str_y_center = ui->lineEdit_9->text();
+    QString str_angle = ui->lineEdit_10->text();
+
+    if (str_y_center.length() == 0 || str_y_center.length() == 0 || str_angle.length() == 0)
+        print_warning("Ошибка ввода: пустой ввод");
+    else
+    {
+        bool flag_x_center, flag_y_center, flag_angle;
+        int x_center, y_center, angle;
+        x_center = str_x_center.toInt(&flag_x_center);
+        y_center = str_y_center.toInt(&flag_y_center);
+        angle = str_angle.toDouble(&flag_angle);
+        if (!flag_x_center || !flag_y_center || !flag_angle)
+            print_warning("Ошибка ввода: некорректный ввод");
+        else
+        {
+            // пушить в стек для отмены
+            rotate(x_center, y_center, angle);
+            ui->lineEdit_8->clear();
+            ui->lineEdit_9->clear();
+            ui->lineEdit_10->clear();
+            print_succses("Операция упешна: вращаются обычно стрелки, а не сами часы, но ладно..");
+        }
+
+    }
+}
+
+void MainWindow::on_pushButton_clear_2_clicked()
+{
+    data.points.clear();
+    data.connet.clear();
+    init_watch();
+    drawing_whatch();
+    print_succses("Успешно очищено");
 }
