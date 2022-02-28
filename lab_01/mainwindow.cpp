@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+ #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -42,7 +42,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    //
     data.min_x = data.min_y = 0;
     data.max_x = data.max_y = MAX;
 }
@@ -52,6 +51,23 @@ MainWindow::~MainWindow()
     delete ui;
     delete [] data.arr;
     delete scene;
+    cancel = std::stack <struct points>();
+}
+
+static void copy(struct points **a, struct points *b)
+{
+    (*a)->N = b->N;
+    (*a)->max_x = b->max_x;
+    (*a)->max_y = b->max_y;
+    (*a)->min_c1 = b->min_c1;
+    (*a)->min_c2 = b->min_c2;
+    (*a)->min_r1 = b->min_r2;
+    (*a)->min_x = b->min_x;
+    (*a)->min_y = b->min_y;
+    (*a)->soluted = (*a)->soluted;
+    (*a)->arr = new QPointF[b->N];
+    for (int i = 0; i < (*a)->N; i++)
+        (*a)->arr[i] = b->arr[i];
 }
 
 // информационные функции
@@ -64,7 +80,7 @@ void MainWindow::app_info_show()
 
 void MainWindow::author_info_show()
 {
-    QMessageBox::information(this, "Об авторе", " Программа написана студенткой \nАскарян Каринэ из группы ИУ7-42Б");
+    QMessageBox::information(this, "Об авторе", " Программа написана студенткой \nАскарян Каринэ из группы ИУ7-42Б\n +7(916)888-02-20");
 }
 
 void MainWindow::exit_show()
@@ -127,7 +143,7 @@ void MainWindow::on_lineEdit_returnPressed()
 
 // функции масштабирования
 // перевод в абсолютные координаты
-void MainWindow::to_abs_coordinates(double x, double y, double *res_x, double *res_y)
+void MainWindow::to_abs_coor(double x, double y, double *res_x, double *res_y)
 {
     int fx = (data.max_x - data.min_x) * FIELD;
     int fy = (data.max_y - data.min_y) * FIELD;
@@ -146,7 +162,7 @@ void MainWindow::to_abs_coordinates(double x, double y, double *res_x, double *r
 }
 
 // перевод из абсолютных координат
-void MainWindow::from_abs_coordinates(double x, double y, double *res_x, double *res_y)
+void MainWindow::from_abs_coor(double x, double y, double *res_x, double *res_y)
 {
     int fx = (data.max_x - data.min_x) * FIELD;
     int fy = (data.max_y - data.min_y) * FIELD;
@@ -172,7 +188,7 @@ void MainWindow::drawing_axis(QPainter *p)
     p->setPen(BLACK);
 
     double rx, ry;
-    from_abs_coordinates(0, 0, &rx, &ry);
+    from_abs_coor(0, 0, &rx, &ry);
 
     int h = ui->graphicsView->height()-5;
     int w = ui->graphicsView->width()-5;
@@ -202,7 +218,7 @@ void MainWindow::drawing_points(int sel = -1)
     for (int i = 0; i < data.N; i++)
     {
         double rx, ry;
-        from_abs_coordinates(data.arr[i].x(), data.arr[i].y(), &rx, &ry);
+        from_abs_coor(data.arr[i].x(), data.arr[i].y(), &rx, &ry);
         p.drawEllipse(rx, ry, COEF, COEF);
     }
 
@@ -211,7 +227,7 @@ void MainWindow::drawing_points(int sel = -1)
         p.setBrush(BLUE);
         p.setPen(BLUE);
         double rx, ry;
-        from_abs_coordinates(data.arr[sel].x(), data.arr[sel].y(), &rx, &ry);
+        from_abs_coor(data.arr[sel].x(), data.arr[sel].y(), &rx, &ry);
         p.drawEllipse(rx, ry, COEF, COEF);
     }
 
@@ -222,7 +238,8 @@ void MainWindow::drawing_points(int sel = -1)
 // отрисовка точек + окружности
 void MainWindow::drawing_cirles(QPointF a, QPointF b, double r1, double r2, int sel = -1)
 {
-    QImage image = QImage(600, 600, QImage::Format_RGB32);
+    QImage image = QImage(ui->graphicsView->geometry().width(), ui->graphicsView->geometry().height(),
+                          QImage::Format_RGB32);
     QPainter p(&image);
 
     image.fill(QColor(255,255,255));
@@ -243,7 +260,7 @@ void MainWindow::drawing_cirles(QPointF a, QPointF b, double r1, double r2, int 
     for (int i = 0; i < data.N; i++)
     {
         double rx, ry;
-        from_abs_coordinates(data.arr[i].x(), data.arr[i].y(), &rx, &ry);
+        from_abs_coor(data.arr[i].x(), data.arr[i].y(), &rx, &ry);
         p.drawEllipse(rx, ry, COEF, COEF);
     }
 
@@ -252,7 +269,7 @@ void MainWindow::drawing_cirles(QPointF a, QPointF b, double r1, double r2, int 
         p.setBrush(BLUE);
         p.setPen(BLUE);
         double rx, ry;
-        from_abs_coordinates(data.arr[sel].x(), data.arr[sel].y(), &rx, &ry);
+        from_abs_coor(data.arr[sel].x(), data.arr[sel].y(), &rx, &ry);
         p.drawEllipse(rx, ry, COEF, COEF);
     }
 
@@ -262,9 +279,12 @@ void MainWindow::drawing_cirles(QPointF a, QPointF b, double r1, double r2, int 
 
 // функции ввода точки
 // ввод точки в таблицу
-void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item) // есть заглушки
+void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item)
 {
     bool ok;
+//    struct points *c;
+//    copy(&c, &data);
+//    cancel.push(*c);
     QString text = item->text();
     if (text.length() == 0)
         print_warning("Пустой ввод: Введите координату точки\n");
@@ -300,15 +320,13 @@ void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item) // есть 
             if (!second_item)
                 print_warning("Невозможно построить данную точку: введите обе координаты\n");
             else
-            {
                 drawing_points();
-            }
         }
     }
 }
 
 // ввод точки мышкой
-void MainWindow::mousePressEvent(QMouseEvent *event) // есть заглушки
+void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     int flag = 1;
     QRect view = ui->graphicsView->geometry();
@@ -322,7 +340,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event) // есть заглушк�
             {
                 flag = 0;
                 double ax, ay;
-                to_abs_coordinates(event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height(), &ax, &ay);
+                to_abs_coor(event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height(), &ax, &ay);
                 ax = int(ax * 100 + 0.5) / 100.0;
                 ay = int(ay * 100 + 0.5) / 100.0;
                 QPointF point = QPointF(ax, ay);
@@ -330,7 +348,10 @@ void MainWindow::mousePressEvent(QMouseEvent *event) // есть заглушк�
                     print_warning("Эта точка уже существует");
                 else
                 {
-                    cancel.push(data);
+                    struct points *c = new struct points;
+                    copy(&c, &data);
+                    cancel.push(*c);
+
                     ui->tableWidget->blockSignals(true);
                     data.arr[i].setX(ax);
                     data.arr[i].setY(ay);
@@ -371,7 +392,9 @@ void MainWindow::on_tableWidget_cellClicked(int row, int column)
 // удаление точки
 void MainWindow::on_pushButton_del_dot_clicked()
 {
-    cancel.push(data);
+//    struct points *c;
+//    copy(&c, &data);
+//    cancel.push(*c);
     QTableWidgetItem *cur_item = ui->tableWidget->currentItem();
     if (cur_item)
     {
@@ -405,7 +428,7 @@ void MainWindow::on_pushButton_clear_clicked()
             data.min_x = data.min_y = 0;
             data.max_x = data.max_y = MAX;
             drawing_points();
-            cancel.clear();
+            cancel = std::stack <struct points>();
         }
     }
 }
@@ -417,24 +440,24 @@ void MainWindow::on_pushButton_cancel_clicked()
         print_warning("Нельзя отменить действие");
     else
     {
-        data = cancel.pop();
+//        delete [] data.arr;
+//        data = cancel.top();
+//        cancel.pop();
 //        for (int i = 0; i < data.N; i++)
 //        {
-//            if (qIsNaN(data.arr[i].x()))
-//                print_warning(QString("i = %1 aaa").arg(i));
+//            if (!qIsNaN(data.arr[i].x()))
 //                ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::number(data.arr[i].x())));
 //            else
 //                ui->tableWidget->setItem(i, 0, new QTableWidgetItem(" "));
 //            if (!qIsNaN(data.arr[i].y()))
-//                print_warning("aaa");
 //                ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(data.arr[i].y())));
 //            else
 //                ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString(" ")));
 //        }
-        if (data.soluted)
-            drawing_cirles(data.min_c1, data.min_c2, data.min_r1, data.min_r2);
-        else
-            drawing_points();
+//        if (data.soluted)
+//            drawing_cirles(data.min_c1, data.min_c2, data.min_r1, data.min_r2);
+//        else
+//            drawing_points();
     }
 }
 
@@ -527,11 +550,11 @@ void MainWindow::on_pushButton_result_clicked()
                     r1 = find_center_radius(a1, b1, c1, &center1);
                     square1 = M_PI * r1 * r1;
 
-                    from_abs_coordinates(a1.x(), a1.y(), &new_x, &new_y);
+                    from_abs_coor(a1.x(), a1.y(), &new_x, &new_y);
                     a = QPointF(new_x, new_y);
-                    from_abs_coordinates(b1.x(), b1.y(), &new_x, &new_y);
+                    from_abs_coor(b1.x(), b1.y(), &new_x, &new_y);
                     b = QPointF(new_x, new_y);
-                    from_abs_coordinates(c1.x(), c1.y(), &new_x, &new_y);
+                    from_abs_coor(c1.x(), c1.y(), &new_x, &new_y);
                     c = QPointF(new_x, new_y);
                     ar1 = find_center_radius(a, b, c, &acenter1);
 
@@ -549,11 +572,11 @@ void MainWindow::on_pushButton_result_clicked()
                                     r2 = find_center_radius(a2, b2, c2, &center2);
                                     square2 = M_PI * r2 * r2;
 
-                                    from_abs_coordinates(a2.x(), a2.y(), &new_x, &new_y);
+                                    from_abs_coor(a2.x(), a2.y(), &new_x, &new_y);
                                     a = QPointF(new_x, new_y);
-                                    from_abs_coordinates(b2.x(), b2.y(), &new_x, &new_y);
+                                    from_abs_coor(b2.x(), b2.y(), &new_x, &new_y);
                                     b = QPointF(new_x, new_y);
-                                    from_abs_coordinates(c2.x(), c2.y(), &new_x, &new_y);
+                                    from_abs_coor(c2.x(), c2.y(), &new_x, &new_y);
                                     c = QPointF(new_x, new_y);
                                     ar2 = find_center_radius(a, b, c, &acenter2);
 
@@ -588,7 +611,9 @@ void MainWindow::on_pushButton_result_clicked()
         print_warning("Окружностей, удовлетоворяющих условию задачи нет");
     else
     {
-        cancel.push(data);
+//        struct points *c;
+//        copy(&c, &data);
+//        cancel.push(*c);
         data.soluted = true;
         drawing_cirles(min_ac1, min_ac2, min_ar1, min_ar2);
         ui->textEdit->setText(QString("Площадь пересечения окружностей: %1").arg(find_square_between(data.min_r1, data.min_r2, data.min_c1, data.min_c2)));
