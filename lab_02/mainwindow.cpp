@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <math.h>
+#include <QTimer>
 
 #define BLACK QColor(0, 0, 0)
 #define GRAY QColor(50, 50, 50)
@@ -11,8 +12,8 @@
 #define RED QColor(200,0, 0)
 #define GREEN QColor(0, 200, 0)
 #define FIELD 0.05
-#define MAX 1000
-#define MIN -1000
+#define MAX 300
+#define MIN -300
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -27,16 +28,14 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *ExitAction = ui->menubar->addAction(("Выход"));
     connect(ExitAction, SIGNAL(triggered()), this, SLOT(exit_show()));
 
-    ui->graphicsView_2->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->graphicsView_2->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     scene = new QGraphicsScene();
-    ui->graphicsView_2->setScene(scene);
+    ui->graphicsView->setScene(scene);
     min_x = min_y = MIN;
     max_x = max_y = MAX;
     init_watch();
-    drawing_whatch();
-
 }
 
 MainWindow::~MainWindow()
@@ -63,6 +62,32 @@ void MainWindow::exit_show()
     qApp->quit();
 }
 
+void MainWindow::showEvent(QShowEvent *ev)
+{
+    QMainWindow::showEvent(ev);
+    QTimer::singleShot(500, this, SLOT(windowShown()));
+}
+
+void MainWindow::windowShown()
+{
+    drawing_whatch();
+}
+
+// выводят информацию
+void MainWindow::print_warning(QString str)
+{
+    ui->textEdit_2->setTextColor(QColor(194, 24, 7)); // red
+    ui->textEdit_2->setText(str);
+    ui->textEdit_2->setTextColor(QColor(0, 0, 0)); // black
+}
+
+void MainWindow::print_succses(QString str)
+{
+    ui->textEdit_2->setTextColor(QColor(24, 134, 45)); // green
+    ui->textEdit_2->setText(str);
+    ui->textEdit_2->setTextColor(QColor(0, 0, 0)); // black
+}
+
 void MainWindow::to_abs_coor(int x, int y, int *res_x, int *res_y)
 {
     int fx = (max_x - min_x) * FIELD;
@@ -72,9 +97,9 @@ void MainWindow::to_abs_coor(int x, int y, int *res_x, int *res_y)
     int nmax_y = max_y + fy;
     int nmin_y = min_y - fy;
 
-    double xk = (double) (nmax_x - nmin_x) / ui->graphicsView_2->width();
+    double xk = (double) (nmax_x - nmin_x) / ui->graphicsView->width();
     double xb = nmin_x;
-    double yk = (double) (nmax_y - nmin_y) / ui->graphicsView_2->height();
+    double yk = (double) (nmax_y - nmin_y) / ui->graphicsView->height();
     double yb = nmin_y;
 
     *res_x = x * xk + xb;
@@ -91,9 +116,9 @@ void MainWindow::from_abs_coor(int x, int y, int *res_x, int *res_y)
     int nmax_y = max_y + fy;
     int nmin_y = min_y - fy;
 
-    double xk = (double) ui->graphicsView_2->width() / (nmax_x - nmin_x);
+    double xk = (double) ui->graphicsView->width() / (nmax_x - nmin_x);
     double xb = -xk * nmin_x;
-    double yk = (double) ui->graphicsView_2->height() / (nmax_y - nmin_y);
+    double yk = (double) ui->graphicsView->height() / (nmax_y - nmin_y);
     double yb = -yk * nmin_y;
 
     *res_x = x * xk + xb;
@@ -108,8 +133,8 @@ void MainWindow::drawing_axis(QPainter *p)
     int rx, ry;
     from_abs_coor(0, 0, &rx, &ry);
 
-    int h = ui->graphicsView_2->height()-5;
-    int w = ui->graphicsView_2->width()-5;
+    int h = ui->graphicsView->height()-5;
+    int w = ui->graphicsView->width()-5;
 
     // Oy
     p->drawLine(rx, 0, rx, h);
@@ -158,32 +183,32 @@ void MainWindow::init_points()
     data.points.push_back(QPoint(92, 34));
     data.points.push_back(QPoint(95, 34));  // 33
     data.points.push_back(QPoint(222, 34));
-    data.points.push_back(QPoint(225,27));
+    data.points.push_back(QPoint(222,27));
     data.points.push_back(QPoint(95, 27));  // 36
     data.points.push_back(QPoint(99, 27));
     data.points.push_back(QPoint(99,24));
-    data.points.push_back(QPoint(222, 27));  // 39
-    data.points.push_back(QPoint(222, 24));
+    data.points.push_back(QPoint(219, 27));  // 39
+    data.points.push_back(QPoint(219, 24));
     data.points.push_back(QPoint(229, 376));
-    data.points.push_back(QPoint(86, 376));  // 42
-    data.points.push_back(QPoint(86, 393));
-    data.points.push_back(QPoint(228, 393));
-    data.points.push_back(QPoint(88, 393));  // 45
+    data.points.push_back(QPoint(90, 376));  // 42
+    data.points.push_back(QPoint(90, 393));
+    data.points.push_back(QPoint(229, 393));
+    data.points.push_back(QPoint(92, 393));  // 45
     data.points.push_back(QPoint(226, 393));
     data.points.push_back(QPoint(226, 408));
-    data.points.push_back(QPoint(88, 408));  // 48
-    data.points.push_back(QPoint(91, 408));
+    data.points.push_back(QPoint(92, 408));  // 48
+    data.points.push_back(QPoint(94, 408));
     data.points.push_back(QPoint(223, 408));
     data.points.push_back(QPoint(223, 422)); // 51
-    data.points.push_back(QPoint(91, 422));
-    data.points.push_back(QPoint(93, 422));
+    data.points.push_back(QPoint(94, 422));
+    data.points.push_back(QPoint(96, 422));
     data.points.push_back(QPoint(222, 422)); // 54
     data.points.push_back(QPoint(222, 430));
-    data.points.push_back(QPoint(93, 430));
-    data.points.push_back(QPoint(65, 430));  // 57
+    data.points.push_back(QPoint(96, 430));
+    data.points.push_back(QPoint(98, 430));  // 57
     data.points.push_back(QPoint(219, 430));
     data.points.push_back(QPoint(219, 433));
-    data.points.push_back(QPoint(95, 433));  // 60
+    data.points.push_back(QPoint(98, 433));  // 60
     data.points.push_back(QPoint(159, 240));
     data.points.push_back(QPoint(147, 229));
     data.points.push_back(QPoint(160, 135)); // 63
@@ -255,39 +280,73 @@ void MainWindow::init_watch()
     data.connet.push_back({31, 30});
     //4ур
     data.connet.push_back({33, 36});
-    data.connet.push_back({31, 35});
+    data.connet.push_back({35, 34});
     data.connet.push_back({36, 35});
     //5ур
     data.connet.push_back({37, 38});
     data.connet.push_back({39, 40});
     data.connet.push_back({38, 40});
+    //ремешок низ
+    // 1ур
+    data.connet.push_back({42, 43});
+    data.connet.push_back({41, 44});
+    data.connet.push_back({43, 44});
+    // 2ур
+    data.connet.push_back({45, 48});
+    data.connet.push_back({48, 47});
+    data.connet.push_back({46, 47});
+    //3ур
+    data.connet.push_back({49, 52});
+    data.connet.push_back({50, 51});
+    data.connet.push_back({52, 51});
+    //4ур
+    data.connet.push_back({53, 56});
+    data.connet.push_back({54, 55});
+    data.connet.push_back({55, 56});
+    //5ур
+    data.connet.push_back({57, 60});
+    data.connet.push_back({58, 59});
+    data.connet.push_back({60, 59});
+    // нижняя стрелка
+    data.connet.push_back({62, 65});
+    data.connet.push_back({65, 66});
+    data.connet.push_back({66, 61});
+    data.connet.push_back({61, 62});
+    // верхняя стрелка
+    data.connet.push_back({62, 63});
+    data.connet.push_back({63, 64});
+    data.connet.push_back({64, 61});
 }
 
 void MainWindow::drawing_whatch()
 {
-    QImage image = QImage(ui->graphicsView_2->geometry().width(), ui->graphicsView_2->geometry().height(), QImage::Format_RGB32);
+    QImage image = QImage(ui->graphicsView->geometry().width(), ui->graphicsView->geometry().height(), QImage::Format_RGB32);
     QPainter p(&image);
     image.fill(QColor(255, 255, 255));
     drawing_axis(&p);
     p.setBrush(QColor(QColor(123,104,238)));
     p.setPen(QPen(QColor(123,104,238), 2));
-//    for (size_t i = 0; i < data.connet.size(); i++)
-//    {
-//        int x1 = data.points[data.connet[i].p1 - 1].x();
-//        int y1 = data.points[data.connet[i].p1 - 1].y();
 
-//        int x2 = data.points[data.connet[i].p2 - 1].x();
-//        int y2 = data.points[data.connet[i].p2 - 1].y();*/
+    p.setBrush(QColor(QColor(123,104,238)));
+    p.setPen(QPen(QColor(123,104,238), 2));
+    for (size_t i = 0; i < data.connet.size(); i++)
+    {
+        int x1 = data.points[data.connet[i].p1 - 1].x();
+        int y1 = data.points[data.connet[i].p1 - 1].y();
 
-//        int real_x1, real_y1;
-//        from_abs_coor(x1, y1, &real_x1, &real_y1);
+        int x2 = data.points[data.connet[i].p2 - 1].x();
+        int y2 = data.points[data.connet[i].p2 - 1].y();
 
-//        int real_x2, real_y2;
-//        from_abs_coor(x2, y2, &real_x2, &real_y2);
+        int real_x1, real_y1;
+        from_abs_coor(x1, y1, &real_x1, &real_y1);
 
-//        p.drawLine(real_x1, real_y1, real_x2, real_y2);
-//        p.drawLine(x1, y1, x2, y2);/*
-//
+        int real_x2, real_y2;
+        from_abs_coor(x2, y2, &real_x2, &real_y2);
+
+        p.drawLine(real_x1, real_y1, real_x2, real_y2);
+    }
+
+
     QPixmap pixmap = QPixmap::fromImage(image);
     scene->addPixmap(pixmap);
 

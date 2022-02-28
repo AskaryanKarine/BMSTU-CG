@@ -27,6 +27,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void showEvent(QShowEvent *ev);
 
 private slots:
     void app_info_show();
@@ -38,6 +39,9 @@ private slots:
     void to_abs_coor(int x, int y, int *res_x, int *res_y);
     void from_abs_coor(int x, int y, int *res_x, int *res_y);
     void drawing_whatch();
+    void print_warning(QString str);
+    void print_succses(QString str);
+    void windowShown();
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
