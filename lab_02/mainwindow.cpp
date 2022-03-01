@@ -220,18 +220,62 @@ void MainWindow::init_points()
     data.points.push_back(QPoint(160, 135)); // 63
     data.points.push_back(QPoint(171, 229));
     data.points.push_back(QPoint(159, 218));
-    data.points.push_back(QPoint(250, 230)); // 66
+    data.points.push_back(QPoint(230, 230)); // 66
     data.points.push_back(QPoint(284, 217));
     data.points.push_back(QPoint(296, 217));
     data.points.push_back(QPoint(296, 241)); // 69
-    data.points.push_back(QPoint(284, 241)); // 70
+    data.points.push_back(QPoint(284, 241));
+    data.points.push_back(QPoint(199, 157));
+    data.points.push_back(QPoint(204, 150)); // 72
+    data.points.push_back(QPoint(230, 188));
+    data.points.push_back(QPoint(237, 184));
+    data.points.push_back(QPoint(240, 230)); // 75
+    data.points.push_back(QPoint(250, 230));
+    data.points.push_back(QPoint(228, 269));
+    data.points.push_back(QPoint(237, 275)); // 78
+    data.points.push_back(QPoint(198, 298));
+    data.points.push_back(QPoint(204, 308));
+    data.points.push_back(QPoint(156, 308)); // 81
+    data.points.push_back(QPoint(156, 317));
+    data.points.push_back(QPoint(118, 297));
+    data.points.push_back(QPoint(113, 306)); // 84
+    data.points.push_back(QPoint(88, 268));
+    data.points.push_back(QPoint(80, 272));
+    data.points.push_back(QPoint(76, 226)); // 87
+    data.points.push_back(QPoint(67, 226));
+    data.points.push_back(QPoint(88, 186));
+    data.points.push_back(QPoint(79, 182)); // 90
+    data.points.push_back(QPoint(117, 157));
+    data.points.push_back(QPoint(112, 148));
+    data.points.push_back(QPoint(121, 262)); // 93
+    data.points.push_back(QPoint(121, 285));
+    data.points.push_back(QPoint(135, 285));
+    data.points.push_back(QPoint(121, 273)); // 96
+    data.points.push_back(QPoint(135, 262));
+    data.points.push_back(QPoint(135, 273));
+    data.points.push_back(QPoint(140, 262)); // 99
+    data.points.push_back(QPoint(152, 262));
+    data.points.push_back(QPoint(140, 285));
+    data.points.push_back(QPoint(152, 285)); // 102
+    data.points.push_back(QPoint(158, 262));
+    data.points.push_back(QPoint(158, 285));
+    data.points.push_back(QPoint(171, 285)); // 105
+    data.points.push_back(QPoint(178, 262));
+    data.points.push_back(QPoint(187, 262));
+    data.points.push_back(QPoint(178, 274)); // 108
+    data.points.push_back(QPoint(187, 274));
+    data.points.push_back(QPoint(178, 285));
+    data.points.push_back(QPoint(187, 285)); // 111
+    data.points.push_back(QPoint(193, 262));
+    data.points.push_back(QPoint(210, 262));
+    data.points.push_back(QPoint(193, 285)); // 114
+    data.points.push_back(QPoint(210, 285));
 
     for (size_t i = 0; i < data.points.size(); i++)
     {
-        data.points[i].setX(data.points[i].x() - 167);
-        data.points[i].setY(data.points[i].y() - 226);
+        data.points[i].setX(data.points[i].x() - 165);
+        data.points[i].setY(data.points[i].y() - 237);
     }
-//        data.points[i] -= QPoint(167, 226);
 }
 
 void MainWindow::init_watch()
@@ -322,6 +366,39 @@ void MainWindow::init_watch()
     data.connet.push_back({62, 63});
     data.connet.push_back({63, 64});
     data.connet.push_back({64, 61});
+    // деления
+    data.connet.push_back({71, 72});
+    data.connet.push_back({73, 74});
+    data.connet.push_back({75, 76});
+    data.connet.push_back({77, 78});
+    data.connet.push_back({79, 80});
+    data.connet.push_back({81, 82});
+    data.connet.push_back({83, 84});
+    data.connet.push_back({85, 86});
+    data.connet.push_back({87, 88});
+    data.connet.push_back({89, 90});
+    data.connet.push_back({91, 92});
+    // rolex
+    data.connet.push_back({93, 94});
+    data.connet.push_back({93, 97});
+    data.connet.push_back({97, 98});
+    data.connet.push_back({98, 96});
+    data.connet.push_back({96, 95});
+    data.connet.push_back({99, 100});
+    data.connet.push_back({100, 102});
+    data.connet.push_back({99, 101});
+    data.connet.push_back({101, 102});
+    data.connet.push_back({103, 104});
+    data.connet.push_back({104, 105});
+    // E
+    data.connet.push_back({106,107});
+    data.connet.push_back({110, 111});
+    data.connet.push_back({108, 109});
+    data.connet.push_back({106, 110});
+    //x
+    data.connet.push_back({112, 115});
+    data.connet.push_back({113, 114});
+
 }
 
 void MainWindow::drawing_whatch()
@@ -430,7 +507,7 @@ void MainWindow::on_pushButton_shift_clicked()
         bool flag_dx, flag_dy;
         int dx, dy;
         dx = str_dx.toInt(&flag_dx);
-        dx = str_dy.toInt(&flag_dy);
+        dy = str_dy.toInt(&flag_dy);
         if (!flag_dx || !flag_dy)
             print_warning("Ошибка ввода: некорректный ввод");
         else
@@ -443,7 +520,6 @@ void MainWindow::on_pushButton_shift_clicked()
             ui->lineEdit_7->clear();
             print_succses("Операция упешна: часы куда-то ушли");
         }
-
     }
 }
 
