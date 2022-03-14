@@ -7,12 +7,18 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>647</height>
+    <height>724</height>
    </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
+   </size>
   </property>
   <property name="font">
    <font>
-    <pointsize>10</pointsize>
+    <pointsize>8</pointsize>
    </font>
   </property>
   <property name="windowTitle">
@@ -21,22 +27,56 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QFormLayout" name="formLayout">
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout_9">
+     <layout class="QVBoxLayout" name="verticalLayout_8">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_7">
         <item>
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>Выбрать цвет фона</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_13">
+          <item>
+           <widget class="QPushButton" name="pushButton_back_color">
+            <property name="text">
+             <string>Выбрать цвет фона</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget_back_color" native="true">
+            <property name="maximumSize">
+             <size>
+              <width>34</width>
+              <height>34</height>
+             </size>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
-          <property name="text">
-           <string>Выбрать цвет линии</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_14">
+          <item>
+           <widget class="QPushButton" name="pushButton_line_color">
+            <property name="text">
+             <string>Выбрать цвет линии</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget_line_color" native="true">
+            <property name="maximumSize">
+             <size>
+              <width>34</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
@@ -45,7 +85,6 @@
             <property name="font">
              <font>
               <pointsize>11</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -110,7 +149,6 @@
           <property name="font">
            <font>
             <pointsize>11</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -161,7 +199,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit">
+               <widget class="QLineEdit" name="lineEdit_line_x_start">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -206,7 +244,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_2">
+               <widget class="QLineEdit" name="lineEdit_line_y_start">
                 <property name="maximumSize">
                  <size>
                   <width>40</width>
@@ -278,7 +316,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_3">
+               <widget class="QLineEdit" name="lineEdit_line_x_end">
                 <property name="maximumSize">
                  <size>
                   <width>40</width>
@@ -311,7 +349,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_4">
+               <widget class="QLineEdit" name="lineEdit_line_y_end">
                 <property name="maximumSize">
                  <size>
                   <width>40</width>
@@ -327,7 +365,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="pushButton_line">
           <property name="text">
            <string>Построить отрезок</string>
           </property>
@@ -336,144 +374,159 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_8">
-        <item>
-         <widget class="QLabel" name="label_9">
-          <property name="font">
-           <font>
-            <pointsize>11</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Построить пучок
+       <widget class="QLabel" name="label_9">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Построить пучок
 отрезков</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_8">
-              <item>
-               <widget class="QLabel" name="label_10">
-                <property name="text">
-                 <string>X</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="lineEdit_5">
-                <property name="maximumSize">
-                 <size>
-                  <width>40</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>X</string>
+              </property>
+             </widget>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_9">
-              <item>
-               <widget class="QLabel" name="label_11">
-                <property name="text">
-                 <string>Y</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="lineEdit_6">
-                <property name="maximumSize">
-                 <size>
-                  <width>40</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QLineEdit" name="lineEdit_beam_x">
+              <property name="maximumSize">
+               <size>
+                <width>40</width>
+                <height>16777215</height>
+               </size>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
           <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <item>
-               <widget class="QLabel" name="label_12">
-                <property name="layoutDirection">
-                 <enum>Qt::LeftToRight</enum>
-                </property>
-                <property name="text">
-                 <string>R</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="lineEdit_7">
-                <property name="maximumSize">
-                 <size>
-                  <width>40</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QLabel" name="label_11">
+              <property name="text">
+               <string>Y</string>
+              </property>
+             </widget>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
-              <item>
-               <widget class="QLabel" name="label_13">
-                <property name="text">
-                 <string>Угол</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="lineEdit_8">
-                <property name="maximumSize">
-                 <size>
-                  <width>40</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QLineEdit" name="lineEdit_beam_y">
+              <property name="maximumSize">
+               <size>
+                <width>40</width>
+                <height>16777215</height>
+               </size>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_4">
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_12">
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>R</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_beam_r">
+              <property name="maximumSize">
+               <size>
+                <width>40</width>
+                <height>16777215</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QLabel" name="label_13">
+              <property name="text">
+               <string>Угол</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_">
+              <property name="maximumSize">
+               <size>
+                <width>40</width>
+                <height>16777215</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_beam">
+        <property name="text">
+         <string>Построить пучок </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <item>
+         <widget class="QPushButton" name="pushButton_steps">
           <property name="text">
-           <string>Построить пучок </string>
+           <string>Сравнение
+ступенчатости</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_time">
+          <property name="text">
+           <string>Сравнение 
+времени</string>
           </property>
          </widget>
         </item>
@@ -486,23 +539,23 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>17</width>
-          <height>33</height>
+          <width>20</width>
+          <height>40</height>
          </size>
         </property>
        </spacer>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_10">
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
         <item>
-         <widget class="QPushButton" name="pushButton_5">
+         <widget class="QPushButton" name="pushButton_cancel">
           <property name="text">
            <string>Отмена</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_6">
+         <widget class="QPushButton" name="pushButton_clear">
           <property name="text">
            <string>Очистить экран</string>
           </property>
@@ -517,7 +570,14 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QGraphicsView" name="graphicsView"/>
+      <widget class="QGraphicsView" name="graphicsView">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
       <widget class="QTextEdit" name="textEdit">
        <property name="maximumSize">
         <size>
@@ -528,7 +588,6 @@
        <property name="font">
         <font>
          <pointsize>12</pointsize>
-         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
