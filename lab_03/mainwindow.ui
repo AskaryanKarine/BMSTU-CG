@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>724</height>
+    <height>585</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -40,15 +40,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="widget_back_color" native="true">
+           <widget class="QLabel" name="label_bc">
             <property name="maximumSize">
              <size>
-              <width>34</width>
-              <height>34</height>
+              <width>25</width>
+              <height>25</height>
              </size>
             </property>
-            <property name="autoFillBackground">
-             <bool>true</bool>
+            <property name="text">
+             <string/>
             </property>
            </widget>
           </item>
@@ -64,15 +64,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="widget_line_color" native="true">
+           <widget class="QLabel" name="label_lc">
             <property name="maximumSize">
              <size>
-              <width>34</width>
-              <height>16777215</height>
+              <width>25</width>
+              <height>25</height>
              </size>
             </property>
-            <property name="autoFillBackground">
-             <bool>true</bool>
+            <property name="text">
+             <string/>
             </property>
            </widget>
           </item>
@@ -85,6 +85,7 @@
             <property name="font">
              <font>
               <pointsize>11</pointsize>
+              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -104,6 +105,11 @@
               <height>16777215</height>
              </size>
             </property>
+            <item>
+             <property name="text">
+              <string>Стандартный</string>
+             </property>
+            </item>
             <item>
              <property name="text">
               <string>ЦДА</string>
@@ -131,11 +137,6 @@
               <string>ВУ</string>
              </property>
             </item>
-            <item>
-             <property name="text">
-              <string>Стандартный</string>
-             </property>
-            </item>
            </widget>
           </item>
          </layout>
@@ -149,6 +150,7 @@
           <property name="font">
            <font>
             <pointsize>11</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -378,6 +380,7 @@
         <property name="font">
          <font>
           <pointsize>11</pointsize>
+          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -588,6 +591,7 @@
        <property name="font">
         <font>
          <pointsize>12</pointsize>
+         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -605,7 +609,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>28</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
