@@ -20,6 +20,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+    scene = new QGraphicsScene();
+    ui->graphicsView->setScene(scene);
+    ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+    ui->pushButton_cancel->setEnabled(false);
+    ui->pushButton_clear->setEnabled(false);
+
     data.back = back_color;
     show_color(back_color, ui->label_bc);
     show_color(line_color, ui->label_lc);
@@ -28,6 +35,16 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete scene;
+}
+
+static void copy(struct content_t **a, struct content_t *b)
+{
+    for (size_t i = 0; i < b->lines.size(); i++)
+        (*a)->lines.push_back(b->lines[i]);
+    for (size_t i = 0; i < b->specteres.size(); i++)
+        (*a)->specteres.push_back(b->specteres[i]);
+    (*a)->back = b->back;
 }
 
 // информационные функции
@@ -131,24 +148,34 @@ void MainWindow::on_pushButton_line_clicked() // дописать
         x_end = str_x_end.toInt(&flag_x_end);
         y_end = str_y_end.toInt(&flag_y_end);
         if (!flag_x_start || !flag_x_end || !flag_y_start || !flag_y_end)
-            print_warning("Некорректный ввод");
+            print_warning("Ошибка ввода: Некорректный ввод");
         else
         {
             QPoint start, end;
             start = QPoint(x_start, y_start);
             end = QPoint(x_end, y_end);
-            int method = ui->comboBox->currentIndex();
-            // push in calcel
-            line_t line;
-            line.color = line_color;
-            line.method = (method_t) method;
-            line.start = start;
-            line.end = end;
-            // функция, которая строит линии
-            data.lines.push_back(line);
+
+            if (start == end)
+                print_warning("Ошибка ввода: Точки начала и конца отрезка совпадают");
+            else
+            {
+                content_t *c = new content_t;
+                copy(&c, &data);
+                cancel.push(*c);
+                ui->pushButton_cancel->setEnabled(true);
+                ui->pushButton_clear->setEnabled(true);
+
+                line_t line;
+                line.color = line_color;
+                line.method = (method_t) ui->comboBox->currentIndex();
+                line.start = start;
+                line.end = end;
+                data.lines.push_back(line);
+
+                // функция, которая строит отрезки
+            }
         }
     }
-
 }
 
 void MainWindow::on_pushButton_beam_clicked() // дописать
@@ -159,7 +186,7 @@ void MainWindow::on_pushButton_beam_clicked() // дописать
     QString str_angle = ui->lineEdit_angle->text();
 
     if (str_beam_x.length() == 0 || str_beam_y.length() == 0 || str_beam_r.length() == 0 || str_angle.length() == 0)
-        print_warning("");
+        print_warning("Ошибка ввода: пустой или неполный ввод");
     else
     {
         bool flag_beam_x, flag_beam_y, flag_beam_r, flag_angle;
@@ -172,19 +199,53 @@ void MainWindow::on_pushButton_beam_clicked() // дописать
         angle = str_angle.toDouble(&flag_angle);
 
         if (!beam_x || !beam_y || !beam_r || !angle)
-            print_warning("");
+            print_warning("Ошибка ввода: некорректный ввод");
         else
         {
+            content_t *c = new content_t;
+            copy(&c, &data);
+            cancel.push(*c);
+            ui->pushButton_cancel->setEnabled(true);
+            ui->pushButton_clear->setEnabled(true);
+
             QPoint center = QPoint(beam_x, beam_y);
-            int method = ui->comboBox->currentIndex();
-            // push in calcel
+
             spec_t spectre;
             spectre.center = center;
             spectre.angle = angle;
             spectre.color = line_color;
-            spectre.method = (method_t) method;
-            // функция рисующая спектр
+            spectre.method = (method_t) ui->comboBox->currentIndex();
             data.specteres.push_back(spectre);
+
+            // функция рисующая спектр
         }
+    }
+}
+
+void MainWindow::on_pushButton_clear_clicked()
+{
+    back_color = Qt::white;
+    line_color = Qt::black;
+    show_color(back_color, ui->label_bc);
+    show_color(line_color, ui->label_lc);
+    data.lines.clear();
+    data.specteres.clear();
+    cancel = std::stack<content_t>();
+    print_succses("Успешно очищено");
+    data.back = back_color;
+    ui->pushButton_cancel->setEnabled(false);
+    ui->pushButton_clear->setEnabled(false);
+}
+
+void MainWindow::on_pushButton_cancel_clicked() // дописать
+{
+
+    data = cancel.top();
+    cancel.pop();
+    // перерисовать сцену
+    if (cancel.empty())
+    {
+        ui->pushButton_cancel->setEnabled(false);
+        ui->pushButton_clear->setEnabled(false);
     }
 }

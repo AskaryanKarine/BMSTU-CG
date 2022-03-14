@@ -68,12 +68,17 @@ private slots:
 
     void on_pushButton_beam_clicked();
 
+    void on_pushButton_clear_clicked();
+
+    void on_pushButton_cancel_clicked();
+
 private:
     Ui::MainWindow *ui;
+    QGraphicsScene *scene;
     content_t data;
     QColor back_color = Qt::white;
     QColor line_color = Qt::black;
-    std::vector<content_t> cancel;
+    std::stack<content_t> cancel;
 
 };
 #endif // MAINWINDOW_H
