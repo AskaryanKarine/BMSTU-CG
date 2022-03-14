@@ -38,6 +38,7 @@ struct content_t
 {
     std::vector<line_t> lines;
     std::vector<spec_t> specteres;
+    QColor back;
 };
 
 
@@ -62,6 +63,10 @@ private slots:
     void print_succses(QString str);
     void show_color(QColor color, QLabel *button);
     void on_pushButton_line_color_clicked();
+
+    void on_pushButton_line_clicked();
+
+    void on_pushButton_beam_clicked();
 
 private:
     Ui::MainWindow *ui;

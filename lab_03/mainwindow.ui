@@ -493,7 +493,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_">
+             <widget class="QLineEdit" name="lineEdit_angle">
               <property name="maximumSize">
                <size>
                 <width>40</width>
