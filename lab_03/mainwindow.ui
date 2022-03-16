@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>951</width>
-    <height>700</height>
+    <height>631</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -85,6 +85,7 @@
             <property name="font">
              <font>
               <pointsize>9</pointsize>
+              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -149,6 +150,7 @@
           <property name="font">
            <font>
             <pointsize>9</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -378,6 +380,7 @@
         <property name="font">
          <font>
           <pointsize>9</pointsize>
+          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -555,6 +558,13 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="pushButton_reset_scale">
+        <property name="text">
+         <string>Сбросить масштабирование</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_11">
         <item>
          <widget class="QPushButton" name="pushButton_cancel">
@@ -597,6 +607,7 @@
        <property name="font">
         <font>
          <pointsize>12</pointsize>
+         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -614,7 +625,7 @@
      <x>0</x>
      <y>0</y>
      <width>951</width>
-     <height>28</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
