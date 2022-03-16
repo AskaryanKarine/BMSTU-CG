@@ -3,7 +3,9 @@
 #include <QColorDialog>
 #include <QColor>
 #include <QMessageBox>
+#include <QWheelEvent>
 #include <iostream>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -22,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     scene = new QGraphicsScene();
     ui->graphicsView->setScene(scene);
-    ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+//    ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     ui->pushButton_cancel->setEnabled(false);
     ui->pushButton_clear->setEnabled(false);
@@ -30,12 +32,28 @@ MainWindow::MainWindow(QWidget *parent)
     data.back = back_color;
     show_color(back_color, ui->label_bc);
     show_color(line_color, ui->label_lc);
+    max.setX(ui->graphicsView->geometry().width() / 2);
+    max.setY(ui->graphicsView->geometry().height() / 2);
+    min.setX(-1 * ui->graphicsView->geometry().width() / 2);
+    min.setY(-1 * ui->graphicsView->geometry().height() / 2);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     delete scene;
+    cancel = std::stack <content_t>();
+}
+
+void MainWindow::showEvent(QShowEvent *ev)
+{
+    QMainWindow::showEvent(ev);
+    QTimer::singleShot(500, this, SLOT(windowShown()));
+}
+
+void MainWindow::windowShown()
+{
+    drawing_content();
 }
 
 static void copy(struct content_t **a, struct content_t *b)
@@ -70,6 +88,65 @@ void MainWindow::exit_show()
 
     if (rc == QMessageBox::Ok)
         qApp->quit();
+}
+
+void MainWindow::wheelEvent(QWheelEvent* event)
+{
+    ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    double scale_factor = 1.15;
+
+    if (event->angleDelta().y() > 0)
+        ui->graphicsView->scale(scale_factor, scale_factor);
+    else
+        ui->graphicsView->scale(1 / scale_factor, 1 / scale_factor);
+//    std::cout <<
+}
+
+void MainWindow::from_abs_coord(int &res_x, int &res_y, const int &x, const int &y)
+{
+    double xk = (double) ui->graphicsView->width() / (max.x() - min.x());
+    double xb = -xk * min.x();
+    double yk = (double) ui->graphicsView->height() / (max.y() - min.y());
+    double yb = -yk * min.y();
+
+    res_x = x * xk + xb;
+    res_y = y * yk + yb;
+}
+
+void MainWindow::drawing_content()
+{
+    QImage image = QImage(ui->graphicsView->geometry().width(), ui->graphicsView->geometry().height(),
+                          QImage::Format_RGB32);
+    QPainter p(&image);
+//    ui->graphicsView->setBackgroundBrush(QBrush(back_color));
+//    p.setBackground(back_color);
+    image.fill(back_color);
+    drawing_axes(p);
+
+
+    QPixmap pixmap = QPixmap::fromImage(image);
+    scene->addPixmap(pixmap);
+}
+
+void MainWindow::drawing_axes(QPainter &p)
+{
+    p.setPen(Qt::black);
+
+    int rx, ry;
+    from_abs_coord(rx, ry, 0, 0);
+
+    int h = ui->graphicsView->height()-5;
+    int w = ui->graphicsView->width()-5;
+
+    // Oy
+    p.drawLine(rx, 0, rx, h);
+    p.drawLine(rx, h, rx - 5,  h - 5);
+    p.drawLine(rx, h, rx + 5,  h - 5);
+
+    // Ox;
+    p.drawLine(0, ry, w, ry);
+    p.drawLine(w, ry, w - 5,  ry - 5);
+    p.drawLine(w, ry, w - 5,  ry + 5);
 }
 
 void MainWindow::print_warning(QString str)
@@ -130,6 +207,42 @@ void MainWindow::on_pushButton_line_color_clicked()
     show_color(line_color, ui->label_lc);
 }
 
+void MainWindow::check_max_min(QPoint &point)
+{
+    if (max.x() < point.x())
+        max.setX(point.x());
+
+    if (max.y() < point.y())
+        max.setY(point.y());
+
+    if (min.x() > point.x())
+        min.setX(point.x());
+
+    if (min.y() > point.y())
+        min.setY(point.y());
+}
+
+
+
+void drawing_line(line_t &line)
+{
+    switch (line.method)
+    {
+        case STANDART:
+            break;
+        case DDA:
+            break;
+        case BRESEN_INT:
+            break;
+        case BRESEN_DOUBLE:
+            break;
+        case BRESEN_STEPS:
+            break;
+        case WY:
+            break;
+    }
+}
+
 void MainWindow::on_pushButton_line_clicked() // дописать
 {
     QString str_x_start = ui->lineEdit_line_x_start->text();
@@ -159,6 +272,8 @@ void MainWindow::on_pushButton_line_clicked() // дописать
                 print_warning("Ошибка ввода: Точки начала и конца отрезка совпадают");
             else
             {
+                check_max_min(start);
+                check_max_min(end);
                 content_t *c = new content_t;
                 copy(&c, &data);
                 cancel.push(*c);
@@ -171,7 +286,7 @@ void MainWindow::on_pushButton_line_clicked() // дописать
                 line.start = start;
                 line.end = end;
                 data.lines.push_back(line);
-
+                drawing_content();
                 // функция, которая строит отрезки
             }
         }
@@ -232,6 +347,8 @@ void MainWindow::on_pushButton_clear_clicked()
     data.specteres.clear();
     cancel = std::stack<content_t>();
     print_succses("Успешно очищено");
+    ui->graphicsView->resetTransform();
+    drawing_content();
     data.back = back_color;
     ui->pushButton_cancel->setEnabled(false);
     ui->pushButton_clear->setEnabled(false);
@@ -239,10 +356,9 @@ void MainWindow::on_pushButton_clear_clicked()
 
 void MainWindow::on_pushButton_cancel_clicked() // дописать
 {
-
     data = cancel.top();
     cancel.pop();
-    // перерисовать сцену
+    drawing_content();
     if (cancel.empty())
     {
         ui->pushButton_cancel->setEnabled(false);
