@@ -119,8 +119,8 @@ void MainWindow::drawing_content()
                           QImage::Format_RGB32);
     QPainter p(&image);
 //    ui->graphicsView->setBackgroundBrush(QBrush(back_color));
-//    p.setBackground(back_color);
-    image.fill(back_color);
+    p.setBackground(back_color);
+//    image.fill(back_color);
     drawing_axes(p);
 
 
