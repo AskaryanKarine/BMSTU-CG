@@ -137,7 +137,7 @@ void MainWindow::on_pushButton_line_clicked() // дописать
     QString str_x_end = ui->lineEdit_line_x_end->text();
     QString str_y_end = ui->lineEdit_line_y_end->text();
 
-    if (str_x_end.length() == 0 || str_x_start == 0 || str_y_end == 0 || str_y_start == 0)
+    if (str_x_end.length() == 0 || str_x_start.length() == 0 || str_y_end.length() == 0 || str_y_start.length() == 0)
         print_warning("Ошибка ввода: пустой или неполный ввод");
     else
     {

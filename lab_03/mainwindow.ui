@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>621</height>
+    <width>951</width>
+    <height>784</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -85,7 +85,6 @@
             <property name="font">
              <font>
               <pointsize>11</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -157,7 +156,6 @@
           <property name="font">
            <font>
             <pointsize>11</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -394,12 +392,11 @@
         <property name="font">
          <font>
           <pointsize>11</pointsize>
-          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
         <property name="text">
-         <string>Построить пучок
+         <string>Построить спектр
 отрезков</string>
         </property>
         <property name="alignment">
@@ -534,7 +531,7 @@
       <item>
        <widget class="QPushButton" name="pushButton_beam">
         <property name="text">
-         <string>Построить пучок </string>
+         <string>Построить спектр</string>
         </property>
        </widget>
       </item>
@@ -649,7 +646,6 @@
        <property name="font">
         <font>
          <pointsize>12</pointsize>
-         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -666,8 +662,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>22</height>
+     <width>951</width>
+     <height>28</height>
     </rect>
    </property>
   </widget>
