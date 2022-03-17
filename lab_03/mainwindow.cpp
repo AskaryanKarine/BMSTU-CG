@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <QDrag>
 #include <QMimeData>
+#include <QtGlobal>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -121,9 +122,14 @@ void MainWindow::wheelEvent(QWheelEvent* event)
 
 bool MainWindow::eventFilter(QObject* object, QEvent* event)
 {
-    if (object == ui->graphicsView->viewport() && event->type() == QEvent::Wheel)
+//    if (object == ui->graphicsView->viewport() && event->type() == QEvent::GraphicsSceneWheel) // qt 6
+//    if ()
+    if (event->type() == QEvent::Wheel && object == ui->graphicsView->viewport())
+//        std::cout << "a" << std::endl;
+//    if (object == ui->graphicsView->viewport() && event->type() == QEvent::Wheel) // qt 5
         return true;
     return false;
+
 }
 
 // событие нажатия мыши
