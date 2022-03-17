@@ -6,6 +6,8 @@
 #include <QWheelEvent>
 #include <iostream>
 #include <QTimer>
+#include <QDrag>
+#include <QMimeData>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -19,12 +21,10 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *ExitAction = ui->menubar->addAction(("Выход"));
     connect(ExitAction, SIGNAL(triggered()), this, SLOT(exit_show()));
 
-    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     scene = new QGraphicsScene();
     ui->graphicsView->setScene(scene);
-
+    ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     ui->pushButton_cancel->setEnabled(false);
 
     data.back = back_color;
@@ -34,6 +34,10 @@ MainWindow::MainWindow(QWidget *parent)
     min.setY(0);
     max.setX(ui->graphicsView->geometry().width());
     max.setX(ui->graphicsView->geometry().height());
+
+    ui->graphicsView->viewport()->installEventFilter(this);
+    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
 MainWindow::~MainWindow()
@@ -110,75 +114,60 @@ void MainWindow::wheelEvent(QWheelEvent* event)
     ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     double scale_factor = 1.15;
     if (event->angleDelta().y() > 0)
-    {
         ui->graphicsView->scale(scale_factor, scale_factor);
-        stoper++;
-    }
-    else if (stoper > 0)
-    {
+    else
         ui->graphicsView->scale(1 / scale_factor, 1 / scale_factor);
-        stoper--;
-    }
-
 }
 
-// перевод в абсолютные координаты
-void MainWindow::from_abs_coor(int x, int y, int *res_x, int *res_y)
+bool MainWindow::eventFilter(QObject* object, QEvent* event)
 {
-    int fx = (max.x() - min.x()) * 0.05;
-    int fy = (max.y() - min.y()) * 0.05;
-    int nmax_x = max.x() + fx;
-    int nmin_x = min.x() - fx;
-    int nmax_y = max.x() + fy;
-    int nmin_y = min.y() - fy;
+    if (object == ui->graphicsView->viewport() && event->type() == QEvent::Wheel)
+        return true;
+    return false;
+}
 
-    double xk = (double) ui->graphicsView->width() / (nmax_x - nmin_x);
-    double xb = -xk * nmin_x;
-    double yk = (double) ui->graphicsView->height() / (nmax_y - nmin_y);
-    double yb = -yk * nmin_y;
-
-    *res_x = x * xk + xb;
-    *res_y = y * yk + yb;
+// событие нажатия мыши
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton && ui->graphicsView->geometry().contains(event->pos()))
+        ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
 // функции рисования
 // функция рисования ВСЕГО
 void MainWindow::drawing_content()
 {
-    QImage image = QImage(ui->graphicsView->geometry().width(), ui->graphicsView->geometry().height(),
-                          QImage::Format_RGB32);
-    QPainter p(&image);
-    image.fill(back_color);
-    drawing_axes(p);
-
-
-    QPixmap pixmap = QPixmap::fromImage(image);
-    scene->addPixmap(pixmap);
+    scene->clear();
+    ui->graphicsView->setBackgroundBrush(back_color);
+    drawing_axes();
 }
 
 // функция рисования осей
-void MainWindow::drawing_axes(QPainter &p)
+void MainWindow::drawing_axes()
 {
-    p.setPen(Qt::black);
-
-    int rx, ry;
-    from_abs_coor(0, 0, &rx, &ry);
-    int h = ui->graphicsView->height()-5;
-    int w = ui->graphicsView->width()-5;
+    QPen pen = QPen(Qt::black);
 
     // Oy
-    p.drawLine(rx, 0, rx, h);
-    p.drawLine(rx, h, rx - 5,  h - 5);
-    p.drawLine(rx, h, rx + 5,  h - 5);
+    scene->addLine(0, -4, 0, 100, pen);
+    scene->addLine(0, 100, 4, 85, pen);
+    scene->addLine(0, 100, -4, 85, pen);
+    // Y
+    scene->addLine(-3, 105, 0, 110, pen);
+    scene->addLine(0, 110, 3, 105, pen);
+    scene->addLine(0, 110, 0, 114, pen);
 
     // Ox
-    p.drawLine(0, ry, w, ry);
-    p.drawLine(w, ry, w - 5,  ry - 5);
-    p.drawLine(w, ry, w - 5,  ry + 5);
+    scene->addLine(-4, 0, 100, 0, pen);
+    scene->addLine(100, 0, 85, 4, pen);
+    scene->addLine(100, 0, 85, -4, pen);
+    // X
+    scene->addLine(105, -3, 109, 3, pen);
+    scene->addLine(109, -3, 105, 3, pen);
+
 }
 
 // рисование линий
-void drawing_line(line_t &line, QPainter &p, bool is_drawing, bool is_count_step)
+void drawing_line(line_t &line, canvas_t &p)
 {
     switch (line.method)
     {
@@ -372,6 +361,7 @@ void MainWindow::on_pushButton_clear_clicked()
     drawing_content();
     data.back = back_color;
     ui->pushButton_cancel->setEnabled(false);
+    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
 }
 
 // функция отмены действия
@@ -383,6 +373,7 @@ void MainWindow::on_pushButton_cancel_clicked() // дописать
     if (cancel.empty())
     {
         ui->pushButton_cancel->setEnabled(false);
+        ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
     }
 }
 
@@ -392,10 +383,11 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     QMainWindow::resizeEvent(event);
     ui->graphicsView->resetTransform();
     drawing_content();
-    print_succses("Вы изменили размер окна");
+//    print_succses("Вы изменили размер окна");
 }
 
 void MainWindow::on_pushButton_reset_scale_clicked()
 {
     ui->graphicsView->resetTransform();
+    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
 }

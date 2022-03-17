@@ -7,6 +7,8 @@
 #include <QLabel>
 #include <stack>
 
+typedef QGraphicsScene *canvas_t;
+
 enum method_t
 {
     STANDART,
@@ -54,6 +56,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    bool eventFilter(QObject *object, QEvent *event);
 private slots:
     void on_pushButton_back_color_clicked();
     void app_info_show();
@@ -67,16 +70,15 @@ private slots:
     void on_pushButton_beam_clicked();
     void on_pushButton_clear_clicked();
     void on_pushButton_cancel_clicked();
-    void drawing_axes(QPainter &p);
+    void drawing_axes();
     void check_max_min(QPoint &point);
     void showEvent(QShowEvent *ev);
     void windowShown();
     void drawing_content();
     void wheelEvent(QWheelEvent *event);
     void resizeEvent(QResizeEvent *event);
-    void from_abs_coor(int x, int y, int *res_x, int *res_y);
     void on_pushButton_reset_scale_clicked();
-
+    void mousePressEvent(QMouseEvent *event);
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
@@ -85,6 +87,5 @@ private:
     QColor line_color = Qt::black;
     std::stack<content_t> cancel;
     QPoint max, min;
-    int stoper = 0;
 };
 #endif // MAINWINDOW_H
