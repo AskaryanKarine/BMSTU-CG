@@ -122,12 +122,12 @@ void MainWindow::wheelEvent(QWheelEvent* event)
 
 bool MainWindow::eventFilter(QObject* object, QEvent* event)
 {
-//    if (object == ui->graphicsView->viewport() && event->type() == QEvent::GraphicsSceneWheel) // qt 6
-//    if ()
+#if QT_VERSION >= 0x060000
+
+#else
     if (event->type() == QEvent::Wheel && object == ui->graphicsView->viewport())
-//        std::cout << "a" << std::endl;
-//    if (object == ui->graphicsView->viewport() && event->type() == QEvent::Wheel) // qt 5
         return true;
+#endif
     return false;
 
 }
