@@ -117,8 +117,7 @@
             </item>
             <item>
              <property name="text">
-              <string>Брезенхем 
-действ. числа</string>
+              <string>Брезенхем действительные числа</string>
              </property>
             </item>
             <item>
@@ -128,8 +127,7 @@
             </item>
             <item>
              <property name="text">
-              <string>Брезенхем с 
-устр. ступенчатости</string>
+              <string>Брезенхем с устр. ступенчатости</string>
              </property>
             </item>
             <item>
