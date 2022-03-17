@@ -31,10 +31,6 @@ MainWindow::MainWindow(QWidget *parent)
     data.back = back_color;
     show_color(back_color, ui->label_bc);
     show_color(line_color, ui->label_lc);
-    min.setX(0);
-    min.setY(0);
-    max.setX(ui->graphicsView->geometry().width());
-    max.setX(ui->graphicsView->geometry().height());
 
     ui->graphicsView->viewport()->installEventFilter(this);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -241,22 +237,6 @@ void MainWindow::on_pushButton_line_color_clicked()
     show_color(line_color, ui->label_lc);
 }
 
-
-void MainWindow::check_max_min(QPoint &point)
-{
-    if (max.x() < point.x())
-        max.setX(point.x());
-
-    if (max.y() < point.y())
-        max.setY(point.y());
-
-    if (min.x() > point.x())
-        min.setX(point.x());
-
-    if (min.y() > point.y())
-        min.setY(point.y());
-}
-
 // построить линию
 void MainWindow::on_pushButton_line_clicked() // дописать
 {
@@ -287,8 +267,6 @@ void MainWindow::on_pushButton_line_clicked() // дописать
                 print_warning("Ошибка ввода: Точки начала и конца отрезка совпадают");
             else
             {
-                check_max_min(start);
-                check_max_min(end);
                 content_t *c = new content_t;
                 copy(&c, &data);
                 cancel.push(*c);
@@ -338,7 +316,6 @@ void MainWindow::on_pushButton_beam_clicked() // дописать
             ui->pushButton_cancel->setEnabled(true);
 
             QPoint center = QPoint(beam_x, beam_y);
-            check_max_min(center);
 
             spec_t spectre;
             spectre.center = center;

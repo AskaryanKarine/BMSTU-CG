@@ -71,7 +71,6 @@ private slots:
     void on_pushButton_clear_clicked();
     void on_pushButton_cancel_clicked();
     void drawing_axes();
-    void check_max_min(QPoint &point);
     void showEvent(QShowEvent *ev);
     void windowShown();
     void drawing_content();
