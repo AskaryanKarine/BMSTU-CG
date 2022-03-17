@@ -118,12 +118,15 @@ void MainWindow::wheelEvent(QWheelEvent* event)
 
 bool MainWindow::eventFilter(QObject* object, QEvent* event)
 {
-#if QT_VERSION >= 0x060000
 
-#else
     if (event->type() == QEvent::Wheel && object == ui->graphicsView->viewport())
-        return true;
+    {
+#if QT_VERSION >= 0x060000
+        QWheelEvent *wheel_event = static_cast<QWheelEvent *>(event);
+        wheelEvent(wheel_event);
 #endif
+        return true;
+    }
     return false;
 
 }
