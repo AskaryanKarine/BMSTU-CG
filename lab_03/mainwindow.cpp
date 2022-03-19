@@ -29,12 +29,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pushButton_cancel->setEnabled(false);
 
     data.back = back_color;
-    show_color(back_color, ui->label_bc);
+    show_color(data.back, ui->label_bc);
     show_color(line_color, ui->label_lc);
 
     ui->graphicsView->viewport()->installEventFilter(this);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
 MainWindow::~MainWindow()
@@ -143,7 +144,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 void MainWindow::drawing_content()
 {
     scene->clear();
-    ui->graphicsView->setBackgroundBrush(back_color);
+    ui->graphicsView->setBackgroundBrush(data.back);
     drawing_axes();
 }
 
@@ -172,11 +173,12 @@ void MainWindow::drawing_axes()
 }
 
 // рисование линий
-void drawing_line(line_t &line, canvas_t &p)
+void drawing_line(line_t &line, canvas_t scene)
 {
     switch (line.method)
     {
         case STANDART:
+        scene->addLine(line.start.x(), line.start.y(), line.end.x(), line.end.y(), QPen(line.color));
             break;
         case DDA:
             break;
@@ -281,7 +283,9 @@ void MainWindow::on_pushButton_line_clicked() // дописать
                 line.start = start;
                 line.end = end;
                 data.lines.push_back(line);
-                drawing_content();
+//                drawing_content();
+                drawing_line(line, ui->graphicsView->scene());
+                ui->graphicsView->setBackgroundBrush(data.back);
                 // функция, которая строит отрезки
             }
         }
@@ -375,5 +379,5 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 void MainWindow::on_pushButton_reset_scale_clicked()
 {
     ui->graphicsView->resetTransform();
-    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
+//    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
 }
