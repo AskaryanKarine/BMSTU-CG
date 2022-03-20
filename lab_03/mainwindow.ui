@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>951</width>
-    <height>743</height>
+    <height>612</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -85,6 +85,7 @@
             <property name="font">
              <font>
               <pointsize>9</pointsize>
+              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -147,6 +148,7 @@
           <property name="font">
            <font>
             <pointsize>9</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -376,6 +378,7 @@
         <property name="font">
          <font>
           <pointsize>9</pointsize>
+          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -405,7 +408,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_beam_x">
+             <widget class="QLineEdit" name="lineEdit_spectrum_x">
               <property name="maximumSize">
                <size>
                 <width>40</width>
@@ -429,7 +432,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_beam_y">
+             <widget class="QLineEdit" name="lineEdit_spectrum_y">
               <property name="maximumSize">
                <size>
                 <width>40</width>
@@ -473,7 +476,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_beam_r">
+             <widget class="QLineEdit" name="lineEdit_spectrum_radius">
               <property name="maximumSize">
                <size>
                 <width>40</width>
@@ -513,7 +516,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_beam">
+       <widget class="QPushButton" name="pushButton_spectrum">
         <property name="text">
          <string>Построить спектр</string>
         </property>
@@ -608,6 +611,7 @@
        <property name="font">
         <font>
          <pointsize>12</pointsize>
+         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -625,7 +629,7 @@
      <x>0</x>
      <y>0</y>
      <width>951</width>
-     <height>28</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

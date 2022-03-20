@@ -27,11 +27,11 @@ struct line_t
     method_t method;
 };
 
-struct spec_t
+struct spectre_t
 {
     QPoint center;
     double angle;
-    double r;
+    double radius;
     QColor color;
     method_t method;
 };
@@ -39,8 +39,8 @@ struct spec_t
 struct content_t
 {
     std::vector<line_t> lines;
-    std::vector<spec_t> specteres;
-    QColor back;
+    std::vector<spectre_t> spectra;
+    QColor back_color;
 };
 
 
@@ -67,7 +67,7 @@ private slots:
     void show_color(QColor color, QLabel *button);
     void on_pushButton_line_color_clicked();
     void on_pushButton_line_clicked();
-    void on_pushButton_beam_clicked();
+    void on_pushButton_spectrum_clicked();
     void on_pushButton_clear_clicked();
     void on_pushButton_cancel_clicked();
     void drawing_axes();
@@ -79,13 +79,12 @@ private slots:
     void on_pushButton_reset_scale_clicked();
     void mousePressEvent(QMouseEvent *event);
     void drawing_line(line_t &line);
-    void drawing_spector(spec_t &s);
+    void drawing_spectrum(spectre_t &s);
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
     content_t data;
     QColor line_color = Qt::black;
     std::stack<content_t> cancel;
-    QPoint max, min;
 };
 #endif // MAINWINDOW_H

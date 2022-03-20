@@ -29,8 +29,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     ui->pushButton_cancel->setEnabled(false);
 
-    data.back = Qt::white;
-    show_color(data.back, ui->label_bc);
+    data.back_color = Qt::white;
+    show_color(data.back_color, ui->label_bc);
     show_color(line_color, ui->label_lc);
 
     ui->graphicsView->viewport()->installEventFilter(this);
@@ -60,9 +60,11 @@ static void copy(struct content_t **a, struct content_t *b)
 {
     for (size_t i = 0; i < b->lines.size(); i++)
         (*a)->lines.push_back(b->lines[i]);
-    for (size_t i = 0; i < b->specteres.size(); i++)
-        (*a)->specteres.push_back(b->specteres[i]);
-    (*a)->back = b->back;
+
+    for (size_t i = 0; i < b->spectra.size(); i++)
+        (*a)->spectra.push_back(b->spectra[i]);
+
+    (*a)->back_color = b->back_color;
 }
 
 // информационные функции
@@ -144,7 +146,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 void MainWindow::drawing_content()
 {
     scene->clear();
-    ui->graphicsView->setBackgroundBrush(data.back);
+    ui->graphicsView->setBackgroundBrush(data.back_color);
     drawing_axes();
     for (size_t i = 0; i < data.lines.size(); i++)
         drawing_line(data.lines[i]);
@@ -195,12 +197,12 @@ void MainWindow::drawing_line(line_t &line)
 }
 
 // функция рисования спектра
-void MainWindow::drawing_spector(spec_t &s)
+void MainWindow::drawing_spectrum(spectre_t &spectrum)
 {
-    switch (s.method)
+    switch (spectrum.method)
     {
         case STANDART:
-        standart_spector(s, scene);
+        standart_spector(spectrum, scene);
             break;
         case DDA:
             break;
@@ -236,16 +238,16 @@ void MainWindow::show_color(QColor color, QLabel *lab)
 void MainWindow::on_pushButton_back_color_clicked()
 {
     QColorDialog dialog;
-    dialog.setCurrentColor(data.back);
+    dialog.setCurrentColor(data.back_color);
     dialog.show();
     dialog.exec();
     QColor color = dialog.selectedColor();
     if (!color.isValid())
         print_warning("Что-то пошло не так");
     else
-        data.back = color;
-    show_color(data.back, ui->label_bc);
-    ui->graphicsView->setBackgroundBrush(data.back);
+        data.back_color = color;
+    show_color(data.back_color, ui->label_bc);
+    ui->graphicsView->setBackgroundBrush(data.back_color);
 }
 
 // выбор цвета линий
@@ -306,7 +308,7 @@ void MainWindow::on_pushButton_line_clicked() // дописать
                 data.lines.push_back(line);
 //                drawing_content();
                 drawing_line(line);
-                ui->graphicsView->setBackgroundBrush(data.back);
+                ui->graphicsView->setBackgroundBrush(data.back_color);
                 // функция, которая строит отрезки
             }
         }
@@ -314,27 +316,27 @@ void MainWindow::on_pushButton_line_clicked() // дописать
 }
 
 // поистроить спектр
-void MainWindow::on_pushButton_beam_clicked() // дописать
+void MainWindow::on_pushButton_spectrum_clicked() // дописать
 {
-    QString str_beam_x = ui->lineEdit_beam_x->text();
-    QString str_beam_y = ui->lineEdit_beam_y->text();
-    QString str_beam_r = ui->lineEdit_beam_r->text();
+    QString str_spectrum_x = ui->lineEdit_spectrum_x->text();
+    QString str_spectrum_y = ui->lineEdit_spectrum_y->text();
+    QString str_spectrum_r = ui->lineEdit_spectrum_radius->text();
     QString str_angle = ui->lineEdit_angle->text();
 
-    if (str_beam_x.length() == 0 || str_beam_y.length() == 0 || str_beam_r.length() == 0 || str_angle.length() == 0)
+    if (str_spectrum_x.length() == 0 || str_spectrum_y.length() == 0 || str_spectrum_r.length() == 0 || str_angle.length() == 0)
         print_warning("Ошибка ввода: пустой или неполный ввод");
     else
     {
-        bool flag_beam_x, flag_beam_y, flag_beam_r, flag_angle;
-        int beam_x, beam_y;
-        double beam_r, angle;
+        bool flag_spectrum_x, flag_spectrum_y, flag_spectrum_r, flag_angle;
+        int spectrum_x, spectrum_y;
+        double spectrum_r, angle;
 
-        beam_x = str_beam_x.toInt(&flag_beam_x);
-        beam_y = str_beam_y.toInt(&flag_beam_y);
-        beam_r = str_beam_r.toDouble(&flag_beam_r);
+        spectrum_x = str_spectrum_x.toInt(&flag_spectrum_x);
+        spectrum_y = str_spectrum_y.toInt(&flag_spectrum_y);
+        spectrum_r = str_spectrum_r.toDouble(&flag_spectrum_r);
         angle = str_angle.toDouble(&flag_angle);
 
-        if (!beam_x || !beam_y || !beam_r || !angle)
+        if (!flag_spectrum_x || !flag_spectrum_y || !flag_spectrum_r || !flag_angle)
             print_warning("Ошибка ввода: некорректный ввод");
         else
         {
@@ -343,16 +345,16 @@ void MainWindow::on_pushButton_beam_clicked() // дописать
             cancel.push(*c);
             ui->pushButton_cancel->setEnabled(true);
 
-            QPoint center = QPoint(beam_x, beam_y);
+            QPoint center = QPoint(spectrum_x, spectrum_y);
 
-            spec_t spectre;
+            spectre_t spectre;
             spectre.center = center;
             spectre.angle = angle;
             spectre.color = line_color;
             spectre.method = (method_t) ui->comboBox->currentIndex();
-            spectre.r = beam_r;
-            data.specteres.push_back(spectre);
-            drawing_spector(spectre);
+            spectre.radius = spectrum_r;
+            data.spectra.push_back(spectre);
+            drawing_spectrum(spectre);
         }
     }
 }
@@ -360,12 +362,12 @@ void MainWindow::on_pushButton_beam_clicked() // дописать
 // функция очистки всего холста
 void MainWindow::on_pushButton_clear_clicked()
 {
-    data.back = Qt::white;
+    data.back_color = Qt::white;
     line_color = Qt::black;
-    show_color(data.back, ui->label_bc);
+    show_color(data.back_color, ui->label_bc);
     show_color(line_color, ui->label_lc);
     data.lines.clear();
-    data.specteres.clear();
+    data.spectra.clear();
     cancel = std::stack<content_t>();
     print_succses("Успешно очищено");
     ui->graphicsView->resetTransform();
