@@ -150,6 +150,8 @@ void MainWindow::drawing_content()
     drawing_axes();
     for (size_t i = 0; i < data.lines.size(); i++)
         drawing_line(data.lines[i]);
+    for (size_t i = 0; i < data.spectra.size(); i++)
+        drawing_spectrum(data.spectra[i]);
 }
 
 // функция рисования осей
@@ -217,7 +219,6 @@ void MainWindow::drawing_spectrum(spectre_t &spectrum)
     }
 }
 
-
 // показать цвет на лейбл
 void MainWindow::show_color(QColor color, QLabel *lab)
 {
@@ -245,9 +246,11 @@ void MainWindow::on_pushButton_back_color_clicked()
     if (!color.isValid())
         print_warning("Что-то пошло не так");
     else
-        data.back_color = color;
-    show_color(data.back_color, ui->label_bc);
-    ui->graphicsView->setBackgroundBrush(data.back_color);
+        back_color = color;
+
+//        data.back_color = color;
+    show_color(back_color, ui->label_bc);
+//    ui->graphicsView->setBackgroundBrush(back_color);
 }
 
 // выбор цвета линий
@@ -308,7 +311,8 @@ void MainWindow::on_pushButton_line_clicked() // дописать
                 data.lines.push_back(line);
 //                drawing_content();
                 drawing_line(line);
-                ui->graphicsView->setBackgroundBrush(data.back_color);
+                data.back_color = back_color;
+                ui->graphicsView->setBackgroundBrush(back_color);
                 // функция, которая строит отрезки
             }
         }
@@ -354,6 +358,8 @@ void MainWindow::on_pushButton_spectrum_clicked() // дописать
             spectre.method = (method_t) ui->comboBox->currentIndex();
             spectre.radius = spectrum_r;
             data.spectra.push_back(spectre);
+            data.back_color = back_color;
+            ui->graphicsView->setBackgroundBrush(back_color);
             drawing_spectrum(spectre);
         }
     }
@@ -379,13 +385,13 @@ void MainWindow::on_pushButton_clear_clicked()
 // функция отмены действия
 void MainWindow::on_pushButton_cancel_clicked() // дописать
 {
-    data = cancel.top();
-    cancel.pop();
-    drawing_content();
     if (cancel.empty())
-    {
         ui->pushButton_cancel->setEnabled(false);
-        ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
+    else
+    {
+        data = cancel.top();
+        cancel.pop();
+        drawing_content();
     }
 }
 
@@ -395,11 +401,9 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     QMainWindow::resizeEvent(event);
     ui->graphicsView->resetTransform();
     drawing_content();
-//    print_succses("Вы изменили размер окна");
 }
 
 void MainWindow::on_pushButton_reset_scale_clicked()
 {
     ui->graphicsView->resetTransform();
-//    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
 }

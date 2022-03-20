@@ -79,12 +79,13 @@ private slots:
     void on_pushButton_reset_scale_clicked();
     void mousePressEvent(QMouseEvent *event);
     void drawing_line(line_t &line);
-    void drawing_spectrum(spectre_t &s);
+    void drawing_spectrum(spectre_t &spectrum);
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
     content_t data;
     QColor line_color = Qt::black;
+    QColor back_color = Qt::white;
     std::stack<content_t> cancel;
 };
 #endif // MAINWINDOW_H
