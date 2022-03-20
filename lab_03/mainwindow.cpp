@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "algorithms.h"
 #include <QColorDialog>
 #include <QColor>
 #include <QMessageBox>
@@ -28,14 +29,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     ui->pushButton_cancel->setEnabled(false);
 
-    data.back = back_color;
+    data.back = Qt::white;
     show_color(data.back, ui->label_bc);
     show_color(line_color, ui->label_lc);
 
     ui->graphicsView->viewport()->installEventFilter(this);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
 MainWindow::~MainWindow()
@@ -146,13 +146,14 @@ void MainWindow::drawing_content()
     scene->clear();
     ui->graphicsView->setBackgroundBrush(data.back);
     drawing_axes();
+    for (size_t i = 0; i < data.lines.size(); i++)
+        drawing_line(data.lines[i]);
 }
 
 // функция рисования осей
 void MainWindow::drawing_axes()
 {
     QPen pen = QPen(Qt::black);
-
     // Oy
     scene->addLine(0, -4, 0, 100, pen);
     scene->addLine(0, 100, 4, 85, pen);
@@ -173,12 +174,12 @@ void MainWindow::drawing_axes()
 }
 
 // рисование линий
-void drawing_line(line_t &line, canvas_t scene)
+void MainWindow::drawing_line(line_t &line)
 {
     switch (line.method)
     {
         case STANDART:
-        scene->addLine(line.start.x(), line.start.y(), line.end.x(), line.end.y(), QPen(line.color));
+            standart_line(line, scene);
             break;
         case DDA:
             break;
@@ -194,6 +195,26 @@ void drawing_line(line_t &line, canvas_t scene)
 }
 
 // функция рисования спектра
+void MainWindow::drawing_spector(spec_t &s)
+{
+    switch (s.method)
+    {
+        case STANDART:
+        standart_spector(s, scene);
+            break;
+        case DDA:
+            break;
+        case BRESEN_INT:
+            break;
+        case BRESEN_DOUBLE:
+            break;
+        case BRESEN_STEPS:
+            break;
+        case WY:
+            break;
+    }
+}
+
 
 // показать цвет на лейбл
 void MainWindow::show_color(QColor color, QLabel *lab)
@@ -215,16 +236,16 @@ void MainWindow::show_color(QColor color, QLabel *lab)
 void MainWindow::on_pushButton_back_color_clicked()
 {
     QColorDialog dialog;
-    dialog.setCurrentColor(back_color);
+    dialog.setCurrentColor(data.back);
     dialog.show();
     dialog.exec();
     QColor color = dialog.selectedColor();
     if (!color.isValid())
         print_warning("Что-то пошло не так");
     else
-        back_color = color;
-    show_color(back_color, ui->label_bc);
-    data.back = back_color;
+        data.back = color;
+    show_color(data.back, ui->label_bc);
+    ui->graphicsView->setBackgroundBrush(data.back);
 }
 
 // выбор цвета линий
@@ -284,7 +305,7 @@ void MainWindow::on_pushButton_line_clicked() // дописать
                 line.end = end;
                 data.lines.push_back(line);
 //                drawing_content();
-                drawing_line(line, ui->graphicsView->scene());
+                drawing_line(line);
                 ui->graphicsView->setBackgroundBrush(data.back);
                 // функция, которая строит отрезки
             }
@@ -329,9 +350,9 @@ void MainWindow::on_pushButton_beam_clicked() // дописать
             spectre.angle = angle;
             spectre.color = line_color;
             spectre.method = (method_t) ui->comboBox->currentIndex();
+            spectre.r = beam_r;
             data.specteres.push_back(spectre);
-
-            // функция рисующая спектр
+            drawing_spector(spectre);
         }
     }
 }
@@ -339,9 +360,9 @@ void MainWindow::on_pushButton_beam_clicked() // дописать
 // функция очистки всего холста
 void MainWindow::on_pushButton_clear_clicked()
 {
-    back_color = Qt::white;
+    data.back = Qt::white;
     line_color = Qt::black;
-    show_color(back_color, ui->label_bc);
+    show_color(data.back, ui->label_bc);
     show_color(line_color, ui->label_lc);
     data.lines.clear();
     data.specteres.clear();
@@ -349,7 +370,6 @@ void MainWindow::on_pushButton_clear_clicked()
     print_succses("Успешно очищено");
     ui->graphicsView->resetTransform();
     drawing_content();
-    data.back = back_color;
     ui->pushButton_cancel->setEnabled(false);
     ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
 }

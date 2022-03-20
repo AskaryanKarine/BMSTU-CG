@@ -78,11 +78,12 @@ private slots:
     void resizeEvent(QResizeEvent *event);
     void on_pushButton_reset_scale_clicked();
     void mousePressEvent(QMouseEvent *event);
+    void drawing_line(line_t &line);
+    void drawing_spector(spec_t &s);
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
     content_t data;
-    QColor back_color = Qt::white;
     QColor line_color = Qt::black;
     std::stack<content_t> cancel;
     QPoint max, min;
