@@ -4,6 +4,17 @@
 #include "mainwindow.h"
 
 void standart_line(line_t &line, canvas_t scene);
-void standart_spector(spectre_t &spector, canvas_t scene);
+void standart_spectrum(spectre_t &spector, canvas_t scene);
+
+void dda_line(line_t &line, canvas_t scene, bool steps);
+void dda_spectre(spectre_t &spectrum, canvas_t scene, bool is_drawing, bool steps);
+
+//void bresen_double_line(line_t &line, canvas_t scene, bool steps);
+//void bresen_double_spectre(spectre_t &spectrum, canvas_t scene, bool is_drawing, bool steps);
+
+//void bresen_int_line(line_t &line, canvas_t scene, bool steps);
+//void bresen_int_spectre(spectre_t &spectrum, canvas_t scene, bool is_drawing, bool steps);
+
+
 
 #endif // ALGORITHMS_H

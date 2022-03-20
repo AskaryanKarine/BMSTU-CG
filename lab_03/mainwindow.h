@@ -21,15 +21,15 @@ enum method_t
 
 struct line_t
 {
-    QPoint start;
-    QPoint end;
+    QPointF start;
+    QPointF end;
     QColor color;
     method_t method;
 };
 
 struct spectre_t
 {
-    QPoint center;
+    QPointF center;
     double angle;
     double radius;
     QColor color;

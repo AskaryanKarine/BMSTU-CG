@@ -186,6 +186,8 @@ void MainWindow::drawing_line(line_t &line)
             standart_line(line, scene);
             break;
         case DDA:
+            dda_line(line, scene, false);
+//            dda_line(line, scene);
             break;
         case BRESEN_INT:
             break;
@@ -204,9 +206,10 @@ void MainWindow::drawing_spectrum(spectre_t &spectrum)
     switch (spectrum.method)
     {
         case STANDART:
-        standart_spector(spectrum, scene);
+            standart_spectrum(spectrum, scene);
             break;
         case DDA:
+            dda_spectre(spectrum, scene, true, false);
             break;
         case BRESEN_INT:
             break;
@@ -281,18 +284,18 @@ void MainWindow::on_pushButton_line_clicked() // дописать
     else
     {
         bool flag_x_start, flag_y_start, flag_x_end, flag_y_end;
-        int x_start, y_start, x_end, y_end;
-        x_start = str_x_start.toInt(&flag_x_start);
-        y_start = str_y_start.toInt(&flag_y_start);
-        x_end = str_x_end.toInt(&flag_x_end);
-        y_end = str_y_end.toInt(&flag_y_end);
+        double x_start, y_start, x_end, y_end;
+        x_start = str_x_start.toDouble(&flag_x_start);
+        y_start = str_y_start.toDouble(&flag_y_start);
+        x_end = str_x_end.toDouble(&flag_x_end);
+        y_end = str_y_end.toDouble(&flag_y_end);
         if (!flag_x_start || !flag_x_end || !flag_y_start || !flag_y_end)
             print_warning("Ошибка ввода: Некорректный ввод");
         else
         {
-            QPoint start, end;
-            start = QPoint(x_start, y_start);
-            end = QPoint(x_end, y_end);
+            QPointF start, end;
+            start = QPointF(x_start, y_start);
+            end = QPointF(x_end, y_end);
 
             if (start == end)
                 print_warning("Ошибка ввода: Точки начала и конца отрезка совпадают");
@@ -332,11 +335,11 @@ void MainWindow::on_pushButton_spectrum_clicked() // дописать
     else
     {
         bool flag_spectrum_x, flag_spectrum_y, flag_spectrum_r, flag_angle;
-        int spectrum_x, spectrum_y;
+        double spectrum_x, spectrum_y;
         double spectrum_r, angle;
 
-        spectrum_x = str_spectrum_x.toInt(&flag_spectrum_x);
-        spectrum_y = str_spectrum_y.toInt(&flag_spectrum_y);
+        spectrum_x = str_spectrum_x.toDouble(&flag_spectrum_x);
+        spectrum_y = str_spectrum_y.toDouble(&flag_spectrum_y);
         spectrum_r = str_spectrum_r.toDouble(&flag_spectrum_r);
         angle = str_angle.toDouble(&flag_angle);
 
@@ -349,7 +352,7 @@ void MainWindow::on_pushButton_spectrum_clicked() // дописать
             cancel.push(*c);
             ui->pushButton_cancel->setEnabled(true);
 
-            QPoint center = QPoint(spectrum_x, spectrum_y);
+            QPointF center = QPointF(spectrum_x, spectrum_y);
 
             spectre_t spectre;
             spectre.center = center;
