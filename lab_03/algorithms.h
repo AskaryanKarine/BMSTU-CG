@@ -5,12 +5,12 @@
 
 void standart_line(line_t &line, canvas_t scene);
 
-void dda_line(line_t &line, canvas_t scene, bool is_drawing, bool is_cnt_steps);
+int dda_line(line_t &line, canvas_t scene, bool is_drawing, bool is_cnt_steps);
 
-void bresen_double_line(line_t &line, canvas_t scene, bool is_drawing, bool is_cnt_steps);
+int bresen_double_line(line_t &line, canvas_t scene, bool is_drawing, bool is_cnt_steps);
 
-//void bresen_int_line(line_t &line, canvas_t scene, bool steps);
+int bresen_int_line(line_t &line, canvas_t scene, bool is_drawing, bool is_cnt_steps);
 
-
+int bresen_steps_line(line_t &line, canvas_t scene, bool is_drawing, bool is_cnt_steps);
 
 #endif // ALGORITHMS_H
