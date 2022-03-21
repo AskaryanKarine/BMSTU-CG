@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     scene = new QGraphicsScene();
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    ui->graphicsView->setRenderHint(QPainter::Antialiasing);
     ui->pushButton_cancel->setEnabled(false);
 
     data.back_color = Qt::white;
@@ -34,8 +35,13 @@ MainWindow::MainWindow(QWidget *parent)
     show_color(line_color, ui->label_lc);
 
     ui->graphicsView->viewport()->installEventFilter(this);
-    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+    max.setX(600);
+    max.setY(600);
+    min.setX(-5);
+    min.setY(-5);
 }
 
 MainWindow::~MainWindow()
@@ -121,7 +127,6 @@ void MainWindow::wheelEvent(QWheelEvent* event)
 
 bool MainWindow::eventFilter(QObject* object, QEvent* event)
 {
-
     if (event->type() == QEvent::Wheel && object == ui->graphicsView->viewport())
     {
 #if QT_VERSION >= 0x060000
@@ -134,11 +139,31 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
 
 }
 
-// событие нажатия мыши
-void MainWindow::mousePressEvent(QMouseEvent *event)
+void MainWindow::check_size(QPointF point)
 {
-    if (event->button() == Qt::LeftButton && ui->graphicsView->geometry().contains(event->pos()))
-        ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+    bool flag = false;
+    if (point.x() > max.x())
+    {
+        max.setX(point.x());
+        flag = true;
+    }
+    if (point.y() > max.y())
+    {
+        max.setY(point.y());
+        flag = true;
+    }
+    if (point.x() < min.x())
+    {
+        min.setX(point.x());
+        flag = true;
+    }
+    if (point.y() < min.y())
+    {
+        min.setY(point.y());
+        flag = true;
+    }
+    if (flag)
+        scene->setSceneRect(min.x(), min.y(), max.x(), max.y());
 }
 
 // функции рисования
@@ -183,11 +208,10 @@ void MainWindow::drawing_line(line_t &line)
     switch (line.method)
     {
         case STANDART:
-            standart_line(line, scene);
+            standart_line(line, ui->graphicsView->scene());
             break;
         case DDA:
-            dda_line(line, scene, false);
-//            dda_line(line, scene);
+            dda_line(line, ui->graphicsView->scene(), false);
             break;
         case BRESEN_INT:
             break;
@@ -206,10 +230,10 @@ void MainWindow::drawing_spectrum(spectre_t &spectrum)
     switch (spectrum.method)
     {
         case STANDART:
-            standart_spectrum(spectrum, scene);
+            standart_spectrum(spectrum, ui->graphicsView->scene());
             break;
         case DDA:
-            dda_spectre(spectrum, scene, true, false);
+            dda_spectre(spectrum, ui->graphicsView->scene(), true, false);
             break;
         case BRESEN_INT:
             break;
@@ -235,7 +259,6 @@ void MainWindow::show_color(QColor color, QLabel *lab)
     QPixmap pixmap = QPixmap::fromImage(im);
     lab->clear();
     lab->setPixmap(pixmap);
-
 }
 
 // выбор цвета фона
@@ -250,10 +273,7 @@ void MainWindow::on_pushButton_back_color_clicked()
         print_warning("Что-то пошло не так");
     else
         back_color = color;
-
-//        data.back_color = color;
     show_color(back_color, ui->label_bc);
-//    ui->graphicsView->setBackgroundBrush(back_color);
 }
 
 // выбор цвета линий
@@ -297,10 +317,10 @@ void MainWindow::on_pushButton_line_clicked() // дописать
             start = QPointF(x_start, y_start);
             end = QPointF(x_end, y_end);
 
-            if (start == end)
-                print_warning("Ошибка ввода: Точки начала и конца отрезка совпадают");
-            else
-            {
+//            if (start == end)
+//                print_warning("Ошибка ввода: Точки начала и конца отрезка совпадают");
+//            else
+//            {
                 content_t *c = new content_t;
                 copy(&c, &data);
                 cancel.push(*c);
@@ -312,12 +332,13 @@ void MainWindow::on_pushButton_line_clicked() // дописать
                 line.start = start;
                 line.end = end;
                 data.lines.push_back(line);
-//                drawing_content();
+//                check_size(start);
+//                check_size(end);
                 drawing_line(line);
                 data.back_color = back_color;
                 ui->graphicsView->setBackgroundBrush(back_color);
                 // функция, которая строит отрезки
-            }
+//            }
         }
     }
 }
@@ -363,6 +384,10 @@ void MainWindow::on_pushButton_spectrum_clicked() // дописать
             data.spectra.push_back(spectre);
             data.back_color = back_color;
             ui->graphicsView->setBackgroundBrush(back_color);
+            QPointF tmp = QPointF(center.x() + spectrum_r, center.y() + spectrum_r);
+//            check_size(tmp);
+            tmp = QPointF(center.x() - spectrum_r, center.y() - spectrum_r);
+//            check_size(tmp);
             drawing_spectrum(spectre);
         }
     }
@@ -382,7 +407,6 @@ void MainWindow::on_pushButton_clear_clicked()
     ui->graphicsView->resetTransform();
     drawing_content();
     ui->pushButton_cancel->setEnabled(false);
-    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
 }
 
 // функция отмены действия

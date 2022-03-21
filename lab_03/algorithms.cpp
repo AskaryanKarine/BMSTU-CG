@@ -9,11 +9,10 @@ void standart_line(line_t &line, canvas_t scene)
 
 void standart_spectrum(spectre_t &spectrum, canvas_t scene)
 {
-    int count = (int) 360 / spectrum.angle;
-    for (int i = 0; i < count; i++)
+    for (double i = 0; i <= 360; i += spectrum.angle)
     {
-        double x = spectrum.center.x() + cos(M_PI * spectrum.angle * i / 180) * spectrum.radius;
-        double y = spectrum.center.y() + sin(M_PI * spectrum.angle * i / 180) * spectrum.radius;
+        double x = spectrum.center.x() + cos(M_PI * i / 180) * spectrum.radius;
+        double y = spectrum.center.y() + sin(M_PI * i / 180) * spectrum.radius;
         QPointF cur_end = QPointF(x, y);
         QLineF line = QLineF(spectrum.center, cur_end);
         scene->addLine(line, QPen(spectrum.color));
@@ -22,11 +21,9 @@ void standart_spectrum(spectre_t &spectrum, canvas_t scene)
 
 void dda_line(line_t &line, canvas_t scene, bool steps=false)
 {
-    double h, w;
-    h = 0.5;
-    w = 0.5;
     QPen pen = QPen(line.color);
     QBrush brush = QBrush(line.color);
+
     // Целочисленные значения координат начала и конца отрезка,
     // округленные до ближайшего целого
     int iX1 = roundf(line.start.x());
@@ -45,7 +42,8 @@ void dda_line(line_t &line, canvas_t scene, bool steps=false)
 
     // особый случай, на экране закрашивается ровно один пиксел
     if (length == 0)
-        scene->addRect(iX1, iY1, h, w, pen, brush);
+//        scene->addLine(iX1, iY1, iX1, iY1);
+        scene->addRect(iX1, iY1, 5, 5, pen, brush);
 
 
     // Вычисляем приращения на каждом шаге по осям абсцисс и ординат
@@ -60,7 +58,8 @@ void dda_line(line_t &line, canvas_t scene, bool steps=false)
     length++;
     while (length--)
     {
-        scene->addRect(roundf(x), roundf(y), h, w, pen, brush);
+//        scene->addLine(roundf(x), roundf(y), roundf(x), roundf(y), pen);
+        scene->addRect(roundf(x), roundf(y), 0.5, 0.5, pen, brush);
         x += dX;
         y += dY;
     }
@@ -68,11 +67,10 @@ void dda_line(line_t &line, canvas_t scene, bool steps=false)
 
 void dda_spectre(spectre_t &spectrum, canvas_t scene, bool is_drawing=false, bool steps=false)
 {
-    int count = (int) 360 / spectrum.angle;
-    for (int i = 0; i < count; i++)
+    for (double i = 0; i < 360; i += spectrum.angle)
     {
-        double x = spectrum.center.x() + cos(M_PI * spectrum.angle * i / 180) * spectrum.radius;
-        double y = spectrum.center.y() + sin(M_PI * spectrum.angle * i / 180) * spectrum.radius;
+        double x = spectrum.center.x() + cos(M_PI * i / 180) * spectrum.radius;
+        double y = spectrum.center.y() + sin(M_PI * i / 180) * spectrum.radius;
         QPointF cur_end = QPointF(x, y);
         line_t line;
         line.color = spectrum.color;

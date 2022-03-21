@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>951</width>
-    <height>612</height>
+    <width>904</width>
+    <height>735</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -85,7 +85,6 @@
             <property name="font">
              <font>
               <pointsize>9</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -148,7 +147,6 @@
           <property name="font">
            <font>
             <pointsize>9</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -375,10 +373,15 @@
       </item>
       <item>
        <widget class="QLabel" name="label_9">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <pointsize>9</pointsize>
-          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -595,10 +598,10 @@
         </size>
        </property>
        <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
+        <enum>Qt::ScrollBarAsNeeded</enum>
        </property>
        <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
+        <enum>Qt::ScrollBarAsNeeded</enum>
        </property>
       </widget>
       <widget class="QTextEdit" name="textEdit">
@@ -611,7 +614,6 @@
        <property name="font">
         <font>
          <pointsize>12</pointsize>
-         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -628,8 +630,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>951</width>
-     <height>22</height>
+     <width>904</width>
+     <height>28</height>
     </rect>
    </property>
   </widget>

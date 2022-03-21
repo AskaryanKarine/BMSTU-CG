@@ -77,9 +77,9 @@ private slots:
     void wheelEvent(QWheelEvent *event);
     void resizeEvent(QResizeEvent *event);
     void on_pushButton_reset_scale_clicked();
-    void mousePressEvent(QMouseEvent *event);
     void drawing_line(line_t &line);
     void drawing_spectrum(spectre_t &spectrum);
+    void check_size(QPointF point);
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
@@ -87,5 +87,6 @@ private:
     QColor line_color = Qt::black;
     QColor back_color = Qt::white;
     std::stack<content_t> cancel;
+    QPointF max, min;
 };
 #endif // MAINWINDOW_H
