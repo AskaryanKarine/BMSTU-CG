@@ -25,10 +25,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ExitAction, SIGNAL(triggered()), this, SLOT(exit_show()));
 
 
-    scene = new QGraphicsScene();
+    scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    ui->graphicsView->setRenderHint(QPainter::Antialiasing);
+    ui->graphicsView->setRenderHint(QPainter::Antialiasing, false);
+//    scen
     ui->pushButton_cancel->setEnabled(false);
 
     data.back_color = Qt::white;
@@ -186,6 +187,7 @@ void MainWindow::drawing_line(line_t &line)
         case BRESEN_INT:
             break;
         case BRESEN_DOUBLE:
+            bresen_double_line(line, ui->graphicsView->scene(), true, false);
             break;
         case BRESEN_STEPS:
             break;
