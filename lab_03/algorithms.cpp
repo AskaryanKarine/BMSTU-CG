@@ -7,23 +7,17 @@ void standart_line(line_t &line, canvas_t scene)
     scene->addLine(l, QPen(line.color));
 }
 
-void standart_spectrum(spectre_t &spectrum, canvas_t scene)
+void draw_pix(double x, double y, canvas_t scene, QColor color)
 {
-    for (double i = 0; i <= 360; i += spectrum.angle)
-    {
-        double x = spectrum.center.x() + cos(M_PI * i / 180) * spectrum.radius;
-        double y = spectrum.center.y() + sin(M_PI * i / 180) * spectrum.radius;
-        QPointF cur_end = QPointF(x, y);
-        QLineF line = QLineF(spectrum.center, cur_end);
-        scene->addLine(line, QPen(spectrum.color));
-    }
+    QPen pen = QPen(color);
+    QBrush brush = QBrush(color);
+
+    scene->addRect(x, y, 1, 1, pen, brush);
 }
 
-void dda_line(line_t &line, canvas_t scene, bool steps=false)
-{
-    QPen pen = QPen(line.color);
-    QBrush brush = QBrush(line.color);
 
+void dda_line(line_t &line, canvas_t scene, bool is_drawing=false, bool is_cnt_steps=false)
+{
     // Целочисленные значения координат начала и конца отрезка,
     // округленные до ближайшего целого
     int iX1 = roundf(line.start.x());
@@ -42,9 +36,8 @@ void dda_line(line_t &line, canvas_t scene, bool steps=false)
 
     // особый случай, на экране закрашивается ровно один пиксел
     if (length == 0)
-//        scene->addLine(iX1, iY1, iX1, iY1);
-        scene->addRect(iX1, iY1, 5, 5, pen, brush);
-
+        if (is_drawing)
+            draw_pix(iX1, iY1, scene, line.color);
 
     // Вычисляем приращения на каждом шаге по осям абсцисс и ординат
     double dX = (line.end.x() - line.start.x()) / length;
@@ -54,53 +47,33 @@ void dda_line(line_t &line, canvas_t scene, bool steps=false)
     double x = line.start.x();
     double y = line.start.y();
 
+    double buf_x = x, buf_y = y;
+    int steps = 1;
     // Основной цикл
     length++;
     while (length--)
     {
-//        scene->addLine(roundf(x), roundf(y), roundf(x), roundf(y), pen);
-        scene->addRect(roundf(x), roundf(y), 0.5, 0.5, pen, brush);
+        if (is_drawing)
+            draw_pix(round(x), round(y), scene, line.color);
+
         x += dX;
         y += dY;
+
+        if (is_cnt_steps)
+        {
+            if (round(x) != round(buf_x) && round(y) != round(buf_y))
+                steps++;
+
+            buf_x = x;
+            buf_y = y;
+        }
     }
 }
 
-void dda_spectre(spectre_t &spectrum, canvas_t scene, bool is_drawing=false, bool steps=false)
-{
-    for (double i = 0; i < 360; i += spectrum.angle)
-    {
-        double x = spectrum.center.x() + cos(M_PI * i / 180) * spectrum.radius;
-        double y = spectrum.center.y() + sin(M_PI * i / 180) * spectrum.radius;
-        QPointF cur_end = QPointF(x, y);
-        line_t line;
-        line.color = spectrum.color;
-        line.start = spectrum.center;
-        line.end = cur_end;
-        if (is_drawing)
-            dda_line(line, scene);
-    }
-}
 
 //void bresen_double_line(line_t &line, canvas_t scene, bool steps=false)
 //{
 
-//}
-
-//void bresen_double_spectre(spectre_t &spectrum, canvas_t scene, bool is_drawing=false, bool steps=false)
-//{
-//    int count = (int) 360 / spectrum.angle;
-//    for (int i = 0; i < count; i++)
-//    {
-//        double x = spectrum.center.x() + cos(M_PI * spectrum.angle * i / 180) * spectrum.radius;
-//        double y = spectrum.center.y() + sin(M_PI * spectrum.angle * i / 180) * spectrum.radius;
-//        QPointF cur_end = QPointF(x, y);
-//        line_t line;
-//        line.color = spectrum.color;
-//        line.start = spectrum.center;
-//        line.end = cur_end;
-//        if (is_drawing)
-//            bresen_double_line(line, scene);
-//    }
 //}
 
 //void bresen_int_line(line_t &line, canvas_t scene, bool steps=false)
@@ -108,21 +81,5 @@ void dda_spectre(spectre_t &spectrum, canvas_t scene, bool is_drawing=false, boo
 
 //}
 
-//void bresen_int_spectre(spectre_t &spectrum, canvas_t scene, bool is_drawing = false, bool steps = false)
-//{
-//    int count = (int) 360 / spectrum.angle;
-//    for (int i = 0; i < count; i++)
-//    {
-//        double x = spectrum.center.x() + cos(M_PI * spectrum.angle * i / 180) * spectrum.radius;
-//        double y = spectrum.center.y() + sin(M_PI * spectrum.angle * i / 180) * spectrum.radius;
-//        QPointF cur_end = QPointF(x, y);
-//        line_t line;
-//        line.color = spectrum.color;
-//        line.start = spectrum.center;
-//        line.end = cur_end;
-//        if (is_drawing)
-//            bresen_int_line(line, scene);
-//    }
-//}
 
 

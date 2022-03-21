@@ -79,7 +79,6 @@ private slots:
     void on_pushButton_reset_scale_clicked();
     void drawing_line(line_t &line);
     void drawing_spectrum(spectre_t &spectrum);
-    void check_size(QPointF point);
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
