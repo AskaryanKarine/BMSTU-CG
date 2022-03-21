@@ -19,6 +19,12 @@ enum method_t
     WY
 };
 
+enum request_t
+{
+    DRAW_LINE,
+    DRAW_SPECTRE
+};
+
 struct line_t
 {
     QPointF start;
@@ -87,5 +93,6 @@ private:
     QColor back_color = Qt::white;
     std::stack<content_t> cancel;
     QPointF max, min;
+    std::vector<request_t> queue;
 };
 #endif // MAINWINDOW_H

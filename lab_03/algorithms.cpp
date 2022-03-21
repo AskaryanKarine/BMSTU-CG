@@ -1,11 +1,10 @@
 #include "algorithms.h"
-#include <QRectF>
 #include <cmath>
 
 void standart_line(line_t &line, canvas_t scene)
 {
     QLineF l = QLineF(line.start, line.end);
-    scene->addLine(l, QPen(line.color));
+    scene->addLine(l, QPen(line.color, 2));
 }
 
 void draw_pix(double x, double y, canvas_t scene, QColor color)
@@ -13,8 +12,7 @@ void draw_pix(double x, double y, canvas_t scene, QColor color)
     QPen pen = QPen(color);
     QBrush brush = QBrush(color);
 
-//    scene->addLine(x, y, x + 0.2, y + 0.2, pen);
-    scene->addRect(x, y, 1, 1, pen, brush);
+    scene->addRect(x*2, y*2, 2, 2, pen, brush);
 }
 
 int dda_line(line_t &line, canvas_t scene, bool is_drawing=false, bool is_cnt_steps=false)
@@ -73,7 +71,6 @@ static int sign(double x)
     return 0;
 }
 
-
 int bresen_double_line(line_t &line, canvas_t scene, bool is_drawing=false, bool is_cnt_steps=false)
 {
     double x = round(line.start.x());
@@ -88,14 +85,12 @@ int bresen_double_line(line_t &line, canvas_t scene, bool is_drawing=false, bool
     dx = abs(dx);
     dy = abs(dy);
 
-    int change;
-    if (dx > dy)
-        change = 0;
-    else
-    {
+    int change = 0;
+    if (dy >= dx)
         change = 1;
+
+    if (change)
         std::swap(dx, dy);
-    }
 
     double m = dy / dx;
     double e = m - 0.5;
@@ -116,7 +111,7 @@ int bresen_double_line(line_t &line, canvas_t scene, bool is_drawing=false, bool
                 x += sx;
             e--;
         }
-        else
+        if (e <= 0)
         {
             if (change == 0)
                 x += sx;
@@ -138,7 +133,6 @@ int bresen_double_line(line_t &line, canvas_t scene, bool is_drawing=false, bool
     return steps;
 }
 
-
 int bresen_int_line(line_t &line, canvas_t scene, bool is_drawing=false, bool is_cnt_steps=false)
 {
     int x = round(line.start.x());
@@ -153,14 +147,12 @@ int bresen_int_line(line_t &line, canvas_t scene, bool is_drawing=false, bool is
     dx = abs(dx);
     dy = abs(dy);
 
-    int change;
-    if (dx > dy)
-        change = 0;
-    else
-    {
+    int change = 0;
+    if (dy >= dx)
         change = 1;
+
+    if (change)
         std::swap(dx, dy);
-    }
 
     int m = 2 * dy;
     int m1 = 2 * dx;
@@ -182,7 +174,7 @@ int bresen_int_line(line_t &line, canvas_t scene, bool is_drawing=false, bool is
                 x += sx;
             e -= m1;
         }
-        else
+        if (e <= 0)
         {
             if (change == 0)
                 x += sx;
@@ -221,7 +213,6 @@ QColor update(QColor color, double intens)
     QColor c = QColor(r, g, b, res);
     return c;
 }
-
 
 int bresen_steps_line(line_t &line, canvas_t scene, bool is_drawing=false, bool is_cnt_steps=false)
 {

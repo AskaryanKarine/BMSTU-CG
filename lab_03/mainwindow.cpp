@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ExitAction, SIGNAL(triggered()), this, SLOT(exit_show()));
 
 
-    scene = new QGraphicsScene(this);
+    scene = new QGraphicsScene();
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing, false);
@@ -36,8 +36,8 @@ MainWindow::MainWindow(QWidget *parent)
     show_color(line_color, ui->label_lc);
 
     ui->graphicsView->viewport()->installEventFilter(this);
-//    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
@@ -133,7 +133,6 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
         return true;
     }
     return false;
-
 }
 
 // функции рисования
@@ -143,10 +142,15 @@ void MainWindow::drawing_content()
     scene->clear();
     ui->graphicsView->setBackgroundBrush(data.back_color);
     drawing_axes();
-    for (size_t i = 0; i < data.lines.size(); i++)
-        drawing_line(data.lines[i]);
-    for (size_t i = 0; i < data.spectra.size(); i++)
-        drawing_spectrum(data.spectra[i]);
+
+    size_t l = 0, s = 0;
+    for (size_t i = 0; i < queue.size(); i++)
+    {
+        if (queue[i] == DRAW_LINE)
+            drawing_line(data.lines[l++]);
+        if (queue[i] == DRAW_SPECTRE)
+            drawing_spectrum(data.spectra[s++]);
+    }
 }
 
 // функция рисования осей
@@ -169,7 +173,6 @@ void MainWindow::drawing_axes()
     // X
     scene->addLine(105, -3, 109, 3, pen);
     scene->addLine(109, -3, 105, 3, pen);
-
 }
 
 // рисование линий
@@ -302,6 +305,7 @@ void MainWindow::on_pushButton_line_clicked() // дописать
                 line.start = start;
                 line.end = end;
                 data.lines.push_back(line);
+                queue.push_back(DRAW_LINE);
                 drawing_line(line);
                 data.back_color = back_color;
                 ui->graphicsView->setBackgroundBrush(back_color);
@@ -351,6 +355,7 @@ void MainWindow::on_pushButton_spectrum_clicked() // дописать
             data.spectra.push_back(spectre);
             data.back_color = back_color;
             ui->graphicsView->setBackgroundBrush(back_color);
+            queue.push_back(DRAW_SPECTRE);
             drawing_spectrum(spectre);
         }
     }
@@ -366,6 +371,7 @@ void MainWindow::on_pushButton_clear_clicked()
     data.lines.clear();
     data.spectra.clear();
     cancel = std::stack<content_t>();
+    queue.clear();
     print_succses("Успешно очищено");
     ui->graphicsView->resetTransform();
     drawing_content();
@@ -375,14 +381,15 @@ void MainWindow::on_pushButton_clear_clicked()
 // функция отмены действия
 void MainWindow::on_pushButton_cancel_clicked() // дописать
 {
-    if (cancel.empty())
-        ui->pushButton_cancel->setEnabled(false);
-    else
+    if (!cancel.empty())
     {
         data = cancel.top();
         cancel.pop();
         drawing_content();
+        queue.pop_back();
     }
+    if (cancel.empty())
+        ui->pushButton_cancel->setEnabled(false);
 }
 
 // изменение размера (все перестроится)
