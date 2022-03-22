@@ -554,16 +554,11 @@ void MainWindow::on_pushButton_time_clicked()
             spectre.radius = spectrum_r;
 
             std::vector<double> time;
-            spectre.method = DDA;
-            time.push_back(measure_avg_time(spectre));
-            spectre.method = BRESEN_DOUBLE;
-            time.push_back(measure_avg_time(spectre));
-            spectre.method = BRESEN_INT;
-            time.push_back(measure_avg_time(spectre));
-            spectre.method = BRESEN_STEPS;
-            time.push_back(measure_avg_time(spectre));
-            spectre.method = WY;
-            time.push_back(measure_avg_time(spectre));
+            for (int i = DDA; i <= WY; i++)
+            {
+                spectre.method = (method_t) i;
+                time.push_back(measure_avg_time(spectre));
+            }
 
             std::ofstream out("../lab_03/time_res.txt");
 
