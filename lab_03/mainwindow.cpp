@@ -156,23 +156,23 @@ void MainWindow::drawing_content()
 // функция рисования осей
 void MainWindow::drawing_axes()
 {
-    QPen pen = QPen(Qt::black);
+    QPen pen = QPen(Qt::black, 2);
     // Oy
-    scene->addLine(0, -4, 0, 100, pen);
-    scene->addLine(0, 100, 4, 85, pen);
-    scene->addLine(0, 100, -4, 85, pen);
+    scene->addLine(0, -8, 0, 200, pen);
+    scene->addLine(0, 200, 8, 170, pen);
+    scene->addLine(0, 200, -8, 170, pen);
     // Y
-    scene->addLine(-3, 105, 0, 110, pen);
-    scene->addLine(0, 110, 3, 105, pen);
-    scene->addLine(0, 110, 0, 114, pen);
+    scene->addLine(-6, 210, 0, 220, pen);
+    scene->addLine(0, 220, 6, 210, pen);
+    scene->addLine(0, 220, 0, 228, pen);
 
     // Ox
-    scene->addLine(-4, 0, 100, 0, pen);
-    scene->addLine(100, 0, 85, 4, pen);
-    scene->addLine(100, 0, 85, -4, pen);
+    scene->addLine(-8, 0, 200, 0, pen);
+    scene->addLine(200, 0, 170, 8, pen);
+    scene->addLine(200, 0, 170, -8, pen);
     // X
-    scene->addLine(105, -3, 109, 3, pen);
-    scene->addLine(109, -3, 105, 3, pen);
+    scene->addLine(210, -6, 218, 6, pen);
+    scene->addLine(218, -6, 210, 6, pen);
 }
 
 // рисование линий
@@ -196,6 +196,7 @@ void MainWindow::drawing_line(line_t &line)
             bresen_steps_line(line, ui->graphicsView->scene(), true, false);
             break;
         case WY:
+            wy_line(line, ui->graphicsView->scene(), true, false);
             break;
     }
 }

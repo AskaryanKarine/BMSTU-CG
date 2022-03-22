@@ -13,4 +13,6 @@ int bresen_int_line(line_t &line, canvas_t scene, bool is_drawing, bool is_cnt_s
 
 int bresen_steps_line(line_t &line, canvas_t scene, bool is_drawing, bool is_cnt_steps);
 
+int wy_line(line_t &line, canvas_t scene, bool is_drawing, bool is_cnt_steps);
+
 #endif // ALGORITHMS_H
