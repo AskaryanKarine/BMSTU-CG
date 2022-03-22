@@ -481,7 +481,7 @@ void MainWindow::on_pushButton_steps_clicked()
                     out << steps[i] << "\n";
             }
             out.close();
-            system("python ../lab_03/time.py");
+            system("python ../lab_03/steps.py");
 
             print_succses("Успешно");
         }
@@ -569,6 +569,7 @@ void MainWindow::on_pushButton_time_clicked()
 
             if (out.is_open())
             {
+                out << spectre.radius << "\n";
                 for (std::size_t i = 0; i < time.size(); i++)
                     out << time[i] << "\n";
             }
