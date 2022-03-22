@@ -11,6 +11,7 @@
 #include <QMimeData>
 #include <QtGlobal>
 #include <cmath>
+#include <fstream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -143,11 +144,10 @@ void MainWindow::drawing_content()
     ui->graphicsView->setBackgroundBrush(data.back_color);
     drawing_axes();
     for (size_t i = 0; i < data.lines.size(); i++)
-        drawing_line(data.lines[i]);
+        drawing_line(data.lines[i], true, false);
 
     for (size_t i = 0; i < data.spectra.size(); i++)
         drawing_spectrum(data.spectra[i]);
-
 }
 
 // функция рисования осей
@@ -173,7 +173,7 @@ void MainWindow::drawing_axes()
 }
 
 // рисование линий
-void MainWindow::drawing_line(line_t &line)
+void MainWindow::drawing_line(line_t &line, bool is_drawing, bool is_cnt_steps)
 {
     switch (line.method)
     {
@@ -181,19 +181,19 @@ void MainWindow::drawing_line(line_t &line)
             standart_line(line, ui->graphicsView->scene());
             break;
         case DDA:
-            dda_line(line, ui->graphicsView->scene(), true, false);
+            dda_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
             break;
         case BRESEN_INT:
-            bresen_int_line(line, ui->graphicsView->scene(), true, false);
+            bresen_int_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
             break;
         case BRESEN_DOUBLE:
-            bresen_double_line(line, ui->graphicsView->scene(), true, false);
+            bresen_double_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
             break;
         case BRESEN_STEPS:
-            bresen_steps_line(line, ui->graphicsView->scene(), true, false);
+            bresen_steps_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
             break;
         case WY:
-            wy_line(line, ui->graphicsView->scene(), true, false);
+            wy_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
             break;
     }
 }
@@ -213,7 +213,7 @@ void MainWindow::drawing_spectrum(spectre_t &spectrum)
         y = spectrum.center.y() + sin(M_PI * i / 180) * spectrum.radius;
         cur_end = QPointF(x, y);
         line.end = cur_end;
-        drawing_line(line);
+        drawing_line(line, true, false);
     }
 }
 
@@ -303,9 +303,10 @@ void MainWindow::on_pushButton_line_clicked() // дописать
                 line.start = start;
                 line.end = end;
                 data.lines.push_back(line);
-                drawing_line(line);
+                drawing_line(line, true, false);
                 data.back_color = back_color;
                 ui->graphicsView->setBackgroundBrush(back_color);
+                print_succses("Успешно построенно");
             }
         }
     }
@@ -353,6 +354,7 @@ void MainWindow::on_pushButton_spectrum_clicked() // дописать
             data.back_color = back_color;
             ui->graphicsView->setBackgroundBrush(back_color);
             drawing_spectrum(spectre);
+            print_succses("Успешно построенно");
         }
     }
 }
@@ -397,4 +399,138 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 void MainWindow::on_pushButton_reset_scale_clicked()
 {
     ui->graphicsView->resetTransform();
+}
+
+std::vector<int> MainWindow::measure_steps(spectre_t spectrum)
+{
+    std::vector<int> steps;
+
+}
+
+// кол-во ступенек в зависимости от угла
+void MainWindow::on_pushButton_steps_clicked()
+{
+    QString str_spectrum_x = ui->lineEdit_spectrum_x->text();
+    QString str_spectrum_y = ui->lineEdit_spectrum_y->text();
+    QString str_spectrum_r = ui->lineEdit_spectrum_radius->text();
+    QString str_angle = ui->lineEdit_angle->text();
+
+    if (str_spectrum_x.length() == 0 || str_spectrum_y.length() == 0 || str_spectrum_r.length() == 0 || str_angle.length() == 0)
+        print_warning("Ошибка ввода: пустой или неполный ввод");
+    else
+    {
+        bool flag_spectrum_x, flag_spectrum_y, flag_spectrum_r, flag_angle;
+        double spectrum_x, spectrum_y;
+        double spectrum_r, angle;
+
+        spectrum_x = str_spectrum_x.toDouble(&flag_spectrum_x);
+        spectrum_y = str_spectrum_y.toDouble(&flag_spectrum_y);
+        spectrum_r = str_spectrum_r.toDouble(&flag_spectrum_r);
+        angle = str_angle.toDouble(&flag_angle);
+
+        if (!flag_spectrum_x || !flag_spectrum_y || !flag_spectrum_r || !flag_angle)
+            print_warning("Ошибка ввода: некорректный ввод");
+        else
+        {
+            QPointF center = QPointF(spectrum_x, spectrum_y);
+
+            spectre_t spectre;
+            spectre.center = center;
+            spectre.angle = angle;
+            spectre.color = line_color;
+            spectre.radius = spectrum_r;
+        }
+    }
+}
+
+double MainWindow::measure_avg_time(spectre_t spectrum)
+{
+    const int iterations = 100;
+    using std::chrono::duration;
+    using std::chrono::duration_cast;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::microseconds;
+
+    auto end = high_resolution_clock::now();
+    auto start = high_resolution_clock::now();
+    double x, y;
+    QPointF cur_end;
+    line_t line;
+    line.color = spectrum.color;
+    line.method = spectrum.method;
+    line.start = spectrum.center;
+
+    for (int i = 0; i < iterations; i++)
+    {
+        for (double j = 0.0; j <= 360.0; j += spectrum.angle)
+        {
+            x = spectrum.center.x() + cos(M_PI * i / 180) * spectrum.radius;
+            y = spectrum.center.y() + sin(M_PI * i / 180) * spectrum.radius;
+            cur_end = QPointF(x, y);
+            line.end = cur_end;
+            drawing_line(line, false, false);
+        }
+    }
+    end = high_resolution_clock::now();
+    return (double)duration_cast<microseconds>(end - start).count() / iterations;
+}
+
+// время выполнения
+void MainWindow::on_pushButton_time_clicked()
+{
+    QString str_spectrum_x = ui->lineEdit_spectrum_x->text();
+    QString str_spectrum_y = ui->lineEdit_spectrum_y->text();
+    QString str_spectrum_r = ui->lineEdit_spectrum_radius->text();
+    QString str_angle = ui->lineEdit_angle->text();
+
+    if (str_spectrum_x.length() == 0 || str_spectrum_y.length() == 0 || str_spectrum_r.length() == 0 || str_angle.length() == 0)
+        print_warning("Ошибка ввода: пустой или неполный ввод");
+    else
+    {
+        bool flag_spectrum_x, flag_spectrum_y, flag_spectrum_r, flag_angle;
+        double spectrum_x, spectrum_y;
+        double spectrum_r, angle;
+
+        spectrum_x = str_spectrum_x.toDouble(&flag_spectrum_x);
+        spectrum_y = str_spectrum_y.toDouble(&flag_spectrum_y);
+        spectrum_r = str_spectrum_r.toDouble(&flag_spectrum_r);
+        angle = str_angle.toDouble(&flag_angle);
+
+        if (!flag_spectrum_x || !flag_spectrum_y || !flag_spectrum_r || !flag_angle)
+            print_warning("Ошибка ввода: некорректный ввод");
+        else
+        {
+            QPointF center = QPointF(spectrum_x, spectrum_y);
+
+            spectre_t spectre;
+            spectre.center = center;
+            spectre.angle = angle;
+            spectre.color = line_color;
+            spectre.radius = spectrum_r;
+
+            std::vector<double> time;
+            spectre.method = DDA;
+            time.push_back(measure_avg_time(spectre));
+            spectre.method = BRESEN_DOUBLE;
+            time.push_back(measure_avg_time(spectre));
+            spectre.method = BRESEN_INT;
+            time.push_back(measure_avg_time(spectre));
+            spectre.method = BRESEN_STEPS;
+            time.push_back(measure_avg_time(spectre));
+            spectre.method = WY;
+            time.push_back(measure_avg_time(spectre));
+
+            std::ofstream out("../lab_03/time_res.txt");
+
+            if (out.is_open())
+            {
+                for (std::size_t i = 0; i < time.size(); i++)
+                    out << time[i] << "\n";
+            }
+            out.close();
+            system("python ../lab_03/time.py");
+
+            print_succses("Успешно");
+        }
+    }
 }
