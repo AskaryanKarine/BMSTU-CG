@@ -4,7 +4,7 @@
 void standart_line(line_t &line, canvas_t scene)
 {
     QLineF l = QLineF(line.start, line.end);
-    scene->addLine(l, QPen(line.color, 2));
+    scene->addLine(l, QPen(line.color, 1));
 }
 
 void draw_pix(double x, double y, canvas_t scene, QColor color)
@@ -12,7 +12,7 @@ void draw_pix(double x, double y, canvas_t scene, QColor color)
     QPen pen = QPen(color);
     QBrush brush = QBrush(color);
 
-    scene->addRect(x*2, y*2, 2, 2, pen, brush);
+    scene->addRect(x, y, 1, 1, pen, brush);
 }
 
 int dda_line(line_t &line, canvas_t scene, bool is_drawing=false, bool is_cnt_steps=false)
