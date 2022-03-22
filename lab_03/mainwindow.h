@@ -77,13 +77,12 @@ private slots:
     void wheelEvent(QWheelEvent *event);
     void resizeEvent(QResizeEvent *event);
     void on_pushButton_reset_scale_clicked();
-    void drawing_line(line_t &line, bool is_drawing, bool is_cnt_steps);
+    int drawing_line(line_t &line, bool is_drawing, bool is_cnt_steps);
     void drawing_spectrum(spectre_t &spectrum);
     void on_pushButton_steps_clicked();
-
     void on_pushButton_time_clicked();
-
     double measure_avg_time(spectre_t spectrum);
+    void measure_steps(spectre_t spectrum, std::vector<int> &all_steps);
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;

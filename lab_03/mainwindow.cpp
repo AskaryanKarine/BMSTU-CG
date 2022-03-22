@@ -173,29 +173,33 @@ void MainWindow::drawing_axes()
 }
 
 // рисование линий
-void MainWindow::drawing_line(line_t &line, bool is_drawing, bool is_cnt_steps)
+int MainWindow::drawing_line(line_t &line, bool is_drawing, bool is_cnt_steps)
 {
+    int rc = 0;
     switch (line.method)
     {
         case STANDART:
             standart_line(line, ui->graphicsView->scene());
             break;
         case DDA:
-            dda_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
+            rc = dda_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
             break;
         case BRESEN_INT:
-            bresen_int_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
+            rc = bresen_int_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
             break;
         case BRESEN_DOUBLE:
-            bresen_double_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
+            rc = bresen_double_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
             break;
         case BRESEN_STEPS:
-            bresen_steps_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
+            rc = bresen_steps_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
             break;
         case WY:
-            wy_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
+            rc = wy_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
             break;
     }
+    if (is_cnt_steps)
+        return rc;
+    return -1;
 }
 
 // функция рисования спектра
@@ -401,10 +405,24 @@ void MainWindow::on_pushButton_reset_scale_clicked()
     ui->graphicsView->resetTransform();
 }
 
-std::vector<int> MainWindow::measure_steps(spectre_t spectrum)
+void MainWindow::measure_steps(spectre_t spectrum, std::vector<int> &all_steps)
 {
-    std::vector<int> steps;
-
+    double x, y;
+    QPointF cur_end;
+    line_t line;
+    line.color = spectrum.color;
+    line.method = spectrum.method;
+    line.start = spectrum.center;
+    int step;
+    for (double j = 0.0; j <= 360.0; j += spectrum.angle)
+    {
+        x = spectrum.center.x() + cos(M_PI * j / 180) * spectrum.radius;
+        y = spectrum.center.y() + sin(M_PI * j / 180) * spectrum.radius;
+        cur_end = QPointF(x, y);
+        line.end = cur_end;
+        step = drawing_line(line, false, true);
+        all_steps.push_back(step);
+    }
 }
 
 // кол-во ступенек в зависимости от угла
@@ -439,6 +457,33 @@ void MainWindow::on_pushButton_steps_clicked()
             spectre.angle = angle;
             spectre.color = line_color;
             spectre.radius = spectrum_r;
+            std::vector<int> steps;
+            spectre.method = DDA;
+            measure_steps(spectre, steps);
+            spectre.method = BRESEN_DOUBLE;
+            measure_steps(spectre, steps);
+            spectre.method = BRESEN_INT;
+            measure_steps(spectre, steps);
+            spectre.method = BRESEN_STEPS;
+            measure_steps(spectre, steps);
+            spectre.method = WY;
+            measure_steps(spectre, steps);
+
+            double ma = spectre.angle * std::ceil(360 / spectre.angle);
+            std::ofstream out("../lab_03/steps_res.txt");
+
+            if (out.is_open())
+            {
+                out << spectre.radius << "\n";
+                out << spectre.angle << "\n";
+                out << ma << "\n";
+                for (std::size_t i = 0; i < steps.size(); i++)
+                    out << steps[i] << "\n";
+            }
+            out.close();
+            system("python ../lab_03/time.py");
+
+            print_succses("Успешно");
         }
     }
 }
@@ -464,8 +509,8 @@ double MainWindow::measure_avg_time(spectre_t spectrum)
     {
         for (double j = 0.0; j <= 360.0; j += spectrum.angle)
         {
-            x = spectrum.center.x() + cos(M_PI * i / 180) * spectrum.radius;
-            y = spectrum.center.y() + sin(M_PI * i / 180) * spectrum.radius;
+            x = spectrum.center.x() + cos(M_PI * j / 180) * spectrum.radius;
+            y = spectrum.center.y() + sin(M_PI * j / 180) * spectrum.radius;
             cur_end = QPointF(x, y);
             line.end = cur_end;
             drawing_line(line, false, false);
