@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>904</width>
-    <height>796</height>
+    <height>678</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -27,7 +27,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QFormLayout" name="formLayout">
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout_8">
+     <layout class="QVBoxLayout" name="verticalLayout_10">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_7">
         <item>
@@ -91,6 +91,7 @@
             <property name="font">
              <font>
               <pointsize>9</pointsize>
+              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -103,7 +104,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="comboBox_algorithm">
+           <widget class="QComboBox" name="comboBox_method">
             <property name="maximumSize">
              <size>
               <width>220</width>
@@ -152,6 +153,7 @@
             <property name="font">
              <font>
               <pointsize>9</pointsize>
+              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -159,7 +161,7 @@
              <string>Фигура:</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -200,12 +202,12 @@
           <property name="font">
            <font>
             <pointsize>9</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
           <property name="text">
-           <string>Построить окружность 
- (элипс)</string>
+           <string>Построить фигуру</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -254,7 +256,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_circle_x">
+               <widget class="QLineEdit" name="lineEdit_figure_x">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -299,7 +301,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_circle_y">
+               <widget class="QLineEdit" name="lineEdit_figure_y">
                 <property name="maximumSize">
                  <size>
                   <width>40</width>
@@ -371,7 +373,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_circle_r1">
+               <widget class="QLineEdit" name="lineEdit_figure_r1">
                 <property name="maximumSize">
                  <size>
                   <width>40</width>
@@ -404,7 +406,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_circle_r2">
+               <widget class="QLineEdit" name="lineEdit_figure_r2">
                 <property name="maximumSize">
                  <size>
                   <width>40</width>
@@ -420,7 +422,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_circle">
+         <widget class="QPushButton" name="pushButton_figure">
           <property name="maximumSize">
            <size>
             <width>16777215</width>
@@ -435,7 +437,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_10">
+       <layout class="QVBoxLayout" name="verticalLayout_8">
         <item>
          <widget class="QLabel" name="label_9">
           <property name="maximumSize">
@@ -447,6 +449,7 @@
           <property name="font">
            <font>
             <pointsize>9</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -459,7 +462,7 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_15">
+         <layout class="QHBoxLayout" name="horizontalLayout_18">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
@@ -477,7 +480,7 @@
                <string>Центр</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignBottom|Qt::AlignHCenter</set>
               </property>
              </widget>
             </item>
@@ -548,7 +551,7 @@
                <string>R1</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignBottom|Qt::AlignHCenter</set>
               </property>
              </widget>
             </item>
@@ -622,7 +625,7 @@
                <string>R2</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignBottom|Qt::AlignHCenter</set>
               </property>
              </widget>
             </item>
@@ -658,7 +661,7 @@
               <item>
                <widget class="QLabel" name="label_19">
                 <property name="text">
-                 <string>ΔR1</string>
+                 <string>ΔR2</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -678,6 +681,91 @@
              </layout>
             </item>
            </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_15">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_17">
+            <property name="spacing">
+             <number>7</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_20">
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>N</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_spectrum_n">
+              <property name="maximumSize">
+               <size>
+                <width>40</width>
+                <height>16777215</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>
@@ -797,7 +885,7 @@
      <x>0</x>
      <y>0</y>
      <width>904</width>
-     <height>28</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

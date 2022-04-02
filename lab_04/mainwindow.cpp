@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-//#include "algorithms.h"
 #include <QColorDialog>
 #include <QColor>
 #include <QMessageBox>
@@ -8,10 +7,16 @@
 #include <iostream>
 #include <QTimer>
 #include <QDrag>
-#include <QMimeData>
 #include <QtGlobal>
-#include <cmath>
-#include <fstream>
+#include "request.h"
+
+#define DEF_X ui->graphicsView->geometry().x() / 2.0
+#define DEF_Y ui->graphicsView->geometry().y() / 2.0;
+#define DEF_N 100
+#define DEF_R1 10
+#define DEF_R2 20
+#define DEF_DR1 0.5
+#define DEF_DR2 0.5
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -29,8 +34,12 @@ MainWindow::MainWindow(QWidget *parent)
     scene = new QGraphicsScene();
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    ui->graphicsView->setRenderHint(QPainter::Antialiasing, false);
+
     ui->pushButton_cancel->setEnabled(false);
+
+    ui->lineEdit_figure_r2->setDisabled(true);
+    ui->lineEdit_spectrum_dr2->setDisabled(true);
+    ui->lineEdit_spectrum_r2->setDisabled(true);
 
     data.back_color = Qt::white;
     show_color(data.back_color, ui->label_bc);
@@ -49,37 +58,34 @@ MainWindow::~MainWindow()
     cancel = std::stack <content_t>();
 }
 
+// информационные функции
+void MainWindow::app_info_show()
+{
+    QMessageBox::information(NULL, "О программе","Реализация и исследование алгоритмов построения окружностей и эллипсов");
+}
+
+void MainWindow::author_info_show()
+{
+    QMessageBox::information(NULL, "Об авторе", " Программа написана студенткой \nАскарян Каринэ из группы ИУ7-42Б\n +7(916)888-02-20");
+}
+
 void MainWindow::showEvent(QShowEvent *ev)
 {
     QMainWindow::showEvent(ev);
     QTimer::singleShot(500, this, SLOT(windowShown()));
 }
 
-void MainWindow::windowShown()
+void MainWindow::windowShown() // !!!
 {
-    drawing_content();
+    request_t req;
+    req.operation = DRAW_ALL;
+    // !!!
+    request_handel(req);
 }
 
-static void copy(struct content_t **a, struct content_t *b)
+void MainWindow::error_message(QString str)
 {
-    for (size_t i = 0; i < b->lines.size(); i++)
-        (*a)->lines.push_back(b->lines[i]);
-
-    for (size_t i = 0; i < b->spectra.size(); i++)
-        (*a)->spectra.push_back(b->spectra[i]);
-
-    (*a)->back_color = b->back_color;
-}
-
-// информационные функции
-void MainWindow::app_info_show()
-{
-    QMessageBox::information(NULL, "О программе","Реализация и исследование алгоритмов построения отрезков");
-}
-
-void MainWindow::author_info_show()
-{
-    QMessageBox::information(NULL, "Об авторе", " Программа написана студенткой \nАскарян Каринэ из группы ИУ7-42Б\n +7(916)888-02-20");
+    QMessageBox::critical(NULL, "Ошибка", str);
 }
 
 void MainWindow::exit_show()
@@ -120,91 +126,6 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-// функции рисования
-// функция рисования ВСЕГО
-void MainWindow::drawing_content()
-{
-    scene->clear();
-    ui->graphicsView->setBackgroundBrush(data.back_color);
-    drawing_axes();
-    for (size_t i = 0; i < data.lines.size(); i++)
-        drawing_line(data.lines[i], true, false);
-
-    for (size_t i = 0; i < data.spectra.size(); i++)
-        drawing_spectrum(data.spectra[i]);
-}
-
-// функция рисования осей
-void MainWindow::drawing_axes()
-{
-    QPen pen = QPen(Qt::black, 2);
-    // Oy
-    scene->addLine(0, -8, 0, 200, pen);
-    scene->addLine(0, 200, 8, 170, pen);
-    scene->addLine(0, 200, -8, 170, pen);
-    // Y
-    scene->addLine(-6, 210, 0, 220, pen);
-    scene->addLine(0, 220, 6, 210, pen);
-    scene->addLine(0, 220, 0, 228, pen);
-
-    // Ox
-    scene->addLine(-8, 0, 200, 0, pen);
-    scene->addLine(200, 0, 170, 8, pen);
-    scene->addLine(200, 0, 170, -8, pen);
-    // X
-    scene->addLine(210, -6, 218, 6, pen);
-    scene->addLine(218, -6, 210, 6, pen);
-}
-
-// рисование линий
-int MainWindow::drawing_line(line_t &line, bool is_drawing, bool is_cnt_steps)
-{
-    int rc = 0;
-    switch (line.method)
-    {
-        case STANDART:
-//            standart_line(line, ui->graphicsView->scene());
-            break;
-        case CANONICAL:
-//            rc = dda_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
-            break;
-        case BRESEN:
-//            rc = bresen_int_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
-            break;
-        case PARAMETRIC:
-//            rc = bresen_double_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
-            break;
-        case MIDDLE_POINT:
-//            rc = bresen_steps_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
-            break;
-        case WY:
-//            rc = wy_line(line, ui->graphicsView->scene(), is_drawing, is_cnt_steps);
-            break;
-    }
-    if (is_cnt_steps)
-        return rc;
-    return -1;
-}
-
-// функция рисования спектра
-void MainWindow::drawing_spectrum(spectre_t &spectrum)
-{
-    double x, y;
-    QPointF cur_end;
-    line_t line;
-    line.color = spectrum.color;
-    line.method = spectrum.method;
-    line.start = spectrum.center;
-    for (double i = 0.0; i <= 360.0; i += spectrum.angle)
-    {
-        x = spectrum.center.x() + cos(M_PI * i / 180) * spectrum.radius;
-        y = spectrum.center.y() + sin(M_PI * i / 180) * spectrum.radius;
-        cur_end = QPointF(x, y);
-        line.end = cur_end;
-        drawing_line(line, true, false);
-    }
-}
-
 // показать цвет на лейбл
 void MainWindow::show_color(QColor color, QLabel *lab)
 {
@@ -229,8 +150,7 @@ void MainWindow::on_pushButton_back_color_clicked()
     dialog.exec();
     QColor color = dialog.selectedColor();
     if (!color.isValid())
-    {}
-//        print_warning("Что-то пошло не так");
+        error_message("Выберите цвет");
     else
         back_color = color;
     show_color(back_color, ui->label_bc);
@@ -245,150 +165,38 @@ void MainWindow::on_pushButton_line_color_clicked()
     dialog.exec();
     QColor color = dialog.selectedColor();
     if (!color.isValid())
-    {}
-//        print_warning("Что-то пошло не так");
+        error_message("Выберите цвет");
     else
         line_color = color;
     show_color(line_color, ui->label_lc);
 }
 
-// построить линию
-void MainWindow::on_pushButton_line_clicked() // дописать
-{
-    QString str_x_start = ui->lineEdit_line_x_start->text();
-    QString str_y_start = ui->lineEdit_line_y_start->text();
-    QString str_x_end = ui->lineEdit_line_x_end->text();
-    QString str_y_end = ui->lineEdit_line_y_end->text();
-
-    if (str_x_end.length() == 0 || str_x_start.length() == 0 || str_y_end.length() == 0 || str_y_start.length() == 0)
-    {}
-        //        print_warning("Ошибка ввода: пустой или неполный ввод");
-    else
-    {
-        bool flag_x_start, flag_y_start, flag_x_end, flag_y_end;
-        double x_start, y_start, x_end, y_end;
-        x_start = str_x_start.toDouble(&flag_x_start);
-        y_start = str_y_start.toDouble(&flag_y_start);
-        x_end = str_x_end.toDouble(&flag_x_end);
-        y_end = str_y_end.toDouble(&flag_y_end);
-        if (!flag_x_start || !flag_x_end || !flag_y_start || !flag_y_end)
-        {}
-            //            print_warning("Ошибка ввода: Некорректный ввод");
-        else
-        {
-            QPointF start, end;
-            start = QPointF(x_start, y_start);
-            end = QPointF(x_end, y_end);
-
-            if (start == end)
-            {}
-//                print_warning("Ошибка ввода: Точки начала и конца отрезка совпадают");
-            else
-            {
-                content_t *c = new content_t;
-                copy(&c, &data);
-                cancel.push(*c);
-                ui->pushButton_cancel->setEnabled(true);
-
-                line_t line;
-                line.color = line_color;
-                line.method = (method_t) ui->comboBox->currentIndex();
-                line.start = start;
-                line.end = end;
-                data.lines.push_back(line);
-                drawing_line(line, true, false);
-                data.back_color = back_color;
-                ui->graphicsView->setBackgroundBrush(back_color);
-//                print_succses("Успешно построенно");
-            }
-        }
-    }
-}
-
-// поистроить спектр
-void MainWindow::on_pushButton_spectrum_clicked() // дописать
-{
-    QString str_spectrum_x = ui->lineEdit_spectrum_x->text();
-    QString str_spectrum_y = ui->lineEdit_spectrum_y->text();
-    QString str_spectrum_r = ui->lineEdit_spectrum_radius->text();
-    QString str_angle = ui->lineEdit_angle->text();
-
-    if (str_spectrum_x.length() == 0 || str_spectrum_y.length() == 0 || str_spectrum_r.length() == 0 || str_angle.length() == 0)
-    {}
-//        print_warning("Ошибка ввода: пустой или неполный ввод");
-    else
-    {
-        bool flag_spectrum_x, flag_spectrum_y, flag_spectrum_r, flag_angle;
-        double spectrum_x, spectrum_y;
-        double spectrum_r, angle;
-
-        spectrum_x = str_spectrum_x.toDouble(&flag_spectrum_x);
-        spectrum_y = str_spectrum_y.toDouble(&flag_spectrum_y);
-        spectrum_r = str_spectrum_r.toDouble(&flag_spectrum_r);
-        angle = str_angle.toDouble(&flag_angle);
-
-        if (!flag_spectrum_x || !flag_spectrum_y || !flag_spectrum_r || !flag_angle)
-        {}
-//            print_warning("Ошибка ввода: некорректный ввод");
-        else
-        {
-            content_t *c = new content_t;
-            copy(&c, &data);
-            cancel.push(*c);
-            ui->pushButton_cancel->setEnabled(true);
-
-            QPointF center = QPointF(spectrum_x, spectrum_y);
-
-            spectre_t spectre;
-            spectre.center = center;
-            spectre.angle = angle;
-            spectre.color = line_color;
-            spectre.method = (method_t) ui->comboBox->currentIndex();
-            spectre.radius = spectrum_r;
-            data.spectra.push_back(spectre);
-            data.back_color = back_color;
-            ui->graphicsView->setBackgroundBrush(back_color);
-            drawing_spectrum(spectre);
-//            print_succses("Успешно построенно");
-        }
-    }
-}
-
 // функция очистки всего холста
-void MainWindow::on_pushButton_clear_clicked()
+void MainWindow::on_pushButton_clear_clicked() // !!!
 {
     data.back_color = Qt::white;
     line_color = Qt::black;
     show_color(data.back_color, ui->label_bc);
     show_color(line_color, ui->label_lc);
-    data.lines.clear();
-    data.spectra.clear();
+    data.figures.clear();
+    data.spectrums.clear();
     cancel = std::stack<content_t>();
-//    print_succses("Успешно очищено");
     ui->graphicsView->resetTransform();
-    drawing_content();
+//  !!!
     ui->pushButton_cancel->setEnabled(false);
 }
 
 // функция отмены действия
-void MainWindow::on_pushButton_cancel_clicked() // дописать
+void MainWindow::on_pushButton_cancel_clicked() // !!!
 {
     if (!cancel.empty())
     {
         data = cancel.top();
+        // !!!
         cancel.pop();
-        drawing_content();
     }
     if (cancel.empty())
         ui->pushButton_cancel->setEnabled(false);
-}
-
-// изменение размера (все перестроится)
-void MainWindow::resizeEvent(QResizeEvent* event)
-{
-    QMainWindow::resizeEvent(event);
-    ui->graphicsView->resetTransform();
-    drawing_content();
 }
 
 void MainWindow::on_pushButton_reset_scale_clicked()
@@ -396,92 +204,199 @@ void MainWindow::on_pushButton_reset_scale_clicked()
     ui->graphicsView->resetTransform();
 }
 
-double MainWindow::measure_avg_time(spectre_t spectrum)
+void MainWindow::on_comboBox_figure_activated(int index)
 {
-    const int iterations = 100;
-    using std::chrono::duration;
-    using std::chrono::duration_cast;
-    using std::chrono::high_resolution_clock;
-    using std::chrono::microseconds;
-
-    auto end = high_resolution_clock::now();
-    auto start = high_resolution_clock::now();
-    double x, y;
-    QPointF cur_end;
-    line_t line;
-    line.color = spectrum.color;
-    line.method = spectrum.method;
-    line.start = spectrum.center;
-
-    for (int i = 0; i < iterations; i++)
+    if (index == 1)
     {
-        for (double j = 0.0; j <= 360.0; j += spectrum.angle)
-        {
-            x = spectrum.center.x() + cos(M_PI * j / 180) * spectrum.radius;
-            y = spectrum.center.y() + sin(M_PI * j / 180) * spectrum.radius;
-            cur_end = QPointF(x, y);
-            line.end = cur_end;
-            drawing_line(line, false, false);
-        }
+        ui->lineEdit_figure_r2->setDisabled(false);
+        ui->lineEdit_spectrum_dr2->setDisabled(false);
+        ui->lineEdit_spectrum_r2->setDisabled(false);
     }
-    end = high_resolution_clock::now();
-    return (double)duration_cast<microseconds>(end - start).count() / iterations;
-}
-
-// время выполнения
-void MainWindow::on_pushButton_time_clicked()
-{
-    QString str_spectrum_x = ui->lineEdit_spectrum_x->text();
-    QString str_spectrum_y = ui->lineEdit_spectrum_y->text();
-    QString str_spectrum_r = ui->lineEdit_spectrum_radius->text();
-    QString str_angle = ui->lineEdit_angle->text();
-
-    if (str_spectrum_x.length() == 0 || str_spectrum_y.length() == 0 || str_spectrum_r.length() == 0 || str_angle.length() == 0)
-    {}
-        //        print_warning("Ошибка ввода: пустой или неполный ввод");
     else
     {
-        bool flag_spectrum_x, flag_spectrum_y, flag_spectrum_r, flag_angle;
-        double spectrum_x, spectrum_y;
-        double spectrum_r, angle;
+        ui->lineEdit_figure_r2->setDisabled(true);
+        ui->lineEdit_spectrum_dr2->setDisabled(true);
+        ui->lineEdit_spectrum_r2->setDisabled(true);
+    }
 
-        spectrum_x = str_spectrum_x.toDouble(&flag_spectrum_x);
-        spectrum_y = str_spectrum_y.toDouble(&flag_spectrum_y);
-        spectrum_r = str_spectrum_r.toDouble(&flag_spectrum_r);
-        angle = str_angle.toDouble(&flag_angle);
+}
 
-        if (!flag_spectrum_x || !flag_spectrum_y || !flag_spectrum_r || !flag_angle)
-        {}
-            //            print_warning("Ошибка ввода: некорректный ввод");
+void MainWindow::on_pushButton_figure_clicked() // !!!
+{
+    QString str_x = ui->lineEdit_figure_x->text();
+    QString str_y = ui->lineEdit_figure_y->text();
+    QString str_r1 = ui->lineEdit_figure_r1->text();
+    QString str_r2 = ui->lineEdit_figure_r2->text();
+
+    figure_type_t type = (figure_type_t) ui->comboBox_figure->currentIndex();
+
+    if (!str_x.length() || !str_y.length() || !str_r1.length() || (type == ELLIPSE && !str_r2.length()))
+        error_message("Ошибка ввода: неполный или пустой ввод");
+    else
+    {
+        bool flag_x, flag_y, flag_r1, flag_r2;
+        double x, y, r1, r2;
+        x = str_x.toDouble(&flag_x);
+        y = str_y.toDouble(&flag_y);
+        r1 = str_r1.toDouble(&flag_r1);
+        r2 = str_r2.toDouble(&flag_r2);
+
+        if (!flag_x || !flag_y || !flag_r1 || (type == ELLIPSE && !flag_r2))
+            error_message("Ошибка ввода: некорректный ввод");
         else
         {
-            QPointF center = QPointF(spectrum_x, spectrum_y);
+            QPointF center = QPointF(x, y);
+            figure_t figure;
+            figure.center = center;
+            figure.type = type;
+            figure.color = line_color;
+            figure.method = (method_t) ui->comboBox_method->currentIndex();
+            figure.r1 = r1;
+            if (type == ELLIPSE)
+                figure.r2 = r2;
+            data.figures.push_back(figure);
+            data.back_color = back_color;
+            ui->graphicsView->setBackgroundBrush(back_color);
 
-            spectre_t spectre;
-            spectre.center = center;
-            spectre.angle = angle;
-            spectre.color = line_color;
-            spectre.radius = spectrum_r;
+            // пушить в стек предыдущее состояние
+            ui->pushButton_cancel->setEnabled(true);
 
-            std::vector<double> time;
-//            for (int i = CANONICAL; i <= WY; i++)
-//            {
-//                spectre.method = (method_t) i;
-//                time.push_back(measure_avg_time(spectre));
-//            }
+            request_t req;
+            if (type == ELLIPSE)
+                req.operation = DRAW_ELLIPSE;
+            else if (type == CIRCLE)
+                req.operation = DRAW_CIRCLE;
+//            req.data_figure = figure;
 
-            std::ofstream out("../lab_03/time_res.txt");
-
-            if (out.is_open())
-            {
-                out << spectre.radius << "\n";
-                for (std::size_t i = 0; i < time.size(); i++)
-                    out << time[i] << "\n";
-            }
-            out.close();
-            system("python ../lab_03/time.py");
-
-//            print_succses("Успешно");
+            request_handel(req);
         }
     }
+}
+
+void MainWindow::on_pushButton_spectrum_clicked() // !!!
+{
+    QString str_x = ui->lineEdit_spectrum_x->text();
+    QString str_y = ui->lineEdit_spectrum_y->text();
+    QString str_r1 = ui->lineEdit_spectrum_r1->text();
+    QString str_r2 = ui->lineEdit_spectrum_r2->text();
+    QString str_dr1 = ui->lineEdit_spectrum_dr1->text();
+    QString str_dr2 = ui->lineEdit_spectrum_dr2->text();
+    QString str_n = ui->lineEdit_spectrum_n->text();
+
+
+    figure_type_t type = (figure_type_t) ui->comboBox_figure->currentIndex();
+
+    if (!str_x.length() || !str_y.length() || !str_n.length() || !str_r1.length() || !str_dr1.length() || (type == ELLIPSE && (!str_r2.length() || !str_dr2.length())))
+        error_message("Ошибка ввода: неполный или пустой ввод");
+    else
+    {
+        bool flag_x, flag_y, flag_r1, flag_r2, flag_dr1, flag_dr2, flag_n;
+        double x, y, r1, r2, dr1, dr2;
+        int n;
+        x = str_x.toDouble(&flag_x);
+        y = str_y.toDouble(&flag_y);
+        r1 = str_r1.toDouble(&flag_r1);
+        r2 = str_r2.toDouble(&flag_r2);
+        dr1 = str_dr1.toDouble(&flag_dr1);
+        dr2 = str_dr2.toDouble(&flag_dr2);
+        n = str_n.toInt(&flag_n);
+
+        if (!flag_x || !flag_y || !flag_n || !flag_dr1 || !flag_r1 || (type == ELLIPSE && (!flag_r2 || !flag_dr2)))
+            error_message("Ошибка ввода: некорректный ввод");
+        else
+        {
+            QPointF center = QPointF(x, y);
+            spectrum_t spectrum;
+            spectrum.center = center;
+            spectrum.type = type;
+            spectrum.method = (method_t) ui->comboBox_method->currentIndex();
+            spectrum.color = line_color;
+            spectrum.dr1 = dr1;
+            spectrum.n = n;
+            spectrum.r1 = r1;
+            if (type == ELLIPSE)
+            {
+                spectrum.dr2 = dr2;
+                spectrum.r2 = r2;
+            }
+
+            // пушить в стек предыдущее состояние
+            ui->pushButton_cancel->setEnabled(true);
+
+            request_t req;
+            if (type == ELLIPSE)
+                req.operation = DRAW_ELLIPSE;
+            else if (type == CIRCLE)
+                req.operation = DRAW_CIRCLE;
+
+            request_handel(req);
+        }
+    }
+}
+
+void MainWindow::on_pushButton_time_clicked()
+{
+    QString str_x = ui->lineEdit_spectrum_x->text();
+    QString str_y = ui->lineEdit_spectrum_y->text();
+    QString str_r1 = ui->lineEdit_spectrum_r1->text();
+    QString str_r2 = ui->lineEdit_spectrum_r2->text();
+    QString str_dr1 = ui->lineEdit_spectrum_dr1->text();
+    QString str_dr2 = ui->lineEdit_spectrum_dr2->text();
+    QString str_n = ui->lineEdit_spectrum_n->text();
+
+
+    double x, y, r1, r2, dr1, dr2;
+    int n;
+
+    figure_type_t type = (figure_type_t) ui->comboBox_figure->currentIndex();
+    bool flag_x, flag_y, flag_r1, flag_r2, flag_dr1, flag_dr2, flag_n;
+    x = str_x.toDouble(&flag_x);
+    y = str_y.toDouble(&flag_y);
+    r1 = str_r1.toDouble(&flag_r1);
+    r2 = str_r2.toDouble(&flag_r2);
+    dr1 = str_dr1.toDouble(&flag_dr1);
+    dr2 = str_dr2.toDouble(&flag_dr2);
+    n = str_n.toInt(&flag_n);
+
+    if (!flag_x)
+        x = DEF_X;
+
+    if (!flag_y)
+        y = DEF_Y;
+
+    if (!flag_n)
+        n = DEF_N;
+
+    if (!flag_r1)
+        r1 = DEF_R1;
+
+    if (!flag_dr1)
+        dr1 = DEF_DR1;
+
+    if (type == ELLIPSE)
+    {
+        if (!flag_dr2)
+            dr2 = DEF_DR2;
+
+        if (!flag_r2)
+            r2 = DEF_R2;
+    }
+
+    QPointF center = QPointF(x, y);
+    spectrum_t spectrum;
+    spectrum.center = center;
+    spectrum.type = type;
+    spectrum.color = line_color;
+    spectrum.dr1 = dr1;
+    spectrum.n = n;
+    spectrum.r1 = r1;
+    if (type == ELLIPSE)
+    {
+        spectrum.dr2 = dr2;
+        spectrum.r2 = r2;
+    }
+
+    request_t req;
+    req.operation = MEASURE_TIME;
+
 }
