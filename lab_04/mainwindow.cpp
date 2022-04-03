@@ -69,26 +69,6 @@ void MainWindow::author_info_show()
     QMessageBox::information(NULL, "Об авторе", " Программа написана студенткой \nАскарян Каринэ из группы ИУ7-42Б\n +7(916)888-02-20");
 }
 
-void MainWindow::showEvent(QShowEvent *ev)
-{
-    QMainWindow::showEvent(ev);
-    QTimer::singleShot(500, this, SLOT(windowShown()));
-}
-
-void MainWindow::windowShown()
-{
-    request req;
-    req.operation = DRAW_ALL;
-    req.data = data;
-    req.scene = scene;
-    request_handle(req);
-}
-
-void MainWindow::error_message(QString str)
-{
-    QMessageBox::critical(NULL, "Ошибка", str);
-}
-
 void MainWindow::exit_show()
 {
     QMessageBox msg_quit;
@@ -101,6 +81,28 @@ void MainWindow::exit_show()
 
     if (rc == QMessageBox::Ok)
         qApp->quit();
+}
+
+void MainWindow::error_message(QString str)
+{
+    QMessageBox::critical(NULL, "Ошибка", str);
+}
+
+// чтоб рисовалось нормально
+void MainWindow::showEvent(QShowEvent *ev)
+{
+    QMainWindow::showEvent(ev);
+    QTimer::singleShot(100, this, SLOT(windowShown()));
+}
+
+void MainWindow::windowShown()
+{
+    request req;
+    req.operation = DRAW_ALL;
+    req.data = data;
+    req.scene = scene;
+    req.gv = ui->graphicsView;
+    request_handle(req);
 }
 
 // функция события колесика мыши
@@ -185,6 +187,7 @@ void MainWindow::on_pushButton_clear_clicked()
     ui->graphicsView->resetTransform();
     request req;
     req.scene = scene;
+    req.gv = ui->graphicsView;
     req.operation = DRAW_ALL;
     req.data = data;
     request_handle(req);
@@ -201,6 +204,7 @@ void MainWindow::on_pushButton_cancel_clicked()
         req.data = data;
         req.operation = DRAW_ALL;
         req.scene = scene;
+        req.gv = ui->graphicsView;
         request_handle(req);
         cancel.pop();
     }
@@ -208,11 +212,13 @@ void MainWindow::on_pushButton_cancel_clicked()
         ui->pushButton_cancel->setEnabled(false);
 }
 
+// сброс масштабирования
 void MainWindow::on_pushButton_reset_scale_clicked()
 {
     ui->graphicsView->resetTransform();
 }
 
+// выбор фигуры
 void MainWindow::on_comboBox_figure_activated(int index)
 {
     if (index == 1)
@@ -230,6 +236,7 @@ void MainWindow::on_comboBox_figure_activated(int index)
 
 }
 
+// рисование одной фигуры
 void MainWindow::on_pushButton_figure_clicked() // !!!
 {
     QString str_x = ui->lineEdit_figure_x->text();
@@ -254,6 +261,10 @@ void MainWindow::on_pushButton_figure_clicked() // !!!
             error_message("Ошибка ввода: некорректный ввод");
         else
         {
+            content_t *c = new content_t;
+            copy(&c, &data);
+            cancel.push(*c);
+            ui->pushButton_cancel->setEnabled(true);
             QPointF center = QPointF(x, y);
             figure_t figure;
             figure.center = center;
@@ -267,20 +278,20 @@ void MainWindow::on_pushButton_figure_clicked() // !!!
             data.back_color = back_color;
             ui->graphicsView->setBackgroundBrush(back_color);
 
-            // пушить в стек предыдущее состояние
-            ui->pushButton_cancel->setEnabled(true);
-
             request req;
             req.operation = DRAW_CIRCLE;
             if (type == ELLIPSE)
                 req.operation = DRAW_ELLIPSE;
             req.figure = figure;
             req.scene = scene;
+            req.gv = ui->graphicsView;
+            req.back_color = back_color;
             request_handle(req);
         }
     }
 }
 
+// рисование одного спектра
 void MainWindow::on_pushButton_spectrum_clicked() // !!!
 {
     QString str_x = ui->lineEdit_spectrum_x->text();
@@ -313,6 +324,10 @@ void MainWindow::on_pushButton_spectrum_clicked() // !!!
             error_message("Ошибка ввода: некорректный ввод");
         else
         {
+            content_t *c = new content_t;
+            copy(&c, &data);
+            cancel.push(*c);
+            ui->pushButton_cancel->setEnabled(true);
             QPointF center = QPointF(x, y);
             spectrum_t spectrum;
             spectrum.center = center;
@@ -327,21 +342,21 @@ void MainWindow::on_pushButton_spectrum_clicked() // !!!
                 spectrum.dr2 = dr2;
                 spectrum.r2 = r2;
             }
-
-            // пушить в стек предыдущее состояние
-            ui->pushButton_cancel->setEnabled(true);
-
+            data.spectrums.push_back(spectrum);
             request req;
             req.operation = DRAW_CIRCLE;
             if (type == ELLIPSE)
                 req.operation = DRAW_ELLIPSE;
             req.scene = scene;
+            req.gv = ui->graphicsView;
+            req.back_color = back_color;
             req.spectrum = spectrum;
             request_handle(req);
         }
     }
 }
 
+// замеры времени
 void MainWindow::on_pushButton_time_clicked()
 {
     QString str_x = ui->lineEdit_spectrum_x->text();
@@ -406,6 +421,7 @@ void MainWindow::on_pushButton_time_clicked()
     request req;
     req.operation = MEASURE_TIME;
     req.scene = scene;
+    req.gv = ui->graphicsView;
     req.spectrum = spectrum;
     request_handle(req);
 
