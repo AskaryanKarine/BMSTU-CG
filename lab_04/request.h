@@ -16,6 +16,8 @@ enum operation_t
 struct request
 {
     canvas_t scene;
+    gv_t gv;
+    QColor back_color;
     operation_t operation;
     figure_t figure;
     spectrum_t spectrum;
