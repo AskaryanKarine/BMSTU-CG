@@ -4,9 +4,20 @@
 #include <QPointF>
 #include <QColor>
 #include <QGraphicsScene>
-#include "methods.h"
+#include <QGraphicsView>
 
 typedef QGraphicsScene *canvas_t;
+typedef QGraphicsView *gv_t;
+
+enum method_t
+{
+    STANDART,
+    CANONICAL,
+    PARAMETRIC,
+    BRESEN,
+    MIDDLE_POINT,
+};
+
 
 enum figure_type_t
 {
@@ -43,5 +54,7 @@ struct content_t
     std::vector<spectrum_t> spectrums;
     QColor back_color;
 };
+
+void copy(struct content_t **a, struct content_t *b);
 
 #endif // STRUCTURS_H
