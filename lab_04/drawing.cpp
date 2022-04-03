@@ -1,7 +1,6 @@
 #include "drawing.h"
 #include "methods.h"
 
-
 void drawing_axes(canvas_t &scene)
 {
     QPen pen = QPen(Qt::black, 2);
@@ -38,9 +37,13 @@ void drawing_all(canvas_t &scene, gv_t &gv, const content_t &data)
     }
 
     for (size_t i = 0; i < data.spectrums.size(); i++)
-    {}
+    {
+        if (data.figures[i].type == CIRCLE)
+            drawing_spectrum_circle(scene, gv, data.spectrums[i], data.back_color, true);
+        else
+            drawing_spectrum_ellispe(scene, gv, data.spectrums[i], data.back_color, true);
+    }
 }
-
 
 void drawing_circle(canvas_t &scene, gv_t &gv, const figure_t &data, const QColor &back, const bool &is_draw)
 {
@@ -77,6 +80,33 @@ void drawing_ellipse(canvas_t &scene, gv_t &gv, const figure_t &data, const QCol
             break;
         case MIDDLE_POINT:
             break;
+    }
+}
+
+void drawing_spectrum_circle(canvas_t &scene, gv_t &gv, const spectrum_t &spectrum, const QColor &back, const bool &is_draw)
+{
+    figure_t circle;
+    circle.center = spectrum.center;
+    circle.color = spectrum.color;
+    circle.method = spectrum.method;
+    for (int i = 0; i < spectrum.n; i++)
+    {
+        circle.r1 = spectrum.r1 + i * spectrum.dr1;
+        drawing_circle(scene, gv, circle, back, is_draw);
+    }
+}
+
+void drawing_spectrum_ellispe(canvas_t &scene, gv_t &gv, const spectrum_t &spectrum, const QColor &back, const bool &is_draw)
+{
+    figure_t ellispe;
+    ellispe.center = spectrum.center;
+    ellispe.color = spectrum.color;
+    ellispe.method = spectrum.method;
+    for (int i = 0; i < spectrum.n; i++)
+    {
+        ellispe.r1 = spectrum.r1 + i * spectrum.dr1;
+        ellispe.r2 = spectrum.r2 + i * spectrum.dr2;
+        drawing_ellipse(scene, gv, ellispe, back, is_draw);
     }
 }
 

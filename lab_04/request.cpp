@@ -13,8 +13,10 @@ void request_handle(request &req)
             drawing_ellipse(req.scene, req.gv, req.figure, req.back_color, true);
             break;
         case DRAW_SPECTRUM_CIRCLE:
+            drawing_spectrum_circle(req.scene, req.gv, req.spectrum, req.back_color, true);
             break;
         case DRAW_SPECTRUM_ELLIPSE:
+            drawing_spectrum_ellispe(req.scene, req.gv, req.spectrum, req.back_color, true);
             break;
         case DRAW_ALL:
             drawing_all(req.scene, req.gv, req.data);
