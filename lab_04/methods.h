@@ -10,4 +10,5 @@ enum method_t
     MIDDLE_POINT,
 };
 
+
 #endif // METHODS_H

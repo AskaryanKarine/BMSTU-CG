@@ -75,12 +75,13 @@ void MainWindow::showEvent(QShowEvent *ev)
     QTimer::singleShot(500, this, SLOT(windowShown()));
 }
 
-void MainWindow::windowShown() // !!!
+void MainWindow::windowShown()
 {
-    request_t req;
+    request req;
     req.operation = DRAW_ALL;
-    // !!!
-    request_handel(req);
+    req.data = data;
+    req.scene = scene;
+    request_handle(req);
 }
 
 void MainWindow::error_message(QString str)
@@ -172,7 +173,7 @@ void MainWindow::on_pushButton_line_color_clicked()
 }
 
 // функция очистки всего холста
-void MainWindow::on_pushButton_clear_clicked() // !!!
+void MainWindow::on_pushButton_clear_clicked()
 {
     data.back_color = Qt::white;
     line_color = Qt::black;
@@ -182,17 +183,25 @@ void MainWindow::on_pushButton_clear_clicked() // !!!
     data.spectrums.clear();
     cancel = std::stack<content_t>();
     ui->graphicsView->resetTransform();
-//  !!!
+    request req;
+    req.scene = scene;
+    req.operation = DRAW_ALL;
+    req.data = data;
+    request_handle(req);
     ui->pushButton_cancel->setEnabled(false);
 }
 
 // функция отмены действия
-void MainWindow::on_pushButton_cancel_clicked() // !!!
+void MainWindow::on_pushButton_cancel_clicked()
 {
     if (!cancel.empty())
     {
         data = cancel.top();
-        // !!!
+        request req;
+        req.data = data;
+        req.operation = DRAW_ALL;
+        req.scene = scene;
+        request_handle(req);
         cancel.pop();
     }
     if (cancel.empty())
@@ -261,14 +270,13 @@ void MainWindow::on_pushButton_figure_clicked() // !!!
             // пушить в стек предыдущее состояние
             ui->pushButton_cancel->setEnabled(true);
 
-            request_t req;
+            request req;
+            req.operation = DRAW_CIRCLE;
             if (type == ELLIPSE)
                 req.operation = DRAW_ELLIPSE;
-            else if (type == CIRCLE)
-                req.operation = DRAW_CIRCLE;
-//            req.data_figure = figure;
-
-            request_handel(req);
+            req.figure = figure;
+            req.scene = scene;
+            request_handle(req);
         }
     }
 }
@@ -323,13 +331,13 @@ void MainWindow::on_pushButton_spectrum_clicked() // !!!
             // пушить в стек предыдущее состояние
             ui->pushButton_cancel->setEnabled(true);
 
-            request_t req;
+            request req;
+            req.operation = DRAW_CIRCLE;
             if (type == ELLIPSE)
                 req.operation = DRAW_ELLIPSE;
-            else if (type == CIRCLE)
-                req.operation = DRAW_CIRCLE;
-
-            request_handel(req);
+            req.scene = scene;
+            req.spectrum = spectrum;
+            request_handle(req);
         }
     }
 }
@@ -395,8 +403,10 @@ void MainWindow::on_pushButton_time_clicked()
         spectrum.dr2 = dr2;
         spectrum.r2 = r2;
     }
-
-    request_t req;
+    request req;
     req.operation = MEASURE_TIME;
+    req.scene = scene;
+    req.spectrum = spectrum;
+    request_handle(req);
 
 }

@@ -10,21 +10,18 @@ enum operation_t
     DRAW_SPECTRUM_CIRCLE,
     DRAW_SPECTRUM_ELLIPSE,
     DRAW_ALL,
-    CLEAR_CANVAS,
     MEASURE_TIME
 };
 
-struct request_t
+struct request
 {
-    operation_t operation;
     canvas_t scene;
-    union
-    {
-//        figure_t figure;
-//        spectrum_t data_spectrum;
-//        content_t data_content;
-    };
+    operation_t operation;
+    figure_t figure;
+    spectrum_t spectrum;
+    content_t data;
 };
-void request_handel(request_t &req);
+
+void request_handle(request &req);
 
 #endif // REQUEST_H

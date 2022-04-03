@@ -1,6 +1,6 @@
 #include "request.h"
 
-void request_handel(request_t &req)
+void request_handle(request &req)
 {
     switch (req.operation)
     {
