@@ -344,9 +344,9 @@ void MainWindow::on_pushButton_spectrum_clicked() // !!!
             }
             data.spectrums.push_back(spectrum);
             request req;
-            req.operation = DRAW_CIRCLE;
+            req.operation = DRAW_SPECTRUM_CIRCLE;
             if (type == ELLIPSE)
-                req.operation = DRAW_ELLIPSE;
+                req.operation = DRAW_SPECTRUM_ELLIPSE;
             req.scene = scene;
             req.gv = ui->graphicsView;
             req.back_color = back_color;
