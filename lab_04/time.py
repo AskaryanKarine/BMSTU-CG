@@ -27,9 +27,9 @@ plt.plot(x, y4, label="Алгоритм средней точки")
 plt.legend(loc='upper left') 
 if params[0] == 0:
     plt.title("Замеры времени для окружности")
-    plt.xlabel('Радиус окружности\n Шаг - {}'.format(step))
+    plt.xlabel('Радиус окружности\n Начальный радиус - {}, шаг - {}, количество - {}'.format(r, step, n))
 else:
-    plt.title("Замеры времени для эллипса\n Шаг - {}'.format(step)")
+    plt.title("Замеры времени для эллипса\n Начальный радиус - {}, шаг - {}, количество - {}".format(r, step, n))
     plt.xlabel('Радиус полуоси a')
-plt.ylabel('Время в мкс. \n Начальный радиус - {}'.format(r)) 
+plt.ylabel('Время в мкс.') 
 plt.show()
