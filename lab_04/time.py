@@ -20,16 +20,33 @@ y3 = times[2*n:3*n]
 y4 = times[3*n:4*n]
 x = [y for y in range(r, r + n * step, step)]
 
-plt.plot(x, y1, label="Каноническое уравнение")
-plt.plot(x, y2, label="Параметрическое уравнение")
-plt.plot(x, y3, label="Алгоритм Брезенхема")
-plt.plot(x, y4, label="Алгоритм средней точки")
-plt.legend(loc='upper left') 
+plt.figure(1)
+plt.plot(x, y1, 'b', label="Каноническое уравнение")
+plt.plot(x, y2, 'y', label="Параметрическое уравнение")
+plt.plot(x, y3, 'g', label="Алгоритм Брезенхема")
+plt.plot(x, y4, 'r', label="Алгоритм средней точки")
+plt.legend()
+
 if params[0] == 0:
     plt.title("Замеры времени для окружности")
     plt.xlabel('Радиус окружности\n Начальный радиус - {}, шаг - {}, количество - {}'.format(r, step, n))
 else:
-    plt.title("Замеры времени для эллипса\n Начальный радиус - {}, шаг - {}, количество - {}".format(r, step, n))
-    plt.xlabel('Радиус полуоси a')
+    plt.title("Замеры времени для эллипса")
+    plt.xlabel('Радиус полуоси a\n Начальный радиус - {}, шаг - {}, количество - {}'.format(r, step, n))
 plt.ylabel('Время в мкс.') 
+
+plt.figure(2)
+plt.plot(x, y1, 'b', label="Каноническое уравнение")
+plt.plot(x, y3, 'g', label="Алгоритм Брезенхема")
+plt.plot(x, y4, 'r', label="Алгоритм средней точки")
+plt.legend() 
+
+if params[0] == 0:
+    plt.title("Замеры времени для окружности")
+    plt.xlabel('Радиус окружности\n Начальный радиус - {}, шаг - {}, количество - {}'.format(r, step, n))
+else:
+    plt.title("Замеры времени для эллипса")
+    plt.xlabel('Радиус полуоси a\n Начальный радиус - {}, шаг - {}, количество - {}'.format(r, step, n))
+plt.ylabel('Время в мкс.') 
+
 plt.show()

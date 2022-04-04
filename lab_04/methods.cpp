@@ -6,13 +6,13 @@
 void standart_circle(canvas_t &scene, const figure_t &circle)
 {
     QRectF rect = QRectF(circle.center.x() - circle.ra, circle.center.y() - circle.ra, 2 * circle.ra, 2 * circle.ra);
-    scene->addEllipse(rect, QPen(circle.color, 1), QBrush(QColor(0,0,0,0)));
+    scene->addEllipse(rect, QPen(circle.color, 2), QBrush(QColor(0,0,0,0)));
 }
 
 void standart_ellipse(canvas_t &scene, const figure_t &ellipse)
 {
     QRectF rect = QRectF(ellipse.center.x() - ellipse.ra, ellipse.center.y() - ellipse.rb, 2 * ellipse.ra, 2 * ellipse.rb);
-    scene->addEllipse(rect, QPen(ellipse.color, 1), QBrush(QColor(0,0,0,0)));
+    scene->addEllipse(rect, QPen(ellipse.color, 2), QBrush(QColor(0,0,0,0)));
 }
 
 void canonical_circle(canvas_t &scene, const figure_t &circle, const bool &is_draw)
@@ -22,7 +22,7 @@ void canonical_circle(canvas_t &scene, const figure_t &circle, const bool &is_dr
 
     QPointF center = circle.center;
 
-    for (double x = 0.0; x < circle.ra / sqrt(2) || fabs(x - circle.ra / sqrt(2)) < eps; x++)
+    for (double x = 0.0; x <= circle.ra / std::sqrt(2) || fabs(x - circle.ra / std::sqrt(2)) <= eps; x++)
     {
         double y = sqrt(pr - x * x);
         QPointF p = QPointF(x + center.x(), y + center.y());
@@ -36,24 +36,24 @@ void canonical_ellipse(canvas_t &scene, const figure_t &ellipse, const bool &is_
     const double eps = 1e-6;
     double pra = ellipse.ra * ellipse.ra;
     double prb = ellipse.rb * ellipse.rb;
-    double lim = ellipse.center.x() + ellipse.ra / sqrt(1 + prb / pra);
+    double lim = ellipse.center.x() + ellipse.ra / std::sqrt(1 + prb / pra);
 
     QPointF center = ellipse.center;
 
     for (double x = center.x(); x < lim || fabs(x - lim) < eps; x++)
     {
         double y = round(sqrt(pra * prb - (x - center.x()) * (x - center.x()) * prb) / ellipse.ra + center.y());
-        QPointF p = QPointF(x + center.x(), y + center.y());
+        QPointF p = QPointF(x, y);
         if (is_draw)
             draw_reflect_ellipse(scene, p, center, ellipse.color);
     }
 
-    lim = center.y() + ellipse.rb / sqrt(1 + pra * prb);
+    lim = center.y() + ellipse.rb / sqrt(1 + pra / prb);
 
     for (double y = lim; y >= center.y(); y--)
     {
         double x = round(sqrt(pra * prb - (y - center.y()) * (y - center.y()) * pra) / ellipse.rb + center.x());
-        QPointF p = QPointF(x + center.x(), y + center.y());
+        QPointF p = QPointF(x, y);
 
         if (is_draw)
             draw_reflect_ellipse(scene, p, center, ellipse.color);
@@ -65,7 +65,7 @@ void parametrical_circle(canvas_t &scene, const figure_t &circle, const bool &is
     double step = 1 / circle.ra;
     QPointF center = circle.center;
 
-    for (double t = 0.0; t <= M_PI_2; t += step)
+    for (double t = 0.0; t <= M_PI_4; t += step)
     {
         QPointF p = QPointF(center.x() + circle.ra * cos(t), center.y() + circle.ra * sin(t));
         if (is_draw)
@@ -187,7 +187,7 @@ void bresen_ellipse(canvas_t &scene, const figure_t &ellipse, const bool &is_dra
 void middle_point_circle(canvas_t &scene, const figure_t &circle, const bool &is_draw)
 {
     double x = circle.ra;
-    double y = 0.0;
+    double y = 0.;
     double delta = 1 - circle.ra;
 
     QPointF center = circle.center;

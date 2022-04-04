@@ -1,6 +1,7 @@
 #include "request.h"
 #include "drawing.h"
 #include <fstream>
+#include <ctime>
 
 void request_handle(request &req)
 {
@@ -29,13 +30,13 @@ void request_handle(request &req)
 
 std::vector<double> measure_circle_time(canvas_t &scene, const spectrum_t &spectrum)
 {
+    const int iterations = 10000;
     std::vector<double> data;
     figure_t circle;
     circle.center = spectrum.center;
     circle.color = spectrum.color;
     circle.method = spectrum.method;
 
-    const int iterations = 1000;
     using std::chrono::duration;
     using std::chrono::duration_cast;
     using std::chrono::high_resolution_clock;
@@ -43,18 +44,73 @@ std::vector<double> measure_circle_time(canvas_t &scene, const spectrum_t &spect
     auto end = high_resolution_clock::now();
     auto start = high_resolution_clock::now();
 
+//    clock_t begin, end;
+//    double time_spent_circle;
+//    double sum_circle = 0;
+
     for (int i = 0; i < spectrum.n; i++)
     {
         circle.ra = spectrum.ra + i * spectrum.dra;
         start = high_resolution_clock::now();
         for (int j = 0; j < iterations; j++)
+        {
+//            begin = clock();
             drawing_circle(scene, circle, false);
+//            end = clock();
+//            time_spent_circle = (double)(end - begin);
+//            sum_circle += time_spent_circle;
+        }
         end = high_resolution_clock::now();
         double time = (double)duration_cast<microseconds>(end - start).count() / iterations;
+//        data.push_back(sum_circle / iterations);
         data.push_back(time);
     }
     return data;
 }
+
+std::vector<double> measure_ellipse_time(canvas_t &scene, const spectrum_t &spectrum)
+{
+    const int iterations = 10000;
+    std::vector<double> data;
+    figure_t ellipse;
+    ellipse.center = spectrum.center;
+    ellipse.color = spectrum.color;
+    ellipse.method = spectrum.method;
+
+    using std::chrono::duration;
+    using std::chrono::duration_cast;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::microseconds;
+    auto end = high_resolution_clock::now();
+    auto start = high_resolution_clock::now();
+
+//    clock_t begin, end;
+//    double time_spent_circle;
+//    double sum_circle = 0;
+
+    for (int i = 0; i < spectrum.n; i++)
+    {
+        ellipse.ra = spectrum.ra + i * spectrum.dra;
+        ellipse.rb = spectrum.rb + i * spectrum.drb;
+        start = high_resolution_clock::now();
+
+        for (int j = 0; j < iterations; j++)
+        {
+//            begin = clock();
+            drawing_ellipse(scene, ellipse, false);
+//            end = clock();
+//            time_spent_circle = (double)(end - begin);
+//            sum_circle += time_spent_circle;
+        }
+        end = high_resolution_clock::now();
+        double time = (double)duration_cast<microseconds>(end - start).count() / iterations;
+//        data.push_back(sum_circle / ITERATION);
+        data.push_back(time);
+    }
+    return data;
+}
+
+
 
 void measure_time(canvas_t &scene, spectrum_t &spectrum)
 {
@@ -69,7 +125,14 @@ void measure_time(canvas_t &scene, spectrum_t &spectrum)
         }
     }
     else
-    {}
+    {
+        for (int m = CANONICAL; m <= MIDDLE_POINT; m++)
+        {
+            spectrum.method = (method_t) m;
+            std::vector<double> time = measure_ellipse_time(scene, spectrum);
+            times.push_back(time);
+        }
+    }
 
     std::ofstream out("../lab_04/time_res.txt");
     if (out.is_open())
@@ -84,7 +147,7 @@ void measure_time(canvas_t &scene, spectrum_t &spectrum)
                 out << times[i][j] << "\n";
     }
     out.close();
-//    system("python ../lab_04/time.py");
+    system("python ../lab_04/time.py");
 
 
 }

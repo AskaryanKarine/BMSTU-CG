@@ -1,5 +1,6 @@
 #include "drawing.h"
 #include "methods.h"
+#include <cmath>
 
 void drawing_axes(canvas_t &scene)
 {
@@ -120,7 +121,7 @@ void draw_pix(canvas_t &scene, const double &x, const double &y, const QColor &c
 {
     QPen pen = QPen(color);
     QBrush brush = QBrush(color);
-    scene->addRect(qRound(x), qRound(y), 1, 1, pen, brush);
+    scene->addRect(round(x), round(y), 1, 1, pen, brush);
 }
 
 void draw_reflect_circle(canvas_t &scene, const QPointF &point, const QPointF &center, const QColor &color)
