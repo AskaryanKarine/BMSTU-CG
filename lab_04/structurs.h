@@ -29,8 +29,8 @@ struct figure_t
 {
     QPointF center;
     figure_type_t type;
-    double r1;
-    double r2;
+    double ra;
+    double rb;
     method_t method;
     QColor color;
 };
@@ -39,10 +39,10 @@ struct spectrum_t
 {
     QPointF center;
     figure_type_t type;
-    double r1;
-    double r2;
-    double dr1;
-    double dr2;
+    double ra;
+    double rb;
+    double dra;
+    double drb;
     int n;
     method_t method;
     QColor color;

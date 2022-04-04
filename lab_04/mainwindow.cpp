@@ -13,10 +13,10 @@
 #define DEF_X ui->graphicsView->geometry().x() / 2.0
 #define DEF_Y ui->graphicsView->geometry().y() / 2.0;
 #define DEF_N 100
-#define DEF_R1 10
-#define DEF_R2 20
-#define DEF_DR1 0.5
-#define DEF_DR2 0.5
+#define DEF_R1 100
+#define DEF_R2 100
+#define DEF_DR1 1
+#define DEF_DR2 1
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -31,9 +31,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ExitAction, SIGNAL(triggered()), this, SLOT(exit_show()));
 
 
-    scene = new QGraphicsScene();
+    scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 
     ui->pushButton_cancel->setEnabled(false);
 
@@ -271,9 +272,9 @@ void MainWindow::on_pushButton_figure_clicked() // !!!
             figure.type = type;
             figure.color = line_color;
             figure.method = (method_t) ui->comboBox_method->currentIndex();
-            figure.r1 = r1;
+            figure.ra = r1;
             if (type == ELLIPSE)
-                figure.r2 = r2;
+                figure.rb = r2;
             data.figures.push_back(figure);
             data.back_color = back_color;
             ui->graphicsView->setBackgroundBrush(back_color);
@@ -334,15 +335,17 @@ void MainWindow::on_pushButton_spectrum_clicked() // !!!
             spectrum.type = type;
             spectrum.method = (method_t) ui->comboBox_method->currentIndex();
             spectrum.color = line_color;
-            spectrum.dr1 = dr1;
+            spectrum.dra = dr1;
             spectrum.n = n;
-            spectrum.r1 = r1;
+            spectrum.ra = r1;
             if (type == ELLIPSE)
             {
-                spectrum.dr2 = dr2;
-                spectrum.r2 = r2;
+                spectrum.drb = dr2;
+                spectrum.rb = r2;
             }
             data.spectrums.push_back(spectrum);
+            data.back_color = back_color;
+            ui->graphicsView->setBackgroundBrush(back_color);
             request req;
             req.operation = DRAW_SPECTRUM_CIRCLE;
             if (type == ELLIPSE)
@@ -410,13 +413,13 @@ void MainWindow::on_pushButton_time_clicked()
     spectrum.center = center;
     spectrum.type = type;
     spectrum.color = line_color;
-    spectrum.dr1 = dr1;
+    spectrum.dra = dr1;
     spectrum.n = n;
-    spectrum.r1 = r1;
+    spectrum.ra = r1;
     if (type == ELLIPSE)
     {
-        spectrum.dr2 = dr2;
-        spectrum.r2 = r2;
+        spectrum.drb = dr2;
+        spectrum.rb = r2;
     }
     request req;
     req.operation = MEASURE_TIME;
