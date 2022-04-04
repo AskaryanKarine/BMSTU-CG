@@ -7,27 +7,27 @@ void request_handle(request &req)
     switch (req.operation)
     {
         case DRAW_CIRCLE:
-            drawing_circle(req.scene, req.gv, req.figure, req.back_color, true);
+            drawing_circle(req.scene, req.figure, req.back_color, true);
             break;
         case DRAW_ELLIPSE:
-            drawing_ellipse(req.scene, req.gv, req.figure, req.back_color, true);
+            drawing_ellipse(req.scene, req.figure, req.back_color, true);
             break;
         case DRAW_SPECTRUM_CIRCLE:
-            drawing_spectrum_circle(req.scene, req.gv, req.spectrum, req.back_color);
+            drawing_spectrum_circle(req.scene, req.spectrum, req.back_color);
             break;
         case DRAW_SPECTRUM_ELLIPSE:
-            drawing_spectrum_ellispe(req.scene, req.gv, req.spectrum, req.back_color);
+            drawing_spectrum_ellispe(req.scene, req.spectrum, req.back_color);
             break;
         case DRAW_ALL:
             drawing_all(req.scene, req.gv, req.data);
             break;
         case MEASURE_TIME:
-            measure_time(req.scene, req.gv, req.spectrum);
+            measure_time(req.scene, req.spectrum);
             break;
     }
 }
 
-std::vector<double> measure_circle_time(canvas_t &scene, gv_t &gv, const spectrum_t &spectrum)
+std::vector<double> measure_circle_time(canvas_t &scene, const spectrum_t &spectrum)
 {
     std::vector<double> data;
     figure_t circle;
@@ -49,7 +49,7 @@ std::vector<double> measure_circle_time(canvas_t &scene, gv_t &gv, const spectru
         start = high_resolution_clock::now();
 
         for (int j = 0; j < iterations; j++)
-            drawing_circle(scene, gv, circle, QColor(0,0,0,0), false);
+            drawing_circle(scene, circle, QColor(0,0,0,0), false);
         end = high_resolution_clock::now();
         double time = (double)duration_cast<microseconds>(end - start).count() / iterations;
         data.push_back(time);
@@ -57,7 +57,7 @@ std::vector<double> measure_circle_time(canvas_t &scene, gv_t &gv, const spectru
     return data;
 }
 
-void measure_time(canvas_t &scene, gv_t &gv, spectrum_t &spectrum)
+void measure_time(canvas_t &scene, spectrum_t &spectrum)
 {
     std::vector<std::vector<double>> times;
     if (spectrum.type == CIRCLE)
@@ -65,7 +65,7 @@ void measure_time(canvas_t &scene, gv_t &gv, spectrum_t &spectrum)
         for (int m = CANONICAL; m <= MIDDLE_POINT; m++)
         {
             spectrum.method = (method_t) m;
-            std::vector<double> time = measure_circle_time(scene, gv, spectrum);
+            std::vector<double> time = measure_circle_time(scene, spectrum);
             times.push_back(time);
         }
     }
@@ -85,7 +85,7 @@ void measure_time(canvas_t &scene, gv_t &gv, spectrum_t &spectrum)
                 out << times[i][j] << "\n";
     }
     out.close();
-//    system("python ../lab_04/steps.py");
+//    system("python ../lab_04/time.py");
 
 
 }

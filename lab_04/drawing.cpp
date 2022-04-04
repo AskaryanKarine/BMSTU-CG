@@ -31,23 +31,22 @@ void drawing_all(canvas_t &scene, gv_t &gv, const content_t &data)
     for (size_t i = 0; i < data.figures.size(); i++)
     {
         if (data.figures[i].type == CIRCLE)
-            drawing_circle(scene, gv, data.figures[i], data.back_color, true);
+            drawing_circle(scene, data.figures[i], data.back_color, true);
         else
-            drawing_ellipse(scene, gv, data.figures[i], data.back_color, true);
+            drawing_ellipse(scene, data.figures[i], data.back_color, true);
     }
 
     for (size_t i = 0; i < data.spectrums.size(); i++)
     {
         if (data.spectrums[i].type == CIRCLE)
-            drawing_spectrum_circle(scene, gv, data.spectrums[i], data.back_color);
+            drawing_spectrum_circle(scene, data.spectrums[i], data.back_color);
         else
-            drawing_spectrum_ellispe(scene, gv, data.spectrums[i], data.back_color);
+            drawing_spectrum_ellispe(scene, data.spectrums[i], data.back_color);
     }
 }
 
-void drawing_circle(canvas_t &scene, gv_t &gv, const figure_t &data, const QColor &back, const bool &is_draw)
+void drawing_circle(canvas_t &scene, const figure_t &data, const QColor &back, const bool &is_draw)
 {
-    gv->setBackgroundBrush(back);
     switch (data.method)
     {
         case STANDART:
@@ -68,9 +67,8 @@ void drawing_circle(canvas_t &scene, gv_t &gv, const figure_t &data, const QColo
     }
 }
 
-void drawing_ellipse(canvas_t &scene, gv_t &gv, const figure_t &data, const QColor &back, const bool &is_draw)
+void drawing_ellipse(canvas_t &scene, const figure_t &data, const QColor &back, const bool &is_draw)
 {
-    gv->setBackgroundBrush(back);
     switch (data.method)
     {
         case STANDART:
@@ -91,7 +89,7 @@ void drawing_ellipse(canvas_t &scene, gv_t &gv, const figure_t &data, const QCol
     }
 }
 
-void drawing_spectrum_circle(canvas_t &scene, gv_t &gv, const spectrum_t &spectrum, const QColor &back)
+void drawing_spectrum_circle(canvas_t &scene, const spectrum_t &spectrum, const QColor &back)
 {
     figure_t circle;
     circle.center = spectrum.center;
@@ -100,11 +98,11 @@ void drawing_spectrum_circle(canvas_t &scene, gv_t &gv, const spectrum_t &spectr
     for (int i = 0; i < spectrum.n; i++)
     {
         circle.ra = spectrum.ra + i * spectrum.dra;
-        drawing_circle(scene, gv, circle, back, true);
+        drawing_circle(scene, circle, back, true);
     }
 }
 
-void drawing_spectrum_ellispe(canvas_t &scene, gv_t &gv, const spectrum_t &spectrum, const QColor &back)
+void drawing_spectrum_ellispe(canvas_t &scene, const spectrum_t &spectrum, const QColor &back)
 {
     figure_t ellispe;
     ellispe.center = spectrum.center;
@@ -114,7 +112,7 @@ void drawing_spectrum_ellispe(canvas_t &scene, gv_t &gv, const spectrum_t &spect
     {
         ellispe.ra = spectrum.ra + i * spectrum.dra;
         ellispe.rb = spectrum.rb + i * spectrum.drb;
-        drawing_ellipse(scene, gv, ellispe, back, true);
+        drawing_ellipse(scene, ellispe, back, true);
     }
 }
 

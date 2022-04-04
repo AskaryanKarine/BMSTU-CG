@@ -25,6 +25,6 @@ struct request
 };
 
 void request_handle(request &req);
-void measure_time(canvas_t &scene, gv_t &gv, spectrum_t &spectrum);
+void measure_time(canvas_t &scene, spectrum_t &spectrum);
 
 #endif // REQUEST_H
