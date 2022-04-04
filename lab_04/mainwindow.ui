@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>904</width>
-    <height>678</height>
+    <height>820</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -91,7 +91,6 @@
             <property name="font">
              <font>
               <pointsize>9</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -153,7 +152,6 @@
             <property name="font">
              <font>
               <pointsize>9</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -202,7 +200,6 @@
           <property name="font">
            <font>
             <pointsize>9</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -449,7 +446,6 @@
           <property name="font">
            <font>
             <pointsize>9</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -885,7 +881,7 @@
      <x>0</x>
      <y>0</y>
      <width>904</width>
-     <height>22</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>

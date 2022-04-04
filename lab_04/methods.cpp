@@ -22,7 +22,7 @@ void canonical_circle(canvas_t &scene, const figure_t &circle, const bool &is_dr
 
     QPointF center = circle.center;
 
-    for (double x = 0.0; x <= circle.ra / std::sqrt(2) || fabs(x - circle.ra / std::sqrt(2)) <= eps; x++)
+    for (double x = 0.0; x <= circle.ra / std::sqrt(2) + 1|| fabs(x - circle.ra / std::sqrt(2)) + 1 <= eps; x++)
     {
         double y = sqrt(pr - x * x);
         QPointF p = QPointF(x + center.x(), y + center.y());
@@ -65,7 +65,7 @@ void parametrical_circle(canvas_t &scene, const figure_t &circle, const bool &is
     double step = 1 / circle.ra;
     QPointF center = circle.center;
 
-    for (double t = 0.0; t <= M_PI_4; t += step)
+    for (double t = 0.0; t <= M_PI_4 + 1; t += step)
     {
         QPointF p = QPointF(center.x() + circle.ra * cos(t), center.y() + circle.ra * sin(t));
         if (is_draw)
