@@ -7,16 +7,16 @@ void request_handle(request &req)
     switch (req.operation)
     {
         case DRAW_CIRCLE:
-            drawing_circle(req.scene, req.figure, req.back_color, true);
+            drawing_circle(req.scene, req.figure, true);
             break;
         case DRAW_ELLIPSE:
-            drawing_ellipse(req.scene, req.figure, req.back_color, true);
+            drawing_ellipse(req.scene, req.figure, true);
             break;
         case DRAW_SPECTRUM_CIRCLE:
-            drawing_spectrum_circle(req.scene, req.spectrum, req.back_color);
+            drawing_spectrum_circle(req.scene, req.spectrum);
             break;
         case DRAW_SPECTRUM_ELLIPSE:
-            drawing_spectrum_ellispe(req.scene, req.spectrum, req.back_color);
+            drawing_spectrum_ellispe(req.scene, req.spectrum);
             break;
         case DRAW_ALL:
             drawing_all(req.scene, req.gv, req.data);
@@ -47,9 +47,8 @@ std::vector<double> measure_circle_time(canvas_t &scene, const spectrum_t &spect
     {
         circle.ra = spectrum.ra + i * spectrum.dra;
         start = high_resolution_clock::now();
-
         for (int j = 0; j < iterations; j++)
-            drawing_circle(scene, circle, QColor(0,0,0,0), false);
+            drawing_circle(scene, circle, false);
         end = high_resolution_clock::now();
         double time = (double)duration_cast<microseconds>(end - start).count() / iterations;
         data.push_back(time);

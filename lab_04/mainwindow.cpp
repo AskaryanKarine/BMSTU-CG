@@ -286,14 +286,13 @@ void MainWindow::on_pushButton_figure_clicked() // !!!
             req.figure = figure;
             req.scene = scene;
             req.gv = ui->graphicsView;
-            req.back_color = back_color;
             request_handle(req);
         }
     }
 }
 
 // рисование одного спектра
-void MainWindow::on_pushButton_spectrum_clicked() // !!!
+void MainWindow::on_pushButton_spectrum_clicked()
 {
     QString str_x = ui->lineEdit_spectrum_x->text();
     QString str_y = ui->lineEdit_spectrum_y->text();
@@ -352,7 +351,6 @@ void MainWindow::on_pushButton_spectrum_clicked() // !!!
                 req.operation = DRAW_SPECTRUM_ELLIPSE;
             req.scene = scene;
             req.gv = ui->graphicsView;
-            req.back_color = back_color;
             req.spectrum = spectrum;
             request_handle(req);
         }
