@@ -35,7 +35,7 @@ std::vector<double> measure_circle_time(canvas_t &scene, gv_t &gv, const spectru
     circle.color = spectrum.color;
     circle.method = spectrum.method;
 
-    const int iterations = 10000;
+    const int iterations = 1000;
     using std::chrono::duration;
     using std::chrono::duration_cast;
     using std::chrono::high_resolution_clock;
@@ -82,10 +82,10 @@ void measure_time(canvas_t &scene, gv_t &gv, spectrum_t &spectrum)
         out << spectrum.ra << " " << spectrum.dra << " " << spectrum.n << "\n";
         for (size_t i = 0; i < times.size(); i++)
             for (size_t j = 0; j < times[i].size(); j++)
-                out << i + 1 << " " << times[i][j] << "\n";
+                out << times[i][j] << "\n";
     }
     out.close();
-//    system("python ../lab_03/steps.py");
+//    system("python ../lab_04/steps.py");
 
 
 }
