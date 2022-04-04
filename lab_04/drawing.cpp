@@ -38,10 +38,10 @@ void drawing_all(canvas_t &scene, gv_t &gv, const content_t &data)
 
     for (size_t i = 0; i < data.spectrums.size(); i++)
     {
-        if (data.figures[i].type == CIRCLE)
-            drawing_spectrum_circle(scene, gv, data.spectrums[i], data.back_color, true);
+        if (data.spectrums[i].type == CIRCLE)
+            drawing_spectrum_circle(scene, gv, data.spectrums[i], data.back_color);
         else
-            drawing_spectrum_ellispe(scene, gv, data.spectrums[i], data.back_color, true);
+            drawing_spectrum_ellispe(scene, gv, data.spectrums[i], data.back_color);
     }
 }
 
@@ -54,12 +54,16 @@ void drawing_circle(canvas_t &scene, gv_t &gv, const figure_t &data, const QColo
             standart_circle(scene, data);
             break;
         case CANONICAL:
+            canonical_circle(scene, data, is_draw);
             break;
         case PARAMETRIC:
+            parametrical_circle(scene, data, is_draw);
             break;
         case BRESEN:
+            bresen_circle(scene, data, is_draw);
             break;
         case MIDDLE_POINT:
+            middle_point_circle(scene, data, is_draw);
             break;
     }
 }
@@ -73,17 +77,21 @@ void drawing_ellipse(canvas_t &scene, gv_t &gv, const figure_t &data, const QCol
             standart_ellipse(scene, data);
             break;
         case CANONICAL:
+            canonical_ellipse(scene, data, is_draw);
             break;
         case PARAMETRIC:
+            parametrical_ellipse(scene, data, is_draw);
             break;
         case BRESEN:
+            bresen_ellipse(scene, data, is_draw);
             break;
         case MIDDLE_POINT:
+            middle_point_ellipse(scene, data, is_draw);
             break;
     }
 }
 
-void drawing_spectrum_circle(canvas_t &scene, gv_t &gv, const spectrum_t &spectrum, const QColor &back, const bool &is_draw)
+void drawing_spectrum_circle(canvas_t &scene, gv_t &gv, const spectrum_t &spectrum, const QColor &back)
 {
     figure_t circle;
     circle.center = spectrum.center;
@@ -91,12 +99,12 @@ void drawing_spectrum_circle(canvas_t &scene, gv_t &gv, const spectrum_t &spectr
     circle.method = spectrum.method;
     for (int i = 0; i < spectrum.n; i++)
     {
-        circle.r1 = spectrum.r1 + i * spectrum.dr1;
-        drawing_circle(scene, gv, circle, back, is_draw);
+        circle.ra = spectrum.ra + i * spectrum.dra;
+        drawing_circle(scene, gv, circle, back, true);
     }
 }
 
-void drawing_spectrum_ellispe(canvas_t &scene, gv_t &gv, const spectrum_t &spectrum, const QColor &back, const bool &is_draw)
+void drawing_spectrum_ellispe(canvas_t &scene, gv_t &gv, const spectrum_t &spectrum, const QColor &back)
 {
     figure_t ellispe;
     ellispe.center = spectrum.center;
@@ -104,9 +112,9 @@ void drawing_spectrum_ellispe(canvas_t &scene, gv_t &gv, const spectrum_t &spect
     ellispe.method = spectrum.method;
     for (int i = 0; i < spectrum.n; i++)
     {
-        ellispe.r1 = spectrum.r1 + i * spectrum.dr1;
-        ellispe.r2 = spectrum.r2 + i * spectrum.dr2;
-        drawing_ellipse(scene, gv, ellispe, back, is_draw);
+        ellispe.ra = spectrum.ra + i * spectrum.dra;
+        ellispe.rb = spectrum.rb + i * spectrum.drb;
+        drawing_ellipse(scene, gv, ellispe, back, true);
     }
 }
 
@@ -114,6 +122,30 @@ void draw_pix(canvas_t &scene, const double &x, const double &y, const QColor &c
 {
     QPen pen = QPen(color);
     QBrush brush = QBrush(color);
+    scene->addRect(qRound(x), qRound(y), 1, 1, pen, brush);
+}
 
-    scene->addRect(x, y, 1, 1, pen, brush);
+void draw_reflect_circle(canvas_t &scene, const QPointF &point, const QPointF &center, const QColor &color)
+{
+    draw_pix(scene, point.x(), point.y(), color);
+    draw_pix(scene, 2 * center.x() - point.x(), point.y(), color);
+    draw_pix(scene, point.x(), 2 * center.y() - point.y(), color);
+    draw_pix(scene, 2 * center.x() - point.x(), 2 * center.y() - point.y(), color);
+    draw_pix(scene, point.y() + center.x() - center.y(),
+             point.x() + center.y() - center.x(), color);
+    draw_pix(scene, -point.y() + center.x() + center.y(),
+             point.x() + center.y() - center.x(), color);
+    draw_pix(scene, point.y() + center.x() - center.y(),
+             -point.x() + center.y() + center.x(), color);
+    draw_pix(scene, -point.y() + center.x() + center.y(),
+             -point.x() + center.x() + center.y(), color);
+
+}
+
+void draw_reflect_ellipse(canvas_t &scene, const QPointF &point, const QPointF &center, const QColor &color)
+{
+    draw_pix(scene, point.x(), point.y(), color);
+    draw_pix(scene, 2 * center.x() - point.x(), point.y(), color);
+    draw_pix(scene, point.x(), 2 * center.y() - point.y(), color);
+    draw_pix(scene, 2 * center.x() - point.x(), 2 * center.y() - point.y(), color);
 }
