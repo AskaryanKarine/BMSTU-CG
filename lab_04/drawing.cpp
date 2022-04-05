@@ -119,9 +119,9 @@ void drawing_spectrum_ellispe(canvas_t &scene, const spectrum_t &spectrum)
 
 void draw_pix(canvas_t &scene, const double &x, const double &y, const QColor &color)
 {
-//    QPen pen = QPen(QColor(0,0,0,0));
-    QColor color1 = QColor(color.red(), color.green(), color.blue(), 255);
-    QPen pen = QPen(color1);
+    QPen pen = QPen(QColor(0,0,0,0));
+//    QColor color1 = QColor(color.red(), color.green(), color.blue(), 255);
+//    QPen pen = QPen(color1);
     QBrush brush = QBrush(color);
     scene->addRect(round(x), round(y), 1, 1, pen, brush);
 }
