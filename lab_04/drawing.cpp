@@ -146,7 +146,7 @@ void draw_reflect_circle(canvas_t &scene, const QPointF &point, const QPointF &c
 void draw_reflect_ellipse(canvas_t &scene, const QPointF &point, const QPointF &center, const QColor &color)
 {
     draw_pix(scene, point.x(), point.y(), color);
-    draw_pix(scene, 2 * center.x() - point.x(), point.y(), color);
-    draw_pix(scene, point.x(), 2 * center.y() - point.y(), color);
-    draw_pix(scene, 2 * center.x() - point.x(), 2 * center.y() - point.y(), color);
+//    draw_pix(scene, 2 * center.x() - point.x(), point.y(), color);
+//    draw_pix(scene, point.x(), 2 * center.y() - point.y(), color);
+//    draw_pix(scene, 2 * center.x() - point.x(), 2 * center.y() - point.y(), color);
 }
