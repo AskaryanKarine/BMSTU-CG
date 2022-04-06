@@ -27,7 +27,7 @@ void drawing_all(canvas_t &scene, gv_t &gv, const content_t &data)
 {
     scene->clear();
     gv->setBackgroundBrush(data.back_color);
-    drawing_axes(scene);
+//    drawing_axes(scene);
 
     for (size_t i = 0; i < data.figures.size(); i++)
     {
@@ -146,7 +146,7 @@ void draw_reflect_circle(canvas_t &scene, const QPointF &point, const QPointF &c
 void draw_reflect_ellipse(canvas_t &scene, const QPointF &point, const QPointF &center, const QColor &color)
 {
     draw_pix(scene, point.x(), point.y(), color);
-//    draw_pix(scene, 2 * center.x() - point.x(), point.y(), color);
-//    draw_pix(scene, point.x(), 2 * center.y() - point.y(), color);
-//    draw_pix(scene, 2 * center.x() - point.x(), 2 * center.y() - point.y(), color);
+    draw_pix(scene, 2 * center.x() - point.x(), point.y(), color);
+    draw_pix(scene, point.x(), 2 * center.y() - point.y(), color);
+    draw_pix(scene, 2 * center.x() - point.x(), 2 * center.y() - point.y(), color);
 }
