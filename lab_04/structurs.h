@@ -27,7 +27,7 @@ enum figure_type_t
 
 struct figure_t
 {
-    QPointF center;
+    QPoint center;
     figure_type_t type;
     double ra;
     double rb;
@@ -37,7 +37,7 @@ struct figure_t
 
 struct spectrum_t
 {
-    QPointF center;
+    QPoint center;
     figure_type_t type;
     double ra;
     double rb;

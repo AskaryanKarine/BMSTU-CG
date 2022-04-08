@@ -252,11 +252,11 @@ void MainWindow::on_pushButton_figure_clicked() // !!!
     else
     {
         bool flag_x, flag_y, flag_r1, flag_r2;
-        double x, y, r1, r2;
-        x = str_x.toDouble(&flag_x);
-        y = str_y.toDouble(&flag_y);
-        r1 = str_r1.toDouble(&flag_r1);
-        r2 = str_r2.toDouble(&flag_r2);
+        int x, y, r1, r2;
+        x = str_x.toInt(&flag_x);
+        y = str_y.toInt(&flag_y);
+        r1 = str_r1.toInt(&flag_r1);
+        r2 = str_r2.toInt(&flag_r2);
 
         if (!flag_x || !flag_y || !flag_r1 || (type == ELLIPSE && !flag_r2))
             error_message("Ошибка ввода: некорректный ввод");
@@ -266,7 +266,7 @@ void MainWindow::on_pushButton_figure_clicked() // !!!
             copy(&c, &data);
             cancel.push(*c);
             ui->pushButton_cancel->setEnabled(true);
-            QPointF center = QPointF(x, y);
+            QPoint center = QPoint(x, y);
             figure_t figure;
             figure.center = center;
             figure.type = type;
@@ -310,14 +310,14 @@ void MainWindow::on_pushButton_spectrum_clicked()
     else
     {
         bool flag_x, flag_y, flag_r1, flag_r2, flag_dr1, flag_dr2, flag_n;
-        double x, y, r1, r2, dr1, dr2;
+        int x, y, r1, r2, dr1, dr2;
         int n;
-        x = str_x.toDouble(&flag_x);
-        y = str_y.toDouble(&flag_y);
-        r1 = str_r1.toDouble(&flag_r1);
-        r2 = str_r2.toDouble(&flag_r2);
-        dr1 = str_dr1.toDouble(&flag_dr1);
-        dr2 = str_dr2.toDouble(&flag_dr2);
+        x = str_x.toInt(&flag_x);
+        y = str_y.toInt(&flag_y);
+        r1 = str_r1.toInt(&flag_r1);
+        r2 = str_r2.toInt(&flag_r2);
+        dr1 = str_dr1.toInt(&flag_dr1);
+        dr2 = str_dr2.toInt(&flag_dr2);
         n = str_n.toInt(&flag_n);
 
         if (!flag_x || !flag_y || !flag_n || !flag_dr1 || !flag_r1 || (type == ELLIPSE && (!flag_r2 || !flag_dr2)))
@@ -328,7 +328,7 @@ void MainWindow::on_pushButton_spectrum_clicked()
             copy(&c, &data);
             cancel.push(*c);
             ui->pushButton_cancel->setEnabled(true);
-            QPointF center = QPointF(x, y);
+            QPoint center = QPoint(x, y);
             spectrum_t spectrum;
             spectrum.center = center;
             spectrum.type = type;
@@ -369,17 +369,17 @@ void MainWindow::on_pushButton_time_clicked()
     QString str_n = ui->lineEdit_spectrum_n->text();
 
 
-    double x, y, r1, r2, dr1, dr2;
+    int x, y, r1, r2, dr1, dr2;
     int n;
 
     figure_type_t type = (figure_type_t) ui->comboBox_figure->currentIndex();
     bool flag_x, flag_y, flag_r1, flag_r2, flag_dr1, flag_dr2, flag_n;
-    x = str_x.toDouble(&flag_x);
-    y = str_y.toDouble(&flag_y);
-    r1 = str_r1.toDouble(&flag_r1);
-    r2 = str_r2.toDouble(&flag_r2);
-    dr1 = str_dr1.toDouble(&flag_dr1);
-    dr2 = str_dr2.toDouble(&flag_dr2);
+    x = str_x.toInt(&flag_x);
+    y = str_y.toInt(&flag_y);
+    r1 = str_r1.toInt(&flag_r1);
+    r2 = str_r2.toInt(&flag_r2);
+    dr1 = str_dr1.toInt(&flag_dr1);
+    dr2 = str_dr2.toInt(&flag_dr2);
     n = str_n.toInt(&flag_n);
 
     if (!flag_x)
@@ -406,7 +406,7 @@ void MainWindow::on_pushButton_time_clicked()
             r2 = DEF_R2;
     }
 
-    QPointF center = QPointF(x, y);
+    QPoint center = QPoint(x, y);
     spectrum_t spectrum;
     spectrum.center = center;
     spectrum.type = type;
