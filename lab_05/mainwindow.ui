@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>818</width>
-    <height>683</height>
+    <height>702</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Лабораторная работа №5</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QFormLayout" name="formLayout">
@@ -278,6 +278,12 @@
           <height>16777215</height>
          </size>
         </property>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>50</number>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>80</number>
+        </attribute>
        </widget>
       </item>
       <item>
@@ -342,7 +348,7 @@
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
