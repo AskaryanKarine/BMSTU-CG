@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QColor>
 #include <QLabel>
+#include <stack>
+#include <QTableWidgetItem>
 #include "structurs.h"
 
 QT_BEGIN_NAMESPACE
@@ -18,6 +20,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    bool eventFilter(QObject *object, QEvent *event);
 private slots:
     void app_info_show();
     void author_info_show();
@@ -33,11 +36,29 @@ private slots:
 
     void on_comboBox_activated(int index);
 
+    void on_pushButton_add_point_clicked();
+
+    void on_pushButton_close_clicked();
+
+    void on_pushButton_add_hole_clicked();
+
+    void on_pushButton_clear_clicked();
+
+    void on_tableWidget_cellClicked(int row, int column);
+
+    void on_tableWidget_itemChanged(QTableWidgetItem *item);
+
+    void on_pushButton_reset_scale_clicked();
+
+    void wheelEvent(QWheelEvent *event);
 private:
     Ui::MainWindow *ui;
     canvas_t scene;
     QColor back_color = Qt::white;
     QColor line_color = Qt::black;
     QColor fill_color = Qt::black;
+    content data;
+    std::stack<content> cancel;
+    bool is_hole = false;
 };
 #endif // MAINWINDOW_H
