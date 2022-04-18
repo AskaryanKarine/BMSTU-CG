@@ -12,13 +12,15 @@ SOURCES += \
     drawing.cpp \
     main.cpp \
     mainwindow.cpp \
-    request.cpp
+    request.cpp \
+    table.cpp
 
 HEADERS += \
     drawing.h \
     mainwindow.h \
     request.h \
-    structurs.h
+    structurs.h \
+    table.h
 
 FORMS += \
     mainwindow.ui
