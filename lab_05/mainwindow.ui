@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>818</width>
-    <height>702</height>
+    <height>734</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -329,18 +329,22 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_clear">
-        <property name="text">
-         <string>Очистить экран</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_cancel">
-        <property name="text">
-         <string>Отмена</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QPushButton" name="pushButton_cancel">
+          <property name="text">
+           <string>Отмена</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_clear">
+          <property name="text">
+           <string>Очистить экран</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -355,7 +359,7 @@
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
