@@ -223,9 +223,11 @@ void MainWindow::on_pushButton_add_point_clicked()
             req.view = ui->graphicsView;
             req.oper = ADD_POINT;
             int rc = request_handle(req);
-            if (rc)
+            if (rc == 1)
                 error_message("Такая точка уже введена");
-            else
+            else if (rc == 2)
+                error_message("Точка отверстия находится вне фигуры");
+            else if (rc == 0)
             {
                 content *c = new content;
                 copy(&c, &data);
@@ -486,9 +488,11 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         req.view = ui->graphicsView;
         req.oper = ADD_POINT;
         int rc = request_handle(req);
-        if (rc)
+        if (rc == 1)
             error_message("Такая точка уже введена");
-        else
+        else if (rc == 2)
+            error_message("Точка отверстия находится вне фигуры");
+        else if (rc == 0)
         {
             content *c = new content;
             copy(&c, &data);
@@ -501,3 +505,12 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         }
     }
 }
+
+void MainWindow::on_pushButton_fill_clicked()
+{
+    int delay = 0;
+    if (ui->comboBox->currentIndex() == 1)
+        delay = ui->spinBox->value();
+
+}
+

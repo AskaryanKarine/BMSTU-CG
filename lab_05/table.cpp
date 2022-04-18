@@ -1,5 +1,5 @@
 #include "table.h"
-
+#include <QPolygon>
 void add_row(const point &p, const int &n_figures, const int &n_holes, const size_t &i, QTableWidget *table)
 {
     table->blockSignals(true);
@@ -47,6 +47,17 @@ int add_point(const point &p, const colors col, const bool &is_hole, QTableWidge
         for (size_t i = 0; i < arr.size(); i++)
             if (arr[i].x == p.x && arr[i].y == p.y)
                 return 1;
+        QPolygon pol;
+        for (size_t i = 0; i < data.figures[data.n_figures].main_figure.size(); i++)
+        {
+            QPoint point = QPoint(data.figures[data.n_figures].main_figure[i].x, data.figures[data.n_figures].main_figure[i].y);
+            pol << point;
+        }
+        QPoint point = QPoint(data.figures[data.n_figures].main_figure[0].x, data.figures[data.n_figures].main_figure[0].y);
+        pol << point;
+        bool c = pol.containsPoint(QPoint(p.x, p.y), Qt::OddEvenFill);
+        if (!c)
+            return 2;
         data.figures[data.n_figures].holes[data.n_holes].points.push_back(p);
         i = data.figures[data.n_figures].holes[data.n_holes].points.size() - 1;
     }

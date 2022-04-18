@@ -55,6 +55,8 @@ private slots:
     void on_pushButton_del_point_clicked();
 
     void mousePressEvent(QMouseEvent *event);
+    void on_pushButton_fill_clicked();
+
 private:
     Ui::MainWindow *ui;
     canvas_t scene;
