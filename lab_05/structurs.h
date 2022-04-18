@@ -13,6 +13,19 @@ struct point
     int y;
 };
 
+struct colors
+{
+    QColor line;
+    QColor fill;
+};
+
+struct indexes
+{
+    int fig;
+    int hole;
+    size_t index;
+};
+
 struct hole
 {
     std::vector<point> points;
