@@ -50,7 +50,11 @@ private slots:
 
     void on_pushButton_reset_scale_clicked();
 
-    void wheelEvent(QWheelEvent *event);
+    void on_pushButton_cancel_clicked();
+
+    void on_pushButton_del_point_clicked();
+
+    void mousePressEvent(QMouseEvent *event);
 private:
     Ui::MainWindow *ui;
     canvas_t scene;
@@ -60,5 +64,6 @@ private:
     content data;
     std::stack<content> cancel;
     bool is_hole = false;
+    int cnt = 0;
 };
 #endif // MAINWINDOW_H

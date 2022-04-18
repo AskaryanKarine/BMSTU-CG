@@ -4,6 +4,7 @@
 #include <QColorDialog>
 #include <QWheelEvent>
 #include "request.h"
+#include <iostream>
 //#include "drawing.h"
 
 
@@ -25,8 +26,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
-    ui->graphicsView->viewport()->installEventFilter(this);
+//    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+//    ui->graphicsView->viewport()->installEventFilter(this);
 
     // отключить кнопки и задержку
     ui->pushButton_cancel->setEnabled(false);
@@ -38,9 +39,11 @@ MainWindow::MainWindow(QWidget *parent)
     show_color(fill_color, ui->label_fc);
 
     // начальные условия таблицы
-    ui->tableWidget->setColumnCount(4);
-    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "x" << "y" << "№ф" << "№о");
+    ui->tableWidget->setColumnCount(5);
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "x" << "y" << "№ф" << "№о" << "i");
     ui->tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->tableWidget->setColumnHidden(4, true);
+
 
     data.n_figures = 0;
     data.n_holes = -1;
@@ -60,6 +63,20 @@ MainWindow::~MainWindow()
     delete ui;
     delete scene;
     cancel = std::stack <content>();
+}
+
+static void copy(struct content **a, struct content *b)
+{
+    (*a)->back_color = b->back_color;
+    (*a)->n_figures = b->n_figures;
+    (*a)->n_holes = b->n_holes;
+    for (size_t i = 0; i < b->figures.size(); i++)
+    {
+        (*a)->figures.push_back(b->figures[i]);
+//        for (size_t j = 0; j < b->figures[j].main_figure.size(); j++)
+//            (*a)->figures[i].main_figure
+    }
+
 }
 
 // информационные функции
@@ -150,30 +167,30 @@ void MainWindow::on_comboBox_activated(int index)
         ui->spinBox->setEnabled(false);
 }
 
-// функция события колесика мыши
-void MainWindow::wheelEvent(QWheelEvent* event)
-{
-    ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    double scale_factor = 1.15;
-    if (event->angleDelta().y() > 0)
-        ui->graphicsView->scale(scale_factor, scale_factor);
-    else
-        ui->graphicsView->scale(1 / scale_factor, 1 / scale_factor);
-}
-
 bool MainWindow::eventFilter(QObject* object, QEvent* event)
 {
     if (event->type() == QEvent::Wheel && object == ui->graphicsView->viewport())
     {
-//        QWheelEvent *wheel_event = static_cast<QWheelEvent *>(event);
-//        wheelEvent(wheel_event);
+        QWheelEvent *wheel_event = static_cast<QWheelEvent *>(event);
+        ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+        double scale_factor = 1.15;
+        if (wheel_event->angleDelta().y() > 0)
+        {
+            cnt++;
+            ui->graphicsView->scale(scale_factor, scale_factor);
+        }
+        else if (cnt > 0)
+        {
+            cnt--;
+            ui->graphicsView->scale(1 / scale_factor, 1 / scale_factor);
+        }
         return true;
     }
     return false;
 }
 
 // добавление точки по нажатию кнопки
-void MainWindow::on_pushButton_add_point_clicked() // тут должна быть отмена действия и рисование
+void MainWindow::on_pushButton_add_point_clicked()
 {
     QString str_x = ui->lineEdit_add_x->text();
     QString str_y = ui->lineEdit_add_y->text();
@@ -196,12 +213,10 @@ void MainWindow::on_pushButton_add_point_clicked() // тут должна быт
         else
         {
             point p = {x, y};
-            // отправить запрос на добавление точки
             request req;
             req.data = data;
-            req.fill = fill_color;
+            req.colors_data = {line_color, fill_color};
             req.is_smth = is_hole;
-            req.line = line_color;
             req.p = p;
             req.scene = scene;
             req.table = ui->tableWidget;
@@ -210,26 +225,37 @@ void MainWindow::on_pushButton_add_point_clicked() // тут должна быт
             int rc = request_handle(req);
             if (rc)
                 error_message("Такая точка уже введена");
-            data = req.data;
-            req.oper = DRAW;
-            req.is_smth = false;
-            request_handle(req);
-//            add_point(p, line_color, fill_color, is_hole, ui->tableWidget, data);
-//            drawing_points(scene, ui->graphicsView, false, p, data);
-
+            else
+            {
+                content *c = new content;
+                copy(&c, &data);
+                cancel.push(*c);
+                ui->pushButton_cancel->setEnabled(true);
+                data = req.data;
+                req.oper = DRAW;
+                req.is_smth = false;
+                request_handle(req);
+            }
         }
     }
 }
 
 // замыкание фигуры / отверстия
-void MainWindow::on_pushButton_close_clicked() // запрос на рисование, отмена
+void MainWindow::on_pushButton_close_clicked()
 {
     int n_figures = data.n_figures;
     int n_holes = data.n_holes;
     if (!is_hole)
     {
         if (data.figures[n_figures].main_figure.size() >= 3)
+        {
+            content *c = new content;
+            copy(&c, &data);
+            cancel.push(*c);
+            ui->pushButton_cancel->setEnabled(true);
+
             data.figures[n_figures].is_closed_figure = true;
+        }
         else
             error_message("Недостаточно точек, чтобы замкнуть фигуру");
     }
@@ -237,9 +263,15 @@ void MainWindow::on_pushButton_close_clicked() // запрос на рисова
     {
         if (data.figures[n_figures].holes[n_holes].points.size() >= 3)
         {
+            content *c = new content;
+            copy(&c, &data);
+            cancel.push(*c);
+            ui->pushButton_cancel->setEnabled(true);
+
             data.figures[n_figures].holes[n_holes].is_closed_hole = true;
             is_hole = false;
             ui->pushButton_add_hole->setEnabled(true);
+
         }
         else
             error_message("Недостаточно точек, чтобы замкнуть отверстие");
@@ -252,16 +284,20 @@ void MainWindow::on_pushButton_close_clicked() // запрос на рисова
     req.p = {0, 0};
     req.oper = DRAW;
     request_handle(req);
-//    drawing_points(scene, ui->graphicsView, false, {0, 0}, data);
 }
 
 // добавление отверстия
-void MainWindow::on_pushButton_add_hole_clicked() // отмена
+void MainWindow::on_pushButton_add_hole_clicked()
 {
     if (!data.figures[data.n_figures].is_closed_figure)
         error_message("Фигура не замкнута. Сперва замкните ее");
     else
     {
+        content *c = new content;
+        copy(&c, &data);
+        cancel.push(*c);
+        ui->pushButton_cancel->setEnabled(true);
+
         is_hole = true;
         ui->pushButton_add_hole->setEnabled(false);
         data.figures[data.n_figures].holes.push_back({.is_closed_hole = false});
@@ -316,13 +352,67 @@ void MainWindow::on_tableWidget_cellClicked(int row, int column)
     req.p = p;
     req.oper = DRAW;
     request_handle(req);
-//    drawing_points(scene, ui->graphicsView, true, p, data);
 }
 
 // изменение точки в таблице
-void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item)
+void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item) // отмену добавить
 {
+    int row = ui->tableWidget->row(item);
+    bool flag_x, flag_y;
+    int x = ui->tableWidget->item(row, 0)->text().toInt(&flag_x);
+    int y = ui->tableWidget->item(row, 1)->text().toInt(&flag_y);
+    int n_f = ui->tableWidget->item(row, 2)->text().toInt();
+    int n_h = ui->tableWidget->item(row, 3)->text().toInt();
+    size_t i = (size_t) ui->tableWidget->item(row, 4)->text().toInt();
+    point old_p;
+    if (n_h == -1)
+        old_p = data.figures[n_f].main_figure[i];
+    else
+        old_p = data.figures[n_f].holes[n_h].points[i];
 
+    if (!flag_x)
+    {
+        error_message("Координата Х должна быть целым числом");
+        ui->tableWidget->blockSignals(true);
+        ui->tableWidget->setItem(row, 0, new QTableWidgetItem(QString::number(old_p.x)));
+        ui->centralwidget->blockSignals(false);
+    }
+    else if (!flag_y)
+    {
+        error_message("Координата Y должна быть целым числом");
+        ui->tableWidget->blockSignals(true);
+        ui->tableWidget->setItem(row, 1, new QTableWidgetItem(QString::number(old_p.y)));
+        ui->centralwidget->blockSignals(false);
+    }
+    else
+    {
+        point p = {x, y};
+        request req;
+        req.oper = CHANGE_POINT;
+        req.data = data;
+        req.indexes_data = {n_f, n_h, i};
+        req.table = ui->tableWidget;
+        req.p = p;
+        req.scene = scene;
+        req.view = ui->graphicsView;
+        int rc = request_handle(req);
+        if (rc)
+        {
+            error_message("Такая точка существует");
+            ui->tableWidget->blockSignals(true);
+            ui->tableWidget->setItem(row, 0, new QTableWidgetItem(QString::number(old_p.x)));
+            ui->tableWidget->setItem(row, 1, new QTableWidgetItem(QString::number(old_p.y)));
+            ui->centralwidget->blockSignals(false);
+        }
+        else
+        {
+            content *c = new content;
+            copy(&c, &data);
+            cancel.push(*c);
+            ui->pushButton_cancel->setEnabled(true);
+            data = req.data;
+        }
+    }
 }
 
 // сброс масштабирования
@@ -331,3 +421,83 @@ void MainWindow::on_pushButton_reset_scale_clicked()
     ui->graphicsView->resetTransform();
 }
 
+// отмена
+void MainWindow::on_pushButton_cancel_clicked()
+{
+    if (!cancel.empty())
+    {
+        data = cancel.top();
+        request req;
+        req.data = data;
+        req.table = ui->tableWidget;
+        req.oper = CANCEL;
+        req.scene = scene;
+        req.view = ui->graphicsView;
+        request_handle(req);
+        cancel.pop();
+    }
+    if (cancel.empty())
+        ui->pushButton_cancel->setEnabled(false);
+}
+
+// удаление точки
+void MainWindow::on_pushButton_del_point_clicked()
+{
+    content *c = new content;
+    copy(&c, &data);
+    cancel.push(*c);
+    ui->pushButton_cancel->setEnabled(true);
+    QTableWidgetItem *cur_item = ui->tableWidget->currentItem();
+    if (cur_item)
+    {
+        int row = ui->tableWidget->row(cur_item);
+        int n_f = ui->tableWidget->item(row, 2)->text().toInt();
+        int n_h = ui->tableWidget->item(row, 3)->text().toInt();
+        size_t i = (size_t) ui->tableWidget->item(row, 4)->text().toInt();
+        request req;
+        req.data = data;
+        req.indexes_data = {n_f, n_h, i};
+        req.table = ui->tableWidget;
+        req.scene = scene;
+        req.view = ui->graphicsView;
+        req.oper = DELETE_POINT;
+        request_handle(req);
+        data = req.data;
+    }
+        else
+            error_message("Сначала выберите точку");
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+//    int flag = 1;
+    QRect view = ui->graphicsView->geometry();
+    if (view.contains(event->pos()))
+    {
+//        std::cout << event->pos().x() - view.x() << " " << event->pos().y() - view.y() - menuBar()->geometry().height() << std::endl;
+        point p = {event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height()};
+        request req;
+        req.data = data;
+        req.colors_data = {line_color, fill_color};
+        req.is_smth = is_hole;
+        req.p = p;
+        req.scene = scene;
+        req.table = ui->tableWidget;
+        req.view = ui->graphicsView;
+        req.oper = ADD_POINT;
+        int rc = request_handle(req);
+        if (rc)
+            error_message("Такая точка уже введена");
+        else
+        {
+            content *c = new content;
+            copy(&c, &data);
+            cancel.push(*c);
+            ui->pushButton_cancel->setEnabled(true);
+            data = req.data;
+            req.oper = DRAW;
+            req.is_smth = false;
+            request_handle(req);
+        }
+    }
+}
