@@ -9,7 +9,9 @@ enum operation
     DRAW,
     FILL,
     ADD_POINT,
-    DELETE_POINT
+    DELETE_POINT,
+    CANCEL,
+    CHANGE_POINT
 };
 
 struct request
@@ -19,10 +21,12 @@ struct request
     canvas_t scene;
     gv_t view;
     QTableWidget *table;
-    QColor fill;
-    QColor line;
+//    QColor fill;
+//    QColor line;
     point p;
     bool is_smth;
+    colors colors_data;
+    indexes indexes_data;
 };
 
 int request_handle(request &req);
