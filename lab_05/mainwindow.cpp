@@ -26,8 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
-//    ui->graphicsView->viewport()->installEventFilter(this);
+    ui->graphicsView->viewport()->installEventFilter(this);
 
     // отключить кнопки и задержку
     ui->pushButton_cancel->setEnabled(false);
@@ -37,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     show_color(back_color, ui->label_bc);
     show_color(line_color, ui->label_lc);
     show_color(fill_color, ui->label_fc);
+    ui->graphicsView->setBackgroundBrush(back_color);
 
     // начальные условия таблицы
     ui->tableWidget->setColumnCount(5);
@@ -58,12 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
     data.figures[data.n_figures].line_color = line_color;
     data.figures[data.n_figures].fill_color = fill_color;
 
-//    QPixmap icon1("...lab_05/icons/cursour");
-//    QIcon ButtonIcon1(icon1);
-//    ui->pushButton_cursor_mode->setIcon(ButtonIcon1);
-
-//    ui-->setIcon(ButtonIcon);
-//    button->setIconSize(pixmap.rect().size());
+    ui->pushButton_cursor_mode->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -150,6 +145,7 @@ void MainWindow::on_pushButton_back_color_clicked()
     color_dialog(back_color);
     show_color(back_color, ui->label_bc);
     data.back_color = back_color;
+    ui->graphicsView->setBackgroundBrush(QBrush(back_color));
 }
 
 void MainWindow::on_pushButton_line_color_clicked()
@@ -179,18 +175,21 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
 {
     if (event->type() == QEvent::Wheel && object == ui->graphicsView->viewport())
     {
-        QWheelEvent *wheel_event = static_cast<QWheelEvent *>(event);
-        ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-        double scale_factor = 1.15;
-        if (wheel_event->angleDelta().y() > 0)
+        if (is_hand)
         {
-            cnt++;
-            ui->graphicsView->scale(scale_factor, scale_factor);
-        }
-        else if (cnt > 0)
-        {
-            cnt--;
-            ui->graphicsView->scale(1 / scale_factor, 1 / scale_factor);
+            QWheelEvent *wheel_event = static_cast<QWheelEvent *>(event);
+            ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+            double scale_factor = 1.15;
+            if (wheel_event->angleDelta().y() > 0)
+            {
+                cnt++;
+                ui->graphicsView->scale(scale_factor, scale_factor);
+            }
+            else if (cnt > 0)
+            {
+                cnt--;
+                ui->graphicsView->scale(1 / scale_factor, 1 / scale_factor);
+            }
         }
         return true;
     }
@@ -493,21 +492,24 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         req.table = ui->tableWidget;
         req.view = ui->graphicsView;
         req.oper = ADD_POINT;
-        int rc = request_handle(req);
-        if (rc == 1)
-            error_message("Такая точка уже введена");
-        else if (rc == 2)
-            error_message("Точка отверстия находится вне фигуры");
-        else if (rc == 0)
+        if (!is_hand)
         {
-            content *c = new content;
-            copy(&c, &data);
-            cancel.push(*c);
-            ui->pushButton_cancel->setEnabled(true);
-            data = req.data;
-            req.oper = DRAW;
-            req.is_smth = false;
-            request_handle(req);
+            int rc = request_handle(req);
+            if (rc == 1)
+                error_message("Такая точка уже введена");
+            else if (rc == 2)
+                error_message("Точка отверстия находится вне фигуры");
+            else if (rc == 0)
+            {
+                content *c = new content;
+                copy(&c, &data);
+                cancel.push(*c);
+                ui->pushButton_cancel->setEnabled(true);
+                data = req.data;
+                req.oper = DRAW;
+                req.is_smth = false;
+                request_handle(req);
+            }
         }
     }
 }
@@ -542,5 +544,24 @@ void MainWindow::on_pushButton_fill_clicked()
     ui->pushButton_cancel->setEnabled(true);
     data = req.data;
 
+}
+
+
+void MainWindow::on_pushButton_hand_mode_clicked()
+{
+    ui->pushButton_hand_mode->setEnabled(false);
+    ui->pushButton_cursor_mode->setEnabled(true);
+    is_hand = true;
+    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+}
+
+
+void MainWindow::on_pushButton_cursor_mode_clicked()
+{
+    ui->pushButton_hand_mode->setEnabled(true);
+    ui->pushButton_cursor_mode->setEnabled(false);
+    is_hand = false;
+    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
+    ui->graphicsView->resetTransform();
 }
 

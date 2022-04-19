@@ -326,7 +326,51 @@
         <item>
          <widget class="QPushButton" name="pushButton_reset_scale">
           <property name="text">
-           <string>Сбросить масштабирование</string>
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="image.qrc">
+            <normaloff>:/icons/icons/scale.png</normaloff>:/icons/icons/scale.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>25</width>
+            <height>25</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_cursor_mode">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="image.qrc">
+            <normaloff>:/icons/icons/cursor.png</normaloff>:/icons/icons/cursor.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>25</width>
+            <height>25</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_hand_mode">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="image.qrc">
+            <normaloff>:/icons/icons/hand.png</normaloff>:/icons/icons/hand.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>25</width>
+            <height>25</height>
+           </size>
           </property>
          </widget>
         </item>
@@ -369,6 +413,8 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="image.qrc"/>
+ </resources>
  <connections/>
 </ui>

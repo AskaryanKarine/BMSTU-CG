@@ -57,6 +57,10 @@ private slots:
     void mousePressEvent(QMouseEvent *event);
     void on_pushButton_fill_clicked();
 
+    void on_pushButton_hand_mode_clicked();
+
+    void on_pushButton_cursor_mode_clicked();
+
 private:
     Ui::MainWindow *ui;
     canvas_t scene;
