@@ -82,10 +82,10 @@ void select_point(canvas_t &scene, gv_t &gv, const point &selected_p, const cont
         p.setBrush(f.line_color);
 
         for (size_t j = 0; j < f.main_figure.size(); j++)
-            draw_point(f.main_figure[i], p);
+            draw_point(f.main_figure[j], p);
         for (size_t j = 0; j < f.holes.size(); j++)
-            for (size_t k = 0; k < f.holes[j].points.size() - 1; k++)
-                draw_point(f.holes[j].points[i], p);
+            for (size_t k = 0; k < f.holes[j].points.size(); k++)
+                draw_point(f.holes[j].points[k], p);
     }
 
     p.setBrush(Qt::red);

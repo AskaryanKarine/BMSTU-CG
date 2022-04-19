@@ -57,7 +57,7 @@ int request_handle(request &req)
         case CHANGE_POINT:
             rc = change(req.indexes_data, req.p, req.data, req.table, req.scene, req.view);
             break;
-    case SELECT:
+        case SELECT:
             select_point(req.scene, req.view, req.p, req.data);
             break;
     }

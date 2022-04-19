@@ -363,7 +363,7 @@ void MainWindow::on_tableWidget_cellClicked(int row, int column)
     req.view = ui->graphicsView;
     req.is_smth = true;
     req.p = p;
-    req.oper = DRAW;
+    req.oper = SELECT;
     request_handle(req);
 }
 
