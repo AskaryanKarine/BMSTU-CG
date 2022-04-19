@@ -85,7 +85,8 @@ static void copy(struct content **a, struct content *b)
 // информационные функции
 void MainWindow::app_info_show()
 {
-    QMessageBox::information(NULL, "О программе","Реализация и исследование алгоритмов растрового заполнения сплошных областей");
+    QMessageBox::information(NULL, "О программе","Реализация и исследование алгоритмов растрового заполнения сплошных областей\n\n\
+ 'icons: Flaticon.com'. This cover has been designed using resources from Flaticon.com");
 }
 
 void MainWindow::author_info_show()
