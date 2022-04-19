@@ -59,6 +59,11 @@ MainWindow::MainWindow(QWidget *parent)
     data.figures[data.n_figures].fill_color = fill_color;
 
     ui->pushButton_cursor_mode->setEnabled(false);
+
+    // всплывающие подсказки
+    ui->pushButton_reset_scale->setToolTip("Сброс масштабирования");
+    ui->pushButton_cursor_mode->setToolTip("Режим ввода точек мышкой.\nВнимание! Нельзя приближать");
+    ui->pushButton_hand_mode->setToolTip("Режим масштабирования.\nВнимание! Нельзя вводить\nновые точки мышкой");
 }
 
 MainWindow::~MainWindow()
