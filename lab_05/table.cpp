@@ -31,7 +31,6 @@ int add_point(const point &p, const colors col, const bool &is_hole, QTableWidge
             f.fill_color = col.fill;
             f.line_color = col.line;
             f.is_closed_figure = false;
-            f.is_fill = false;
             data.figures.push_back(f);
         }
         std::vector<point> arr = data.figures[data.n_figures].main_figure;

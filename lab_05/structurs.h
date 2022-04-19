@@ -46,7 +46,6 @@ struct figure
     QColor line_color;
     QColor fill_color;
     bool is_closed_figure;
-    bool is_fill;
 };
 
 struct content

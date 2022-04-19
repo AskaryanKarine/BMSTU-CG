@@ -30,10 +30,7 @@ int change(const indexes &ind, const point &p, content &data, QTableWidget *tabl
 void fill_all(content &data, const int delay, canvas_t &scene, gv_t &view)
 {
     for (size_t i = 0; i < data.figures.size(); i++)
-    {
         fill_one(data.figures[i], delay, scene, view, data.figures[i].fill_color);
-        data.figures[i].is_fill = true;
-    }
 }
 
 int request_handle(request &req)

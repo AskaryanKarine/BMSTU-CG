@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableWidget->setColumnHidden(4, true);
 
 
+    // начальные значения для работы
     data.n_figures = 0;
     data.n_holes = -1;
 
@@ -52,11 +53,17 @@ MainWindow::MainWindow(QWidget *parent)
     f.fill_color = fill_color;
     f.line_color = line_color;
     f.is_closed_figure = false;
-    f.is_fill = false;
     data.figures.push_back(f);
     data.back_color = back_color;
     data.figures[data.n_figures].line_color = line_color;
     data.figures[data.n_figures].fill_color = fill_color;
+
+//    QPixmap icon1("...lab_05/icons/cursour");
+//    QIcon ButtonIcon1(icon1);
+//    ui->pushButton_cursor_mode->setIcon(ButtonIcon1);
+
+//    ui-->setIcon(ButtonIcon);
+//    button->setIconSize(pixmap.rect().size());
 }
 
 MainWindow::~MainWindow()
@@ -334,7 +341,6 @@ void MainWindow::on_pushButton_clear_clicked()
     f.fill_color = fill_color;
     f.line_color = line_color;
     f.is_closed_figure = false;
-    f.is_fill = false;
     data.figures.push_back(f);
     data.figures[data.n_figures].line_color = line_color;
     data.figures[data.n_figures].fill_color = fill_color;

@@ -20,14 +20,9 @@ void drawing_points(canvas_t &scene, gv_t &gv, const bool &is_sel, const point &
 {
 //    scene->clear();
     QImage image = QImage(gv->geometry().width(), gv->geometry().height(), QImage::Format_RGB32);
-//    QPainter p(&image);
-    image.fill(data.back_color);
-    QPixmap pixmap = QPixmap::fromImage(image);
-    scene->addPixmap(pixmap);
-
-    image = QImage(gv->geometry().width(), gv->geometry().height(), QImage::Format_ARGB32);
-    image.fill(Qt::transparent);
     QPainter p(&image);
+    image.fill(data.back_color);
+
     figure f;
     for (size_t i = 0; i < data.figures.size(); i++)
     {
@@ -57,9 +52,6 @@ void drawing_points(canvas_t &scene, gv_t &gv, const bool &is_sel, const point &
                 }
             }
         }
-        if (f.is_fill)
-            fill_one(f, 0, scene, gv, f.fill_color);
-
     }
     if (is_sel)
     {
@@ -69,7 +61,7 @@ void drawing_points(canvas_t &scene, gv_t &gv, const bool &is_sel, const point &
         draw_point(selected_p, p);
     }
 
-    pixmap = QPixmap::fromImage(image);
+    QPixmap pixmap = QPixmap::fromImage(image);
     scene->addPixmap(pixmap);
 }
 

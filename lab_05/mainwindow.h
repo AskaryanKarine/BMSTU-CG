@@ -67,5 +67,6 @@ private:
     std::stack<content> cancel;
     bool is_hole = false;
     int cnt = 0;
+    bool is_hand = false;
 };
 #endif // MAINWINDOW_H
