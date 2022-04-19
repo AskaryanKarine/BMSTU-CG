@@ -1,6 +1,8 @@
 #include "request.h"
 #include "table.h"
 #include "drawing.h"
+#include "fill.h"
+#include <map>
 
 void cancel_data(const content &data, QTableWidget *table, canvas_t &scene, gv_t &view)
 {
@@ -25,6 +27,15 @@ int change(const indexes &ind, const point &p, content &data, QTableWidget *tabl
     }
 }
 
+void fill_all(content &data, const int delay, canvas_t &scene, gv_t &view)
+{
+    for (size_t i = 0; i < data.figures.size(); i++)
+    {
+        fill_one(data.figures[i], delay, scene, view, data.figures[i].fill_color);
+        data.figures[i].is_fill = true;
+    }
+}
+
 int request_handle(request &req)
 {
     int rc = 0;
@@ -34,6 +45,7 @@ int request_handle(request &req)
             drawing_points(req.scene, req.view, req.is_smth, req.p, req.data);
             break;
         case FILL:
+            fill_all(req.data, req.delay, req.scene, req.view);
             break;
         case ADD_POINT:
             rc = add_point(req.p, req.colors_data, req.is_smth, req.table, req.data);

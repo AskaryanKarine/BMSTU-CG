@@ -26,6 +26,13 @@ struct indexes
     size_t index;
 };
 
+struct node
+{
+    double x;
+    double dx;
+    int dy;
+};
+
 struct hole
 {
     std::vector<point> points;
@@ -39,6 +46,7 @@ struct figure
     QColor line_color;
     QColor fill_color;
     bool is_closed_figure;
+    bool is_fill;
 };
 
 struct content

@@ -21,12 +21,11 @@ struct request
     canvas_t scene;
     gv_t view;
     QTableWidget *table;
-//    QColor fill;
-//    QColor line;
     point p;
     bool is_smth;
     colors colors_data;
     indexes indexes_data;
+    int delay;
 };
 
 int request_handle(request &req);

@@ -52,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
     f.fill_color = fill_color;
     f.line_color = line_color;
     f.is_closed_figure = false;
+    f.is_fill = false;
     data.figures.push_back(f);
     data.back_color = back_color;
     data.figures[data.n_figures].line_color = line_color;
@@ -333,6 +334,7 @@ void MainWindow::on_pushButton_clear_clicked()
     f.fill_color = fill_color;
     f.line_color = line_color;
     f.is_closed_figure = false;
+    f.is_fill = false;
     data.figures.push_back(f);
     data.figures[data.n_figures].line_color = line_color;
     data.figures[data.n_figures].fill_color = fill_color;
@@ -472,11 +474,9 @@ void MainWindow::on_pushButton_del_point_clicked()
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-//    int flag = 1;
     QRect view = ui->graphicsView->geometry();
     if (view.contains(event->pos()))
     {
-//        std::cout << event->pos().x() - view.x() << " " << event->pos().y() - view.y() - menuBar()->geometry().height() << std::endl;
         point p = {event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height()};
         request req;
         req.data = data;
@@ -510,7 +510,31 @@ void MainWindow::on_pushButton_fill_clicked()
 {
     int delay = 0;
     if (ui->comboBox->currentIndex() == 1)
+    {
         delay = ui->spinBox->value();
+    }
+    for (size_t i = 0; i < data.figures.size(); i++)
+        if (data.figures[i].is_closed_figure)
+            for (size_t j = 0; j < data.figures[i].holes.size(); j++)
+                if (!data.figures[i].holes[j].is_closed_hole)
+                {
+                    error_message("Замкните фигуру перед заливкой");
+                    return;
+                }
+
+    request req;
+    req.data = data;
+    req.oper = FILL;
+    req.delay = delay;
+    req.scene = scene;
+    req.view = ui->graphicsView;
+    req.colors_data = {line_color, fill_color};
+    request_handle(req);
+    content *c = new content;
+    copy(&c, &data);
+    cancel.push(*c);
+    ui->pushButton_cancel->setEnabled(true);
+    data = req.data;
 
 }
 

@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     drawing.cpp \
+    fill.cpp \
     main.cpp \
     mainwindow.cpp \
     request.cpp \
@@ -17,6 +18,7 @@ SOURCES += \
 
 HEADERS += \
     drawing.h \
+    fill.h \
     mainwindow.h \
     request.h \
     structurs.h \
