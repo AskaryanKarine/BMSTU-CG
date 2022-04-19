@@ -10,6 +10,7 @@ enum operation
     FILL,
     ADD_POINT,
     DELETE_POINT,
+    SELECT,
     CANCEL,
     CHANGE_POINT
 };

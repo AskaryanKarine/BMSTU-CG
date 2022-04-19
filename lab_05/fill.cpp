@@ -1,4 +1,5 @@
 #include "fill.h"
+#include "drawing.h"
 #include <map>
 #include <QTime>
 #include <algorithm>
@@ -109,10 +110,11 @@ void fill(const int &delay, std::map<int, std::vector<node>> &y_group, std::vect
     }
 }
 
-void fill_one(const figure f, const int &delay, canvas_t &scene, gv_t &view, QColor color)
+void fill_one(const figure &f, const int &delay, canvas_t &scene, gv_t &view)
 {
     int y_max = 0, y_min = 1000;
     std::map<int, std::vector<node>> y_group = make_y_group(f, y_max, y_min);
     std::vector<node> active_edges;
-    fill(delay, y_group, active_edges, y_min, y_max, scene, view, color);
+    fill(delay, y_group, active_edges, y_min, y_max, scene, view, f.fill_color);
+
 }

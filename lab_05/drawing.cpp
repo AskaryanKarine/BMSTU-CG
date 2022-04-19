@@ -18,10 +18,12 @@ void draw_line(const point &p1, const point &p2, QPainter &p)
 // функция отрисовки точек (без окружностей)
 void drawing_points(canvas_t &scene, gv_t &gv, const bool &is_sel, const point &selected_p, const content &data)
 {
-//    scene->clear();
-    QImage image = QImage(gv->geometry().width(), gv->geometry().height(), QImage::Format_RGB32);
+    scene->clear();
+    gv->setBackgroundBrush(data.back_color);
+    QImage image = QImage(gv->geometry().width(), gv->geometry().height(), QImage::Format_ARGB32);
     QPainter p(&image);
-    image.fill(data.back_color);
+//    image.fill(data.back_color);
+    image.fill(Qt::transparent);
 
     figure f;
     for (size_t i = 0; i < data.figures.size(); i++)
