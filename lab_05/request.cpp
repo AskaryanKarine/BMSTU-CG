@@ -25,6 +25,7 @@ int change(const indexes &ind, const point &p, content &data, QTableWidget *tabl
         rewrite_table(data, table);
         drawing_points(scene, view, true, p, data);
     }
+    return rc;
 }
 
 void fill_all(content &data, const int delay, canvas_t &scene, gv_t &view)
@@ -55,6 +56,9 @@ int request_handle(request &req)
             break;
         case CHANGE_POINT:
             rc = change(req.indexes_data, req.p, req.data, req.table, req.scene, req.view);
+            break;
+    case SELECT:
+            select_point(req.scene, req.view, req.p, req.data);
             break;
     }
     return rc;

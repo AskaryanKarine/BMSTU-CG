@@ -90,7 +90,7 @@ void draw_str(gv_t &view, canvas_t &scene, std::vector<node> &active_edges, int 
     p.setBrush(color);
 
     for (size_t i = 0; i < active_edges.size() - 1; i += 2)
-        p.drawLine(active_edges[i].x, y, active_edges[i + 1].x, y);
+        p.drawLine((active_edges[i].x), y, qRound(active_edges[i + 1].x), y);
 
     QPixmap pixmap = QPixmap::fromImage(image);
     scene->addPixmap(pixmap);
@@ -110,11 +110,33 @@ void fill(const int &delay, std::map<int, std::vector<node>> &y_group, std::vect
     }
 }
 
+void draw_countor(const figure &f, canvas_t &scene, gv_t &view)
+{
+    QImage image = QImage(view->geometry().width(), view->geometry().height(), QImage::Format_ARGB32);
+    QPainter p(&image);
+    image.fill(Qt::transparent);
+
+    p.setPen(f.line_color);
+    p.setBrush(f.line_color);
+    size_t size = f.main_figure.size();
+    for (size_t j = 0; j < size - 1; j++)
+        draw_line(f.main_figure[j], f.main_figure[j + 1], p);
+    draw_line(f.main_figure[0], f.main_figure[f.main_figure.size() - 1], p);
+    for (size_t j = 0; j < f.holes.size(); j++)
+    {
+        for (size_t k = 0; k < f.holes[j].points.size() - 1; k++)
+            draw_line(f.holes[j].points[k], f.holes[j].points[k + 1], p);
+        draw_line(f.holes[j].points[0], f.holes[j].points[f.holes[j].points.size() - 1], p);
+    }
+    QPixmap pixmap = QPixmap::fromImage(image);
+    scene->addPixmap(pixmap);
+}
+
 void fill_one(const figure &f, const int &delay, canvas_t &scene, gv_t &view)
 {
     int y_max = 0, y_min = 1000;
     std::map<int, std::vector<node>> y_group = make_y_group(f, y_max, y_min);
     std::vector<node> active_edges;
     fill(delay, y_group, active_edges, y_min, y_max, scene, view, f.fill_color);
-
+    draw_countor(f, scene, view);
 }

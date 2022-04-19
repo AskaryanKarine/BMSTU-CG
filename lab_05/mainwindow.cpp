@@ -345,6 +345,10 @@ void MainWindow::on_pushButton_clear_clicked()
     data.figures[data.n_figures].fill_color = fill_color;
 
     ui->graphicsView->resetTransform();
+    ui->pushButton_hand_mode->setEnabled(true);
+    ui->pushButton_cursor_mode->setEnabled(false);
+    is_hand = false;
+    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
 }
 
 // выделение точки

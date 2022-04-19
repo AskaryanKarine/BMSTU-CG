@@ -19,11 +19,11 @@ void draw_line(const point &p1, const point &p2, QPainter &p)
 void drawing_points(canvas_t &scene, gv_t &gv, const bool &is_sel, const point &selected_p, const content &data)
 {
     scene->clear();
-    gv->setBackgroundBrush(data.back_color);
+//    gv->setBackgroundBrush(data.back_color);
     QImage image = QImage(gv->geometry().width(), gv->geometry().height(), QImage::Format_ARGB32);
     QPainter p(&image);
-//    image.fill(data.back_color);
-    image.fill(Qt::transparent);
+    image.fill(data.back_color);
+//    image.fill(Qt::transparent);
 
     figure f;
     for (size_t i = 0; i < data.figures.size(); i++)
@@ -67,4 +67,33 @@ void drawing_points(canvas_t &scene, gv_t &gv, const bool &is_sel, const point &
     scene->addPixmap(pixmap);
 }
 
+
+void select_point(canvas_t &scene, gv_t &gv, const point &selected_p, const content &data)
+{
+    QImage image = QImage(gv->geometry().width(), gv->geometry().height(), QImage::Format_ARGB32);
+    QPainter p(&image);
+    image.fill(Qt::transparent);
+
+    figure f;
+    for (size_t i = 0; i < data.figures.size(); i++)
+    {
+        f = data.figures[i];
+        p.setPen(f.line_color);
+        p.setBrush(f.line_color);
+
+        for (size_t j = 0; j < f.main_figure.size(); j++)
+            draw_point(f.main_figure[i], p);
+        for (size_t j = 0; j < f.holes.size(); j++)
+            for (size_t k = 0; k < f.holes[j].points.size() - 1; k++)
+                draw_point(f.holes[j].points[i], p);
+    }
+
+    p.setBrush(Qt::red);
+    p.setPen(Qt::red);
+
+    draw_point(selected_p, p);
+
+    QPixmap pixmap = QPixmap::fromImage(image);
+    scene->addPixmap(pixmap);
+}
 
