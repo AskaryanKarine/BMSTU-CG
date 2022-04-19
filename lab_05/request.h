@@ -27,6 +27,7 @@ struct request
     colors colors_data;
     indexes indexes_data;
     int delay;
+    std::vector<double> time;
 };
 
 int request_handle(request &req);

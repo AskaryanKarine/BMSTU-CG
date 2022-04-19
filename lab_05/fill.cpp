@@ -132,11 +132,16 @@ void draw_countor(const figure &f, canvas_t &scene, gv_t &view)
     scene->addPixmap(pixmap);
 }
 
-void fill_one(const figure &f, const int &delay, canvas_t &scene, gv_t &view)
+void fill_one(const figure &f, const int &delay, canvas_t &scene, gv_t &view, std::vector<double>& time)
 {
     int y_max = 0, y_min = 1000;
     std::map<int, std::vector<node>> y_group = make_y_group(f, y_max, y_min);
     std::vector<node> active_edges;
+    using std::chrono::duration_cast;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::microseconds;
+    auto cur_time = high_resolution_clock::now();
     fill(delay, y_group, active_edges, y_min, y_max, scene, view, f.fill_color);
+    time.push_back((double)duration_cast<microseconds>(high_resolution_clock::now() - cur_time).count());
     draw_countor(f, scene, view);
 }

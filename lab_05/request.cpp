@@ -28,10 +28,10 @@ int change(const indexes &ind, const point &p, content &data, QTableWidget *tabl
     return rc;
 }
 
-void fill_all(content &data, const int delay, canvas_t &scene, gv_t &view)
+void fill_all(content &data, const int delay, canvas_t &scene, gv_t &view, std::vector<double>& time)
 {
     for (size_t i = 0; i < data.figures.size(); i++)
-        fill_one(data.figures[i], delay, scene, view);
+        fill_one(data.figures[i], delay, scene, view, time);
 }
 
 int request_handle(request &req)
@@ -43,7 +43,7 @@ int request_handle(request &req)
             drawing_points(req.scene, req.view, req.is_smth, req.p, req.data);
             break;
         case FILL:
-            fill_all(req.data, req.delay, req.scene, req.view);
+            fill_all(req.data, req.delay, req.scene, req.view, req.time);
             break;
         case ADD_POINT:
             rc = add_point(req.p, req.colors_data, req.is_smth, req.table, req.data);

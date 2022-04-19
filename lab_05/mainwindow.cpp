@@ -74,12 +74,7 @@ static void copy(struct content **a, struct content *b)
     (*a)->n_figures = b->n_figures;
     (*a)->n_holes = b->n_holes;
     for (size_t i = 0; i < b->figures.size(); i++)
-    {
         (*a)->figures.push_back(b->figures[i]);
-//        for (size_t j = 0; j < b->figures[j].main_figure.size(); j++)
-//            (*a)->figures[i].main_figure
-    }
-
 }
 
 // информационные функции
@@ -536,7 +531,9 @@ void MainWindow::on_pushButton_fill_clicked()
                 }
 
     request req;
+    std::vector<double> time;
     req.data = data;
+    req.time = time;
     req.oper = FILL;
     req.delay = delay;
     req.scene = scene;
@@ -548,7 +545,17 @@ void MainWindow::on_pushButton_fill_clicked()
     cancel.push(*c);
     ui->pushButton_cancel->setEnabled(true);
     data = req.data;
-
+    std::string str;
+    QString s;
+    s += "Время заливки многоульников: ";
+    for (size_t i = 0; i < req.time.size() - 1; i++)
+    {
+        s += QString::number(req.time[i]);
+        s += ", ";
+    }
+    s += QString::number(req.time[req.time.size() - 1]);
+    s += " мкс.";
+    ui->statusbar->showMessage(s, 20000);
 }
 
 
