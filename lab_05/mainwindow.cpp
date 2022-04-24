@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->spinBox->setEnabled(false);
 
     // установка цветов
-    show_color(back_color, ui->label_bc);
+//    show_color(back_color, ui->label_bc);
     show_color(line_color, ui->label_lc);
     show_color(fill_color, ui->label_fc);
     ui->graphicsView->setBackgroundBrush(back_color);
@@ -139,14 +139,6 @@ void MainWindow::color_dialog(QColor &color)
         error_message("Выберите цвет");
     else
         color = tmp;
-}
-
-void MainWindow::on_pushButton_back_color_clicked()
-{
-    color_dialog(back_color);
-    show_color(back_color, ui->label_bc);
-    data.back_color = back_color;
-    ui->graphicsView->setBackgroundBrush(QBrush(back_color));
 }
 
 void MainWindow::on_pushButton_line_color_clicked()
@@ -321,10 +313,8 @@ void MainWindow::on_pushButton_clear_clicked()
 {
     scene->clear();
 
-    back_color = Qt::white;
     line_color = Qt::black;
-    fill_color = Qt::black;
-    show_color(back_color, ui->label_bc);
+    fill_color = QColor("#ffa257");
     show_color(line_color, ui->label_lc);
     show_color(fill_color, ui->label_fc);
     data.back_color = back_color;

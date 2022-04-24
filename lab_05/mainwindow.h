@@ -28,7 +28,6 @@ private slots:
     void error_message(QString str);
     void show_color(QColor color, QLabel *lab);
     void color_dialog(QColor &color);
-    void on_pushButton_back_color_clicked();
 
     void on_pushButton_line_color_clicked();
 
@@ -66,7 +65,7 @@ private:
     canvas_t scene;
     QColor back_color = Qt::white;
     QColor line_color = Qt::black;
-    QColor fill_color = Qt::black;
+    QColor fill_color = QColor("#ffa257");
     content data;
     std::stack<content> cancel;
     bool is_hole = false;
