@@ -15,13 +15,13 @@ void draw_line(const point &p1, const point &p2, QPainter &p)
     p.drawLine(p1.x, p1.y, p2.x, p2.y);
 }
 
-// функция отрисовки точек (без окружностей)
+// функция отрисовки точек
 void drawing_points(canvas_t &scene, gv_t &gv, const bool &is_sel, const point &selected_p, const content &data)
 {
     scene->clear();
     QImage image = QImage(gv->geometry().width(), gv->geometry().height(), QImage::Format_ARGB32);
     QPainter p(&image);
-    image.fill(Qt::white);
+    image.fill(Qt::transparent);
 
     // затравочный пиксель
     p.setPen(data.back_color);

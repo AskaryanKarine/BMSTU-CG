@@ -60,11 +60,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pushButton_cursor_mode->setEnabled(false);
 
     // всплывающие подсказки
-    ui->pushButton_reset_scale->setToolTip("Сброс масштабирования");
-    ui->pushButton_cursor_mode->setToolTip("Режим ввода точек мышкой.\nВнимание! Нельзя приближать");
-    ui->pushButton_hand_mode->setToolTip("Режим масштабирования.\nВнимание! Нельзя вводить\nновые точки мышкой");
+    ui->pushButton_reset_scale->setToolTip("Сброс масштабирования\n✪ ω ✪");
+    ui->pushButton_cursor_mode->setToolTip("Режим ввода точек мышкой.\nВнимание! Нельзя приближать\n(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧");
+    ui->pushButton_hand_mode->setToolTip("Режим масштабирования.\nВнимание! Нельзя вводить\nновые точки мышкой\nヽ(✿ﾟ▽ﾟ)ノ");
     ui->pushButton_seed_point_click->setToolTip("Ввод затравочного пикселя с помощью мышки");
-
+    ui->pushButton_seed_point_key->setToolTip("Ввод/изменение затравочного пикселя с помощью клавиатуры");
+    ui->statusbar->setToolTip("Примите лабу, пожалуйста, я очень старалась ( •̀ ω •́ )✧");
 }
 
 MainWindow::~MainWindow()
@@ -87,8 +88,9 @@ static void copy(struct content **a, struct content *b)
 // информационные функции
 void MainWindow::app_info_show()
 {
-    QMessageBox::information(NULL, "О программе","Реализация и исследование алгоритмов растрового заполнения сплошных областей\n\n\
- 'icons: Flaticon.com'. This cover has been designed using resources from Flaticon.com");
+    QMessageBox::information(NULL, "О программе","Реализация и исследование алгоритма построчного затравочного заполнения сплошных областей\n\n\
+Интерфейс этой программы был разработан с использванием ресурсов с сайта Flaticon.com\n\n\
+This cover has been designed using resources from Flaticon.com");
 }
 
 void MainWindow::author_info_show()
@@ -147,14 +149,15 @@ void MainWindow::on_pushButton_line_color_clicked()
 {
     color_dialog(line_color);
     show_color(line_color, ui->label_lc);
-    data.figures[data.n_figures].line_color = line_color;
+//    size_t size = data.figures.size()  - 1;
+//    data.figures[size].line_color = line_color;
 }
 
 void MainWindow::on_pushButton_fill_color_clicked()
 {
     color_dialog(fill_color);
     show_color(fill_color, ui->label_fc);
-    data.figures[data.n_figures].fill_color = fill_color;
+    data.back_color = fill_color;
 }
 
 // выбор формата вывода
@@ -486,6 +489,7 @@ void MainWindow::on_pushButton_del_point_clicked()
             error_message("Сначала выберите точку");
 }
 
+// клик мыши
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     QRect view = ui->graphicsView->geometry();
@@ -540,6 +544,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
     }
 }
 
+// заполнение фигуры
 void MainWindow::on_pushButton_fill_clicked()
 {
     int delay = 0;
@@ -552,6 +557,11 @@ void MainWindow::on_pushButton_fill_clicked()
         error_message("Введите хотя бы несколько точек");
         return;
     }
+    if (!data.seed_point.x && !data.seed_point.y)
+    {
+        error_message("Введите затравочную точку");
+        return;
+    }
     request req;
     std::vector<double> time;
     req.data = data;
@@ -561,7 +571,14 @@ void MainWindow::on_pushButton_fill_clicked()
     req.scene = scene;
     req.view = ui->graphicsView;
     req.colors_data = {line_color, fill_color};
-    request_handle(req);
+    int rc = request_handle(req);
+    if (rc)
+    {
+        error_message("Что-то пошло не так. Проверьте входные данные, пожалуйста");
+        req.oper = DRAW;
+        request_handle(req);
+        return;
+    }
     content *c = new content;
     copy(&c, &data);
     cancel.push(*c);
@@ -580,6 +597,7 @@ void MainWindow::on_pushButton_fill_clicked()
     ui->statusbar->showMessage(s, 20000);
 }
 
+// включение режима приближения
 void MainWindow::on_pushButton_hand_mode_clicked()
 {
     ui->pushButton_hand_mode->setEnabled(false);
@@ -588,6 +606,7 @@ void MainWindow::on_pushButton_hand_mode_clicked()
     ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
+// включение режима ввода точек
 void MainWindow::on_pushButton_cursor_mode_clicked()
 {
     ui->pushButton_hand_mode->setEnabled(true);
@@ -597,6 +616,7 @@ void MainWindow::on_pushButton_cursor_mode_clicked()
     ui->graphicsView->resetTransform();
 }
 
+// режим ввода затравочной точки с помощью мышки
 void MainWindow::on_pushButton_seed_point_click_clicked()
 {
     is_seed_point = true;
@@ -609,6 +629,7 @@ void MainWindow::on_pushButton_seed_point_click_clicked()
 
 }
 
+// ввод затравочной точки с помощью полей
 void MainWindow::on_pushButton_seed_point_key_clicked()
 {
     QString str_x = ui->lineEdit_seed_point_x->text();
