@@ -33,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->spinBox->setEnabled(false);
 
     // установка цветов
-//    show_color(back_color, ui->label_bc);
     show_color(line_color, ui->label_lc);
     show_color(fill_color, ui->label_fc);
     ui->graphicsView->setBackgroundBrush(back_color);
@@ -64,6 +63,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pushButton_reset_scale->setToolTip("Сброс масштабирования");
     ui->pushButton_cursor_mode->setToolTip("Режим ввода точек мышкой.\nВнимание! Нельзя приближать");
     ui->pushButton_hand_mode->setToolTip("Режим масштабирования.\nВнимание! Нельзя вводить\nновые точки мышкой");
+    ui->pushButton_seed_point_click->setToolTip("Ввод затравочного пикселя с помощью мышки");
+
 }
 
 MainWindow::~MainWindow()
@@ -78,6 +79,7 @@ static void copy(struct content **a, struct content *b)
     (*a)->back_color = b->back_color;
     (*a)->n_figures = b->n_figures;
     (*a)->n_holes = b->n_holes;
+    (*a)->seed_point = b->seed_point;
     for (size_t i = 0; i < b->figures.size(); i++)
         (*a)->figures.push_back(b->figures[i]);
 }
@@ -318,6 +320,10 @@ void MainWindow::on_pushButton_clear_clicked()
     show_color(line_color, ui->label_lc);
     show_color(fill_color, ui->label_fc);
     data.back_color = back_color;
+    data.seed_point.x = Q_QNAN;
+    data.seed_point.y = Q_QNAN;
+    ui->lineEdit_seed_point_x->setText("");
+    ui->lineEdit_seed_point_y->setText("");
 
     cancel = std::stack<content>();
     ui->pushButton_cancel->setEnabled(false);
@@ -431,6 +437,14 @@ void MainWindow::on_pushButton_cancel_clicked()
     if (!cancel.empty())
     {
         data = cancel.top();
+        if (data.seed_point.x != -2147483648)
+            ui->lineEdit_seed_point_x->setText(QString::number(data.seed_point.x));
+        else
+            ui->lineEdit_seed_point_x->setText("");
+        if (data.seed_point.y != -2147483648)
+            ui->lineEdit_seed_point_y->setText(QString::number(data.seed_point.y));
+        else
+            ui->lineEdit_seed_point_y->setText("");
         request req;
         req.data = data;
         req.table = ui->tableWidget;
@@ -487,7 +501,24 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         req.table = ui->tableWidget;
         req.view = ui->graphicsView;
         req.oper = ADD_POINT;
-        if (!is_hand)
+        if (is_seed_point)
+        {
+            content *c = new content;
+            copy(&c, &data);
+            cancel.push(*c);
+            ui->pushButton_cancel->setEnabled(true);
+            is_seed_point = false;
+            ui->pushButton_seed_point_click->setEnabled(true);
+            ui->lineEdit_seed_point_x->setText(QString::number(p.x));
+            ui->lineEdit_seed_point_y->setText(QString::number(p.y));
+            data.seed_point = p;
+            data.back_color = fill_color;
+            req.data = data;
+            req.oper = DRAW;
+            req.is_smth = false;
+            request_handle(req);
+        }
+        else if (!is_hand && !is_seed_point)
         {
             int rc = request_handle(req);
             if (rc == 1)
@@ -549,7 +580,6 @@ void MainWindow::on_pushButton_fill_clicked()
     ui->statusbar->showMessage(s, 20000);
 }
 
-
 void MainWindow::on_pushButton_hand_mode_clicked()
 {
     ui->pushButton_hand_mode->setEnabled(false);
@@ -558,7 +588,6 @@ void MainWindow::on_pushButton_hand_mode_clicked()
     ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
-
 void MainWindow::on_pushButton_cursor_mode_clicked()
 {
     ui->pushButton_hand_mode->setEnabled(true);
@@ -566,5 +595,58 @@ void MainWindow::on_pushButton_cursor_mode_clicked()
     is_hand = false;
     ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
     ui->graphicsView->resetTransform();
+}
+
+void MainWindow::on_pushButton_seed_point_click_clicked()
+{
+    is_seed_point = true;
+    ui->pushButton_cursor_mode->setEnabled(false);
+    ui->pushButton_hand_mode->setEnabled(true);
+    ui->pushButton_seed_point_click->setEnabled(false);
+    is_hand = false;
+    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
+    ui->graphicsView->resetTransform();
+
+}
+
+void MainWindow::on_pushButton_seed_point_key_clicked()
+{
+    QString str_x = ui->lineEdit_seed_point_x->text();
+    QString str_y = ui->lineEdit_seed_point_y->text();
+
+    if (str_x.length() == 0)
+        error_message("Ошибка ввода: введите координату Х затравочной точки");
+    else if (str_y.length() == 0)
+        error_message("Ошибка ввода: введите координату Y затравочной точки");
+    else
+    {
+        bool flag_x, flag_y;
+        int x, y;
+        x = str_x.toInt(&flag_x);
+        y = str_y.toInt(&flag_y);
+
+        if (!flag_x)
+            error_message("Ошибка ввода: координата Х - число");
+        else if (!flag_y)
+            error_message("Ошибка ввода: координата Y - число");
+        else
+        {
+            content *c = new content;
+            copy(&c, &data);
+            cancel.push(*c);
+            ui->pushButton_cancel->setEnabled(true);
+            point p = {x, y};
+            request req;
+            data.seed_point = p;
+            req.data = data;
+            req.p = p;
+            req.scene = scene;
+            req.view = ui->graphicsView;
+            req.oper = DRAW;
+            req.is_smth = false;
+            request_handle(req);
+
+        }
+    }
 }
 

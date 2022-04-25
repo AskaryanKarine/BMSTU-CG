@@ -60,6 +60,10 @@ private slots:
 
     void on_pushButton_cursor_mode_clicked();
 
+    void on_pushButton_seed_point_click_clicked();
+
+    void on_pushButton_seed_point_key_clicked();
+
 private:
     Ui::MainWindow *ui;
     canvas_t scene;
@@ -71,5 +75,6 @@ private:
     bool is_hole = false;
     int cnt = 0;
     bool is_hand = false;
+    bool is_seed_point = false;
 };
 #endif // MAINWINDOW_H

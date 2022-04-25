@@ -54,6 +54,7 @@ struct content
     QColor back_color;
     int n_figures;
     int n_holes;
+    point seed_point;
 };
 
 #endif // STRUCTURS_H

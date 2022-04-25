@@ -19,11 +19,14 @@ void draw_line(const point &p1, const point &p2, QPainter &p)
 void drawing_points(canvas_t &scene, gv_t &gv, const bool &is_sel, const point &selected_p, const content &data)
 {
     scene->clear();
-//    gv->setBackgroundBrush(data.back_color);
     QImage image = QImage(gv->geometry().width(), gv->geometry().height(), QImage::Format_ARGB32);
     QPainter p(&image);
-    image.fill(data.back_color);
-//    image.fill(Qt::transparent);
+    image.fill(Qt::white);
+
+    // затравочный пиксель
+    p.setPen(data.back_color);
+    p.setBrush(data.back_color);
+    draw_point(data.seed_point, p);
 
     figure f;
     for (size_t i = 0; i < data.figures.size(); i++)
