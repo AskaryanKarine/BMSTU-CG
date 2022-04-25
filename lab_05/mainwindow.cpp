@@ -516,6 +516,11 @@ void MainWindow::on_pushButton_fill_clicked()
     {
         delay = ui->spinBox->value();
     }
+    if (data.figures[0].main_figure.empty())
+    {
+        error_message("Введите хотя бы несколько точек");
+        return;
+    }
     for (size_t i = 0; i < data.figures.size(); i++)
         if (data.figures[i].is_closed_figure)
             for (size_t j = 0; j < data.figures[i].holes.size(); j++)
