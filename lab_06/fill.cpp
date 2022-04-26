@@ -32,6 +32,109 @@ void draw_countor(const figure &f, QPainter &p)
 
 }
 
+int fill_fast(const content &data, canvas_t &scene, gv_t &view, std::vector<double>& time)
+{
+    QImage image = QImage(view->geometry().width(), view->geometry().height(), QImage::Format_ARGB32);
+    QPainter p(&image);
+    image.fill(Qt::transparent);
+
+    for (size_t i = 0; i < data.figures.size(); i++)
+        draw_countor(data.figures[i], p);
+
+    p.setPen(data.back_color);
+    p.setBrush(data.back_color);
+
+    std::stack<point> seeds_points;
+    seeds_points.push(data.seed_point);
+
+    using std::chrono::duration;
+    using std::chrono::duration_cast;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::microseconds;
+
+    auto end = high_resolution_clock::now();
+    auto start = high_resolution_clock::now();
+
+    while (!seeds_points.empty())
+    {
+        point cur_p = seeds_points.top();
+        seeds_points.pop();
+        p.drawPoint(cur_p.x, cur_p.y);
+
+        int rx = cur_p.x + 1;
+        int lx = cur_p.x - 1;
+        while (true) {
+            if (rx >= view->geometry().width())
+                return 1;
+
+            QColor color = image.pixelColor(rx, cur_p.y);
+
+            if (color != Qt::transparent) {
+                rx--;
+                break;
+            }
+            p.drawPoint(rx, cur_p.y);
+            rx++;
+        }
+
+        while (true) {
+            if (lx < 0)
+                return 1;
+
+            QColor color = image.pixelColor(lx, cur_p.y);
+
+            if (color != Qt::transparent) {
+                lx++;
+                break;
+            }
+            p.drawPoint(lx, cur_p.y);
+            lx--;
+        }
+
+        point new_seed_p = {};
+        int y = cur_p.y - 1;
+
+        bool flag = false;
+        for (int x = lx; x <= rx; x++)
+        {
+            if (image.pixelColor(x, y) == Qt::transparent && image.pixelColor(x + 1, y) != Qt::transparent)
+            {
+                seeds_points.push({x, y});
+                flag = true;
+            }
+            else if (image.pixelColor(x, y) == Qt::transparent)
+                new_seed_p = {x, y};
+        }
+        if ((new_seed_p.x && new_seed_p.y) && !flag)
+            seeds_points.push(new_seed_p);
+        new_seed_p = {};
+        y = cur_p.y + 1;
+        flag = false;
+        for (int x = lx; x <= rx; x++)
+        {
+            if (image.pixelColor(x, y) == Qt::transparent && image.pixelColor(x + 1, y) != Qt::transparent)
+            {
+                seeds_points.push({x, y});
+                flag = true;
+            }
+            else if (image.pixelColor(x, y) == Qt::transparent)
+                new_seed_p = {x, y};
+        }
+        if ((new_seed_p.x && new_seed_p.y) && !flag)
+            seeds_points.push(new_seed_p);
+    }
+
+    end = high_resolution_clock::now();
+
+    time.push_back((double)duration_cast<microseconds>(end - start).count());
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QGraphicsPixmapItem* item = scene->addPixmap(pixmap);
+    item->update();
+    return 0;
+}
+
+
+
 int fill_delay(const content &data, const int &delay, canvas_t &scene, gv_t &view, std::vector<double>& time)
 {
     QImage image = QImage(view->geometry().width(), view->geometry().height(), QImage::Format_ARGB32);
