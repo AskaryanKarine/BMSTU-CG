@@ -37,7 +37,7 @@ int request_handle(request &req)
             drawing_points(req.scene, req.view, req.is_smth, req.p, req.data);
             break;
         case FILL:
-            rc = fill(req.data, req.delay, req.scene, req.view, req.time);
+            rc = fill_delay(req.data, req.delay, req.scene, req.view, req.time);
             break;
         case ADD_POINT:
             rc = add_point(req.p, req.colors_data, req.is_smth, req.table, req.data);

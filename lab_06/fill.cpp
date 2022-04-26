@@ -4,19 +4,13 @@
 #include <stack>
 #include <QTime>
 #include <QCoreApplication>
+#include <QGraphicsPixmapItem>
 
 void sleep_feature(int sleep_time)
 {
     QTime end = QTime::currentTime().addMSecs(sleep_time);
     while (QTime::currentTime() < end)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
-}
-
-void draw_pix(const point &point, QPainter &painter, const int &delay)
-{
-    if (delay)
-        sleep_feature(delay);
-    painter.drawPoint(point.x, point.y);
 }
 
 void draw_countor(const figure &f, QPainter &p)
@@ -38,12 +32,12 @@ void draw_countor(const figure &f, QPainter &p)
 
 }
 
-int fill(const content &data, const int &delay, canvas_t &scene, gv_t &view, std::vector<double>& time)
+int fill_delay(const content &data, const int &delay, canvas_t &scene, gv_t &view, std::vector<double>& time)
 {
-    scene->clear();
     QImage image = QImage(view->geometry().width(), view->geometry().height(), QImage::Format_ARGB32);
     QPainter p(&image);
     image.fill(Qt::transparent);
+
     for (size_t i = 0; i < data.figures.size(); i++)
         draw_countor(data.figures[i], p);
 
@@ -65,7 +59,7 @@ int fill(const content &data, const int &delay, canvas_t &scene, gv_t &view, std
     {
         point cur_p = seeds_points.top();
         seeds_points.pop();
-        draw_pix(cur_p, p, delay);
+        p.drawPoint(cur_p.x, cur_p.y);
 
         int rx = cur_p.x + 1;
         int lx = cur_p.x - 1;
@@ -79,7 +73,7 @@ int fill(const content &data, const int &delay, canvas_t &scene, gv_t &view, std
                 rx--;
                 break;
             }
-            draw_pix({rx, cur_p.y}, p, delay);
+            p.drawPoint(rx, cur_p.y);
             rx++;
         }
 
@@ -93,7 +87,7 @@ int fill(const content &data, const int &delay, canvas_t &scene, gv_t &view, std
                 lx++;
                 break;
             }
-            draw_pix({lx, cur_p.y}, p, delay);
+            p.drawPoint(lx, cur_p.y);
             lx--;
         }
 
@@ -129,13 +123,18 @@ int fill(const content &data, const int &delay, canvas_t &scene, gv_t &view, std
         if ((new_seed_p.x && new_seed_p.y) && !flag)
             seeds_points.push(new_seed_p);
 
+        QPixmap pixmap = QPixmap::fromImage(image);
+        QGraphicsPixmapItem* item = scene->addPixmap(pixmap);
+        item->update();
+        if (delay != 0)
+            sleep_feature(delay);
     }
 
     end = high_resolution_clock::now();
 
     time.push_back((double)duration_cast<microseconds>(end - start).count());
-
     QPixmap pixmap = QPixmap::fromImage(image);
-    scene->addPixmap(pixmap);
+    QGraphicsPixmapItem* item = scene->addPixmap(pixmap);
+    item->update();
     return 0;
 }

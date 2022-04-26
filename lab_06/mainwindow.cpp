@@ -575,8 +575,6 @@ void MainWindow::on_pushButton_fill_clicked()
     if (rc)
     {
         error_message("Что-то пошло не так. Проверьте входные данные, пожалуйста");
-        req.oper = DRAW;
-        request_handle(req);
         return;
     }
     content *c = new content;
