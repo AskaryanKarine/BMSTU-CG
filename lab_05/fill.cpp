@@ -4,6 +4,7 @@
 #include <QTime>
 #include <algorithm>
 #include <QCoreApplication>
+#include <QGraphicsPixmapItem>
 
 void update_y_group(point p_start, point p_end, std::map<int, std::vector<node>> &y_group, int &y_max, int &y_min)
 {
@@ -80,6 +81,12 @@ void sleep_feature(int sleep_time)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
 }
 
+void draw_fast_str(QPainter &p, std::vector<node> &active_edges, int &y)
+{
+    for (size_t i = 0; i < active_edges.size() - 1; i += 2)
+        p.drawLine((active_edges[i].x), y, qRound(active_edges[i + 1].x), y);
+}
+
 void draw_str(gv_t &view, canvas_t &scene, std::vector<node> &active_edges, int &y, QColor color)
 {
     QImage image = QImage(view->geometry().width(), view->geometry().height(), QImage::Format_ARGB32);
@@ -93,21 +100,34 @@ void draw_str(gv_t &view, canvas_t &scene, std::vector<node> &active_edges, int 
         p.drawLine((active_edges[i].x), y, qRound(active_edges[i + 1].x), y);
 
     QPixmap pixmap = QPixmap::fromImage(image);
-    scene->addPixmap(pixmap);
+    QGraphicsPixmapItem* item = scene->addPixmap(pixmap);
+    item->update();
 }
 
 void fill(const int &delay, std::map<int, std::vector<node>> &y_group, std::vector<node> &active_edges,
           int y_min, int y_max, canvas_t &scene, gv_t &view, QColor color)
 {
+    QImage image = QImage(view->geometry().width(), view->geometry().height(), QImage::Format_ARGB32);
+    QPainter p(&image);
+    image.fill(Qt::transparent);
+    p.setPen(color);
+    p.setBrush(color);
     while (y_max > y_min)
     {
         check_active_edges(active_edges);
         add_actove_edges(y_group, active_edges, y_max);
         if (delay)
+        {
             sleep_feature(delay);
-        draw_str(view, scene, active_edges, y_max, color);
+            draw_str(view, scene, active_edges, y_max, color);
+        }
+        else
+            draw_fast_str(p, active_edges, y_max);
         y_max--;
     }
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QGraphicsPixmapItem* item = scene->addPixmap(pixmap);
+    item->update();
 }
 
 void draw_countor(const figure &f, canvas_t &scene, gv_t &view)
@@ -129,7 +149,8 @@ void draw_countor(const figure &f, canvas_t &scene, gv_t &view)
         draw_line(f.holes[j].points[0], f.holes[j].points[f.holes[j].points.size() - 1], p);
     }
     QPixmap pixmap = QPixmap::fromImage(image);
-    scene->addPixmap(pixmap);
+    QGraphicsPixmapItem* item = scene->addPixmap(pixmap);
+    item->update();
 }
 
 void fill_one(const figure &f, const int &delay, canvas_t &scene, gv_t &view, std::vector<double>& time)
