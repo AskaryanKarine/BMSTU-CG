@@ -31,10 +31,7 @@ int change(const indexes &ind, const point &p, content &data, QTableWidget *tabl
 int fill(const content &data, const int &delay, canvas_t &scene, gv_t &view, std::vector<double> &time)
 {
     int rc = 0;
-    if (delay)
-        rc = fill_delay(data, delay, scene, view, time);
-    else
-        rc = fill_fast(data, scene, view, time);
+    rc = fill_delay(data, delay, scene, view, time);
     return rc;
 }
 
