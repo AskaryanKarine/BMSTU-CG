@@ -32,7 +32,9 @@ private slots:
     void on_pushButton_visible_line_color_clicked();
     void on_pushButton_add_point_clicked();
     void add_draw_point(const point& p);
-    void push_cancal();
+    void push_cancel();
+
+    void on_pushButton_cancel_clicked();
 
 private:
     Ui::MainWindow* ui;
@@ -40,6 +42,5 @@ private:
     content data;
     std::stack<content> cancel;
     bool is_cut = true;
-    int number_cut = 0;
 };
 #endif // MAINWINDOW_H

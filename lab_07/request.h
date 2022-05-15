@@ -18,6 +18,6 @@ struct request {
     int number;
 };
 
-int request_handel(request& req);
+int request_handle(request& req);
 
 #endif // REQUEST_H

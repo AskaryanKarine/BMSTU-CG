@@ -84,11 +84,12 @@ static void copy(struct content** a, struct content* b)
     (*a)->cut_color = b->cut_color;
     (*a)->line_color = b->line_color;
     (*a)->visible_color = b->visible_color;
+    (*a)->number_cut = b->number_cut;
     for (size_t i = 0; i < b->lines.size(); i++)
         (*a)->lines.push_back(b->lines[i]);
 }
 
-void MainWindow::push_cancal()
+void MainWindow::push_cancel()
 {
     content* c = new content;
     copy(&c, &data);
@@ -144,25 +145,29 @@ void MainWindow::on_pushButton_visible_line_color_clicked()
 
 void MainWindow::add_draw_point(const point& p)
 {
-    if (ui->radioButton_cut->isChecked())
-        number_cut++;
+    //    if (ui->radioButton_cut->isChecked())
+    //        data.number_cut++;
     request req;
     req.operation = ADD_POINT;
     req.data = data;
     req.is_cut = ui->radioButton_cut->isChecked();
     req.p = p;
-    req.number = number_cut;
+    if (ui->radioButton_cut->isChecked())
+        req.number = data.number_cut + 1;
     req.scene = scene;
     req.view = ui->graphicsView;
-    int rc = request_handel(req);
-    data = req.data;
-    if (rc == 1)
+    int rc = request_handle(req);
+    if (rc == 1) {
         error_message("Ошибка ввода точки: отсекатель вырожден");
+    }
     if (rc == 2)
         error_message("Ошибка ввода точки: начальная и конечная точки линии совпадают");
     if (!rc) {
+        push_cancel();
+        data = req.data;
+        data.number_cut = req.number;
         req.operation = DRAW_ALL;
-        request_handel(req);
+        request_handle(req);
     }
 }
 
@@ -194,4 +199,20 @@ void MainWindow::on_pushButton_add_point_clicked()
             add_draw_point(p);
         }
     }
+}
+
+void MainWindow::on_pushButton_cancel_clicked()
+{
+    if (!cancel.empty()) {
+        data = cancel.top();
+        request req;
+        req.data = data;
+        req.operation = DRAW_ALL;
+        req.scene = scene;
+        req.view = ui->graphicsView;
+        request_handle(req);
+        cancel.pop();
+    }
+    if (cancel.empty())
+        ui->pushButton_cancel->setEnabled(false);
 }

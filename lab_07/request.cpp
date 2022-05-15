@@ -2,7 +2,7 @@
 #include "drawing.h"
 #include "figure.h"
 
-int request_handel(request& req)
+int request_handle(request& req)
 {
     int rc = 0;
     switch (req.operation) {
