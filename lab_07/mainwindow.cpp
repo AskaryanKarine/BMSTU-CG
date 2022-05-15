@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "request.h"
 #include "ui_mainwindow.h"
 #include <QColorDialog>
 #include <QMessageBox>
@@ -17,13 +18,26 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ExitAction, SIGNAL(triggered()), this, SLOT(exit_show()));
 
     // начальные цвета
-    data.cut_color = QColor("#55ffff");
+    data.cut_color = Qt::blue;
     data.line_color = Qt::black;
     data.visible_color = QColor("#ff5500");
 
     show_color(data.cut_color, ui->label_cc);
     show_color(data.line_color, ui->label_lc);
     show_color(data.visible_color, ui->label_vlc);
+
+    // работа со сценой
+    scene = new QGraphicsScene(this);
+    ui->graphicsView->setScene(scene);
+    ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //    ui->graphicsView->viewport()->installEventFilter(this);
+
+    ui->radioButton_cut->setChecked(is_cut);
+    ui->pushButton_cancel->setEnabled(false);
+
+    data.lines.push_back({});
 }
 
 MainWindow::~MainWindow()
@@ -61,6 +75,25 @@ void MainWindow::exit_show()
 void MainWindow::error_message(QString str)
 {
     QMessageBox::critical(NULL, "Ошибка", str);
+}
+
+// функции для отмены
+static void copy(struct content** a, struct content* b)
+{
+    (*a)->cut = b->cut;
+    (*a)->cut_color = b->cut_color;
+    (*a)->line_color = b->line_color;
+    (*a)->visible_color = b->visible_color;
+    for (size_t i = 0; i < b->lines.size(); i++)
+        (*a)->lines.push_back(b->lines[i]);
+}
+
+void MainWindow::push_cancal()
+{
+    content* c = new content;
+    copy(&c, &data);
+    cancel.push(*c);
+    ui->pushButton_cancel->setEnabled(true);
 }
 
 // работа с цветом
@@ -107,4 +140,58 @@ void MainWindow::on_pushButton_visible_line_color_clicked()
 {
     color_dialog(data.visible_color);
     show_color(data.visible_color, ui->label_vlc);
+}
+
+void MainWindow::add_draw_point(const point& p)
+{
+    if (ui->radioButton_cut->isChecked())
+        number_cut++;
+    request req;
+    req.operation = ADD_POINT;
+    req.data = data;
+    req.is_cut = ui->radioButton_cut->isChecked();
+    req.p = p;
+    req.number = number_cut;
+    req.scene = scene;
+    req.view = ui->graphicsView;
+    int rc = request_handel(req);
+    data = req.data;
+    if (rc == 1)
+        error_message("Ошибка ввода точки: отсекатель вырожден");
+    if (rc == 2)
+        error_message("Ошибка ввода точки: начальная и конечная точки линии совпадают");
+    if (!rc) {
+        req.operation = DRAW_ALL;
+        request_handel(req);
+    }
+}
+
+void MainWindow::on_pushButton_add_point_clicked()
+{
+    QString str_x = ui->lineEdit_x->text();
+    QString str_y = ui->lineEdit_y->text();
+
+    if (str_x.length() == 0 && str_y.length() == 0)
+        error_message("Введите коориднаты точки");
+    else if (str_x.length() == 0)
+        error_message("Ошибка ввода: введите координату Х");
+    else if (str_y.length() == 0)
+        error_message("Ошибка ввода: введите координату Y");
+    else {
+        bool flag_x, flag_y;
+        int x, y;
+        x = str_x.toInt(&flag_x);
+        y = str_y.toInt(&flag_y);
+
+        if (!flag_x)
+            error_message("Ошибка ввода: координата Х - число");
+        else if (!flag_y)
+            error_message("Ошибка ввода: координата Y - число");
+        else if (x < 0 || y < 0)
+            error_message("Ошибка ввода: точка находится за пределами поля");
+        else {
+            point p = { x, y };
+            add_draw_point(p);
+        }
+    }
 }
