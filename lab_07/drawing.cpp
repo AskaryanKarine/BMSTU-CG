@@ -5,7 +5,7 @@
 
 void draw_point(const point& dot, QPainter& paint)
 {
-    paint.drawRect(dot.x, dot.y, COEF, COEF);
+    paint.drawRect(dot.x - 1, dot.y - 1, COEF, COEF);
 }
 
 void draw_line(const figure& line, QPainter& paint)
@@ -19,6 +19,10 @@ void draw_cut(const figure& cut, QPainter& paint)
 {
     int h = cut.p1.y - cut.p2.y;
     int w = cut.p1.x - cut.p2.x;
+    draw_point(cut.p1, paint);
+    draw_point(cut.p2, paint);
+    draw_point({ cut.p2.x, cut.p1.y }, paint);
+    draw_point({ cut.p1.x, cut.p2.y }, paint);
     paint.setBrush(QColor(0, 0, 0, 0));
     paint.drawRect(cut.p1.x, cut.p1.y, -w, -h);
 }
@@ -33,7 +37,7 @@ void draw_all(const content& data, canvas_t& scene, gv_t& view)
     p.setPen(data.cut_color);
     if (data.cut.is_full())
         draw_cut(data.cut, p);
-    else
+    else if (!data.cut.p1.is_null())
         draw_point(data.cut.p1, p);
 
     p.setBrush(data.line_color);
