@@ -8,19 +8,21 @@ typedef QGraphicsScene* canvas_t;
 typedef QGraphicsView* gv_t;
 
 struct point {
-    int x;
-    int y;
-};
+    int x = -1;
+    int y = -1;
 
-enum draw_type {
-    CUT,
-    LINE
+    bool is_null() { return !(x > 0 && y > 0); };
+    bool is_null() const { return !(x > 0 && y > 0); };
+    bool operator==(const point& p) { return x == p.x && y == p.y; };
+    bool operator!=(const point& p) { return !operator==(p); };
 };
 
 struct figure {
-    draw_type dt;
     point p1;
     point p2;
+
+    bool is_full() { return !(p1.is_null() || p2.is_null()); };
+    bool is_full() const { return !(p1.is_null() || p2.is_null()); };
 };
 
 struct content {
