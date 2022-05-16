@@ -388,6 +388,12 @@ void MainWindow::on_pushButton_cut_clicked()
         error_message("Введите отрезок");
         return;
     }
+    request req;
+    req.data = data;
+    req.operation = CUT;
+    req.scene = scene;
+    req.view = ui->graphicsView;
+    request_handle(req);
 }
 
 void MainWindow::on_pushButton_reset_scale_clicked()
