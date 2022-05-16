@@ -3,6 +3,10 @@
 #include "ui_mainwindow.h"
 #include <QColorDialog>
 #include <QMessageBox>
+#include <QMouseEvent>
+#include <QWidget>
+
+#include <iostream>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -32,10 +36,12 @@ MainWindow::MainWindow(QWidget* parent)
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //    ui->graphicsView->viewport()->installEventFilter(this);
+    ui->graphicsView->viewport()->installEventFilter(this);
 
     ui->radioButton_cut->setChecked(is_cut);
     ui->pushButton_cancel->setEnabled(false);
+
+    ui->graphicsView->setMouseTracking(true);
 
     data.lines.push_back({});
 }
@@ -143,10 +149,9 @@ void MainWindow::on_pushButton_visible_line_color_clicked()
     show_color(data.visible_color, ui->label_vlc);
 }
 
+// работа с точками
 void MainWindow::add_draw_point(const point& p)
 {
-    //    if (ui->radioButton_cut->isChecked())
-    //        data.number_cut++;
     request req;
     req.operation = ADD_POINT;
     req.data = data;
@@ -157,9 +162,8 @@ void MainWindow::add_draw_point(const point& p)
     req.scene = scene;
     req.view = ui->graphicsView;
     int rc = request_handle(req);
-    if (rc == 1) {
+    if (rc == 1)
         error_message("Ошибка ввода точки: отсекатель вырожден");
-    }
     if (rc == 2)
         error_message("Ошибка ввода точки: начальная и конечная точки линии совпадают");
     if (!rc) {
@@ -201,6 +205,74 @@ void MainWindow::on_pushButton_add_point_clicked()
     }
 }
 
+// событие клика мыши
+void MainWindow::mousePressEvent(QMouseEvent* event)
+{
+    QRect view = ui->graphicsView->geometry();
+    if (view.contains(event->pos())) {
+        process = not process;
+        point p = { event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height() };
+        point lp = data.lines[data.lines.size() - 1].p1;
+        Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
+        if (key == Qt::ShiftModifier && !ui->radioButton_cut->isChecked()) {
+            point d = { abs(lp.x - p.x), abs(lp.y - p.y) };
+            if (d.x < d.y)
+                p.x = lp.x;
+            else
+                p.y = lp.y;
+        }
+        add_draw_point(p);
+    }
+}
+
+void MainWindow::my_mouse_move_event(QMouseEvent* event)
+{
+    if (!process)
+        return;
+    QRect view = ui->graphicsView->geometry();
+    if (event->pos().x() >= 0 && event->pos().y() >= 0 && event->pos().x() <= view.width() && event->pos().y() <= view.height()) {
+        //        std::cout << event->pos().x() << " " << event->pos().y() << std::endl;
+        point p = { event->pos().x(), event->pos().y() };
+        //        std::cout << "pos " << p.x << " " << p.y << std::endl;
+        point lp = data.lines[data.lines.size() - 1].p1;
+        Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
+        if (key == Qt::ShiftModifier && !ui->radioButton_cut->isChecked()) {
+            point d = { abs(lp.x - p.x), abs(lp.y - p.y) };
+            if (d.x < d.y)
+                p.x = lp.x;
+            else
+                p.y = lp.y;
+        }
+        content* c = new content;
+        copy(&c, &data);
+        request req;
+        req.operation = ADD_POINT;
+        req.data = *c;
+        req.is_cut = ui->radioButton_cut->isChecked();
+        req.p = p;
+        req.number = 2;
+        req.scene = scene;
+        req.view = ui->graphicsView;
+        int rc = request_handle(req);
+        if (!rc) {
+            req.operation = DRAW_ALL;
+            request_handle(req);
+        }
+        delete c;
+    }
+}
+
+bool MainWindow::eventFilter(QObject* object, QEvent* event)
+{
+    if (event->type() == QEvent::MouseMove && object == ui->graphicsView->viewport()) {
+        QMouseEvent* me = static_cast<QMouseEvent*>(event);
+        my_mouse_move_event(me);
+        return true;
+    }
+    return false;
+}
+
+// отмена
 void MainWindow::on_pushButton_cancel_clicked()
 {
     if (!cancel.empty()) {
@@ -215,4 +287,33 @@ void MainWindow::on_pushButton_cancel_clicked()
     }
     if (cancel.empty())
         ui->pushButton_cancel->setEnabled(false);
+}
+
+// очистка
+void MainWindow::on_pushButton_clear_clicked()
+{
+    scene->clear();
+
+    data.cut_color = Qt::blue;
+    data.line_color = Qt::black;
+    data.visible_color = QColor("#ff5500");
+
+    show_color(data.cut_color, ui->label_cc);
+    show_color(data.line_color, ui->label_lc);
+    show_color(data.visible_color, ui->label_vlc);
+
+    data.cut = { {}, {} };
+    data.lines.clear();
+    data.lines.push_back({});
+
+    data.number_cut = 0;
+
+    cancel = std::stack<content>();
+    ui->pushButton_cancel->setEnabled(false);
+
+    ui->graphicsView->resetTransform();
+    //    ui->pushButton_hand_mode->setEnabled(true);
+    //    ui->pushButton_cursor_mode->setEnabled(false);
+    //    is_hand = false;
+    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
 }

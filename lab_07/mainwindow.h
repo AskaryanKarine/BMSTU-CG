@@ -20,6 +20,7 @@ public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
+    bool eventFilter(QObject* object, QEvent* event);
 private slots:
     void app_info_show();
     void author_info_show();
@@ -33,8 +34,10 @@ private slots:
     void on_pushButton_add_point_clicked();
     void add_draw_point(const point& p);
     void push_cancel();
-
     void on_pushButton_cancel_clicked();
+    void on_pushButton_clear_clicked();
+    void mousePressEvent(QMouseEvent* event);
+    void my_mouse_move_event(QMouseEvent* event);
 
 private:
     Ui::MainWindow* ui;
@@ -42,5 +45,6 @@ private:
     content data;
     std::stack<content> cancel;
     bool is_cut = true;
+    bool process = false;
 };
 #endif // MAINWINDOW_H
