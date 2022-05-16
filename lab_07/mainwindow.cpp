@@ -327,3 +327,22 @@ void MainWindow::on_pushButton_clear_clicked()
     //    is_hand = false;
     ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
 }
+
+void MainWindow::on_pushButton_cut_clicked()
+{
+    if (!data.cut.is_full()) {
+        error_message("Введите отсекатель");
+        return;
+    }
+    if ((data.lines.size() > 1 && !data.lines[data.lines.size() - 2].is_full())
+        || (data.lines.size() == 1 && !data.lines[0].is_full())) {
+        error_message("Введите отрезок");
+        return;
+    }
+    request req;
+    req.data = data;
+    req.operation = CUT;
+    req.scene = scene;
+    req.view = ui->graphicsView;
+    request_handle(req);
+}

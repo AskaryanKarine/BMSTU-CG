@@ -39,6 +39,8 @@ private slots:
     void mousePressEvent(QMouseEvent* event);
     void my_mouse_move_event(QMouseEvent* event);
 
+    void on_pushButton_cut_clicked();
+
 private:
     Ui::MainWindow* ui;
     QGraphicsScene* scene;

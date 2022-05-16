@@ -5,7 +5,8 @@
 
 enum type_operation {
     ADD_POINT,
-    DRAW_ALL
+    DRAW_ALL,
+    CUT
 };
 
 struct request {

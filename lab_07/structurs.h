@@ -11,6 +11,9 @@ struct point {
     int x = -1;
     int y = -1;
 
+    //    point(int x, int y)
+    //        : x(x)
+    //        , y(y) {};
     bool is_null() { return !(x > 0 && y > 0); };
     bool is_null() const { return !(x > 0 && y > 0); };
     bool operator==(const point& p) { return x == p.x && y == p.y; };
@@ -29,6 +32,7 @@ struct figure {
 struct content {
     figure cut;
     std::vector<figure> lines;
+    std::vector<figure> visible_lines;
     QColor line_color;
     QColor visible_color;
     QColor cut_color;
