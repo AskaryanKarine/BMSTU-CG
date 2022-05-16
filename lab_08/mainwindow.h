@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include "structurs.h"
@@ -47,6 +47,7 @@ private slots:
 
     void on_pushButton_close_cut_clicked();
 
+    void find_parallel_point(point &p);
 private:
     Ui::MainWindow* ui;
     QGraphicsScene* scene;

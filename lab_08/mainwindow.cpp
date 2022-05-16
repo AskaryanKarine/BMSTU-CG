@@ -251,6 +251,46 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
     }
 }
 
+void MainWindow::find_parallel_point(point &p)
+{
+    point lp = data.lines[data.lines.size() - 1].p1;
+    double angle = atan((lp.y - p.y) / (lp.x - p.x));
+    double min_dif = 0, rib_angle = 0;
+    size_t min_id = 0;
+    figure edge;
+    for (size_t i = 0; i < data.cut.points.size(); i++)
+    {
+        if (i == data.cut.points.size() - 1)
+            edge = {data.cut.points[i], data.cut.points[0]};
+        else
+            edge = {data.cut.points[i], data.cut.points[i + 1]};
+        rib_angle = atan((edge.p1.y - edge.p2.y) / (edge.p1.x - edge.p2.x));
+        if (i == 0 || fabs(fabs(angle - rib_angle) - M_PI_2) > min_dif)
+        {
+            min_dif = fabs(fabs(angle - rib_angle) - M_PI_2);
+            min_id = i;
+        }
+    }
+    if (min_id == data.cut.points.size() - 1)
+        edge = {data.cut.points[min_id], data.cut.points[0]};
+    else
+        edge = {data.cut.points[min_id], data.cut.points[min_id + 1]};
+
+    rib_angle = atan((edge.p1.y - edge.p2.y) / (edge.p1.x - edge.p2.x));
+    min_dif = angle - rib_angle;
+    double dist = std::sqrt(std::pow(lp.x - p.x, 2) + std::pow(lp.y - p.y, 2));
+    dist *= cos(min_dif);
+    if (p.x < lp.x)
+        dist *= -1;
+    p.x = lp.x + dist * cos(rib_angle);
+    p.y = lp.y + dist * sin(rib_angle);
+
+    point n = {edge.p2.y - edge.p1.y, -(edge.p2.x - edge.p1.x)};
+    if (rib_angle)
+        p.x -= (p.x - lp.x + (p.y - lp.y) * n.y / n.x);
+}
+
+
 void MainWindow::my_mouse_move_event(QMouseEvent* event)
 {
     if (!process)
@@ -267,6 +307,9 @@ void MainWindow::my_mouse_move_event(QMouseEvent* event)
                 p.x = lp.x;
             else
                 p.y = lp.y;
+        } else if (key == Qt::ControlModifier && !ui->radioButton_cut->isChecked())
+        {
+            find_parallel_point(p);
         }
         content* c = new content;
         copy(&c, &data);
