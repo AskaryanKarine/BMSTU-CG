@@ -6,6 +6,7 @@
 #include <QMouseEvent>
 #include <QWidget>
 #include <cmath>
+#include "figure.h"
 
 #include <iostream>
 
@@ -367,18 +368,26 @@ void MainWindow::on_pushButton_clear_clicked()
 
 void MainWindow::on_pushButton_cut_clicked()
 {
+    if (data.cut.points.empty())
+    {
+        error_message("Введите отсекатель");
+        return;
+    }
+    if (!data.cut.is_close)
+    {
+        error_message("Замкните отсекатель");
+        return;
+    }
+    if (!check_cut(data.cut))
+    {
+        error_message("Введен некорректный отсекатель");
+        return;
+    }
     if ((data.lines.size() > 1 && !data.lines[data.lines.size() - 2].is_full())
         || (data.lines.size() == 1 && !data.lines[0].is_full())) {
         error_message("Введите отрезок");
         return;
     }
-    // проверка отсекателя
-    request req;
-    req.data = data;
-    req.operation = CUT;
-    req.scene = scene;
-    req.view = ui->graphicsView;
-    request_handle(req);
 }
 
 void MainWindow::on_pushButton_reset_scale_clicked()

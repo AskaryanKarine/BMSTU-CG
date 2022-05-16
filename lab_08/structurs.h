@@ -11,9 +11,6 @@ struct point {
     int x = -1;
     int y = -1;
 
-    //    point(int x, int y)
-    //        : x(x)
-    //        , y(y) {};
     bool is_null() { return !(x > 0 && y > 0); };
     bool is_null() const { return !(x > 0 && y > 0); };
     bool operator==(const point& p) { return x == p.x && y == p.y; };
@@ -32,21 +29,8 @@ struct figure {
 struct cut_rect {
     std::vector<point> points;
     bool is_close;
-    bool is_full()
-    {
-        for (size_t i = 0; i < points.size(); i++)
-            if (points[i].is_null())
-                return false;
-        return true;
-    };
 
-    bool is_full() const
-    {
-        for (size_t i = 0; i < points.size(); i++)
-            if (!points[i].is_null())
-                return false;
-        return true;
-    }
+    bool check_cut();
 };
 
 struct content {
@@ -58,5 +42,8 @@ struct content {
     QColor cut_color;
     int number_cut = 0;
 };
+
+
+
 
 #endif // STRUCTURS_H
