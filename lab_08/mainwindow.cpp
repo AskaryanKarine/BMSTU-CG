@@ -170,8 +170,6 @@ void MainWindow::add_draw_point(const point& p)
     req.data = data;
     req.is_cut = ui->radioButton_cut->isChecked();
     req.p = p;
-    if (ui->radioButton_cut->isChecked())
-        req.number = data.number_cut + 1;
     req.scene = scene;
     req.view = ui->graphicsView;
     int rc = request_handle(req);
@@ -182,7 +180,6 @@ void MainWindow::add_draw_point(const point& p)
     if (!rc) {
         push_cancel();
         data = req.data;
-        data.number_cut = req.number;
         req.operation = DRAW_ALL;
         request_handle(req);
     }
@@ -225,7 +222,14 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
     if (!is_hand) {
         if (event->pos().x() >= view.x() && event->pos().x() <= (view.x() + view.width())
             && event->pos().y() >= view.y() && event->pos().y() <= (view.y() + view.height() + menuBar()->geometry().height())) {
-            process = not process;
+            if (!ui->radioButton_cut->isChecked())
+                process = not process;
+            else {
+//                if (!data.cut.is_close)
+//                    process = true;
+//                else
+                    process = true;
+            }
             std::cout << "process state " << process << std::endl;
             point p = { event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height() };
             point lp = data.lines[data.lines.size() - 1].p1;
@@ -236,6 +240,10 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
                     p.x = lp.x;
                 else
                     p.y = lp.y;
+            }
+            else if (key == Qt::ControlModifier && !ui->radioButton_cut->isChecked())
+            {
+
             }
             add_draw_point(p);
         }
@@ -250,9 +258,9 @@ void MainWindow::my_mouse_move_event(QMouseEvent* event)
     if (event->pos().x() >= 0 && event->pos().y() >= 0
         && event->pos().x() <= view.width() && event->pos().y() <= view.height()) {
         point p = { event->pos().x(), event->pos().y() };
-        point lp = data.lines[data.lines.size() - 1].p1;
         Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
         if (key == Qt::ShiftModifier && !ui->radioButton_cut->isChecked()) {
+            point lp = data.lines[data.lines.size() - 1].p1;
             point d = { abs(lp.x - p.x), abs(lp.y - p.y) };
             if (d.x < d.y)
                 p.x = lp.x;
@@ -266,10 +274,10 @@ void MainWindow::my_mouse_move_event(QMouseEvent* event)
         req.data = *c;
         req.is_cut = ui->radioButton_cut->isChecked();
         req.p = p;
-        req.number = 2;
         req.scene = scene;
         req.view = ui->graphicsView;
         int rc = request_handle(req);
+//                                        req.data.cut.points.pop_back();
         if (!rc) {
             req.operation = DRAW_ALL;
             request_handle(req);
@@ -292,14 +300,10 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
             QWheelEvent* wheel_event = static_cast<QWheelEvent*>(event);
             ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
             double scale_factor = 1.15;
-            if (wheel_event->angleDelta().y() > 0) {
-                //                cnt++;
+            if (wheel_event->angleDelta().y() > 0)
                 ui->graphicsView->scale(scale_factor, scale_factor);
-            } else /*if (cnt > 0)*/
-            {
-                //                cnt--;
+            else
                 ui->graphicsView->scale(1 / scale_factor, 1 / scale_factor);
-            }
         }
         return true;
     }
@@ -307,7 +311,7 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
 }
 
 // отмена
-void MainWindow::on_pushButton_cancel_clicked()
+void MainWindow::on_pushButton_cancel_clicked() // переделать штуку с процессом
 {
     if (!cancel.empty()) {
         data = cancel.top();
@@ -318,7 +322,14 @@ void MainWindow::on_pushButton_cancel_clicked()
         req.view = ui->graphicsView;
         request_handle(req);
         cancel.pop();
-        process = not process;
+        if (!ui->radioButton_cut->isChecked())
+            process = not process;
+        else {
+            if (!data.cut.is_close)
+                process = true;
+            else
+                process = false;
+        }
     }
     if (cancel.empty())
         ui->pushButton_cancel->setEnabled(false);
@@ -337,7 +348,8 @@ void MainWindow::on_pushButton_clear_clicked()
     show_color(data.line_color, ui->label_lc);
     show_color(data.visible_color, ui->label_vlc);
 
-    data.cut = { {}, {} };
+    data.cut.is_close = false;
+    data.cut.points.clear();
     data.lines.clear();
     data.lines.push_back({});
 
@@ -355,15 +367,12 @@ void MainWindow::on_pushButton_clear_clicked()
 
 void MainWindow::on_pushButton_cut_clicked()
 {
-    if (!data.cut.is_full()) {
-        error_message("Введите отсекатель");
-        return;
-    }
     if ((data.lines.size() > 1 && !data.lines[data.lines.size() - 2].is_full())
         || (data.lines.size() == 1 && !data.lines[0].is_full())) {
         error_message("Введите отрезок");
         return;
     }
+    // проверка отсекателя
     request req;
     req.data = data;
     req.operation = CUT;
@@ -393,3 +402,17 @@ void MainWindow::on_pushButton_hand_mode_clicked()
     is_hand = true;
     ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
+
+void MainWindow::on_pushButton_close_cut_clicked()
+{
+    push_cancel();
+    process = false;
+    data.cut.is_close = true;
+    request req;
+    req.data = data;
+    req.scene = scene;
+    req.view = ui->graphicsView;
+    req.operation = DRAW_ALL;
+    request_handle(req);
+}
+

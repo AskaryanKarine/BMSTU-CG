@@ -17,6 +17,7 @@ SOURCES += \
     request.cpp
 
 HEADERS += \
+    cut.h \
     drawing.h \
     figure.h \
     mainwindow.h \

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>801</width>
+    <height>658</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -261,6 +261,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="pushButton_close_cut">
+          <property name="text">
+           <string>Замкнуть отсекатель</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="Line" name="line_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -278,10 +285,16 @@
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Чтобы нарисовать прямую
-линию, зажмите Ctrl</string>
+линию, зажмите Shiftl
+Чтобы нарисовать линию,
+параллельную стороне
+отсекателя, зажмите Ctrl</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::AutoText</enum>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignJustify|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -396,8 +409,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>26</height>
+     <width>801</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>

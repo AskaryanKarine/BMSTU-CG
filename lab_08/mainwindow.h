@@ -45,6 +45,8 @@ private slots:
 
     void on_pushButton_hand_mode_clicked();
 
+    void on_pushButton_close_cut_clicked();
+
 private:
     Ui::MainWindow* ui;
     QGraphicsScene* scene;

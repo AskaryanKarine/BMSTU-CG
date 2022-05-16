@@ -29,8 +29,28 @@ struct figure {
     bool is_full() const { return !(p1.is_null() || p2.is_null()); };
 };
 
+struct cut_rect {
+    std::vector<point> points;
+    bool is_close;
+    bool is_full()
+    {
+        for (size_t i = 0; i < points.size(); i++)
+            if (points[i].is_null())
+                return false;
+        return true;
+    };
+
+    bool is_full() const
+    {
+        for (size_t i = 0; i < points.size(); i++)
+            if (!points[i].is_null())
+                return false;
+        return true;
+    }
+};
+
 struct content {
-    figure cut;
+    cut_rect cut;
     std::vector<figure> lines;
     std::vector<figure> visible_lines;
     QColor line_color;
