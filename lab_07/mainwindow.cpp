@@ -220,6 +220,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
         if (event->pos().x() >= view.x() && event->pos().x() <= (view.x() + view.width())
             && event->pos().y() >= view.y() && event->pos().y() <= (view.y() + view.height() + menuBar()->geometry().height())) {
             process = not process;
+            std::cout << "process state " << process << std::endl;
             point p = { event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height() };
             point lp = data.lines[data.lines.size() - 1].p1;
             Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
@@ -242,9 +243,7 @@ void MainWindow::my_mouse_move_event(QMouseEvent* event)
     QRect view = ui->graphicsView->geometry();
     if (event->pos().x() >= 0 && event->pos().y() >= 0
         && event->pos().x() <= view.width() && event->pos().y() <= view.height()) {
-        //        std::cout << event->pos().x() << " " << event->pos().y() << std::endl;
         point p = { event->pos().x(), event->pos().y() };
-        //        std::cout << "pos " << p.x << " " << p.y << std::endl;
         point lp = data.lines[data.lines.size() - 1].p1;
         Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
         if (key == Qt::ShiftModifier && !ui->radioButton_cut->isChecked()) {
