@@ -37,7 +37,6 @@ struct content {
     QColor visible_color;
     QColor cut_color;
     int number_cut = 0;
-    bool process = false;
 };
 
 #endif // STRUCTURS_H

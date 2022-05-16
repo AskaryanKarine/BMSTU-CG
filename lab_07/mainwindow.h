@@ -38,8 +38,12 @@ private slots:
     void on_pushButton_clear_clicked();
     void mousePressEvent(QMouseEvent* event);
     void my_mouse_move_event(QMouseEvent* event);
-
     void on_pushButton_cut_clicked();
+    void on_pushButton_reset_scale_clicked();
+
+    void on_pushButton_cursor_mode_clicked();
+
+    void on_pushButton_hand_mode_clicked();
 
 private:
     Ui::MainWindow* ui;
@@ -48,5 +52,6 @@ private:
     std::stack<content> cancel;
     bool is_cut = true;
     bool process = false;
+    bool is_hand = false;
 };
 #endif // MAINWINDOW_H

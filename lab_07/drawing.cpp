@@ -8,10 +8,17 @@ void draw_point(const point& dot, QPainter& paint)
     paint.drawRect(dot.x - 1, dot.y - 1, COEF, COEF);
 }
 
-void draw_line(const figure& line, QPainter& paint)
+void draw_cut_line(const figure& line, QPainter& paint)
 {
     //    draw_point(line.p1, paint);
     //    draw_point(line.p2, paint);
+    paint.drawLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y);
+}
+
+void draw_line(const figure& line, QPainter& paint)
+{
+    draw_point(line.p1, paint);
+    draw_point(line.p2, paint);
     paint.drawLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y);
 }
 
@@ -44,7 +51,7 @@ void draw_all(const content& data, canvas_t& scene, gv_t& view)
     p.setPen(data.line_color);
     for (size_t i = 0; i < data.lines.size() - 1; i++)
         if (data.lines[i].is_full())
-            draw_line(data.lines[i], p);
+            draw_cut_line(data.lines[i], p);
 
     figure last_fig = data.lines[data.lines.size() - 1];
 

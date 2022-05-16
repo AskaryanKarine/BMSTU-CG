@@ -12,7 +12,7 @@ void cut_draw(content& data, canvas_t& scene, gv_t& view)
     p.setPen(data.visible_color);
     p.setBrush(data.visible_color);
     for (size_t i = 0; i < data.visible_lines.size(); i++)
-        draw_line(data.visible_lines[i], p);
+        draw_cut_line(data.visible_lines[i], p);
     QPixmap pixmap = QPixmap::fromImage(image);
     scene->addPixmap(pixmap);
 }

@@ -43,6 +43,9 @@ MainWindow::MainWindow(QWidget* parent)
     ui->pushButton_cancel->setEnabled(false);
 
     ui->graphicsView->setMouseTracking(true);
+    ui->pushButton_hand_mode->setEnabled(true);
+    ui->pushButton_cursor_mode->setEnabled(false);
+    is_hand = false;
 
     data.lines.push_back({});
     data.number_cut = 0;
@@ -213,23 +216,22 @@ void MainWindow::on_pushButton_add_point_clicked()
 void MainWindow::mousePressEvent(QMouseEvent* event)
 {
     QRect view = ui->graphicsView->geometry();
-    //    std::cout << "point " << event->pos().x() << " " << event->pos().y() << std::endl;
-    //    std::cout << view.x() << " " << view.y() << " " << (view.x() + view.width()) << " " << (view.y() + view.height() + menuBar()->geometry().height()) << std::endl;
-    if (event->pos().x() >= view.x() && event->pos().x() <= (view.x() + view.width())
-        && event->pos().y() >= view.y() && event->pos().y() <= (view.y() + view.height() + menuBar()->geometry().height())) {
-        //        std::cout << "in" << std::endl;
-        process = not process;
-        point p = { event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height() };
-        point lp = data.lines[data.lines.size() - 1].p1;
-        Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
-        if (key == Qt::ShiftModifier && !ui->radioButton_cut->isChecked()) {
-            point d = { abs(lp.x - p.x), abs(lp.y - p.y) };
-            if (d.x < d.y)
-                p.x = lp.x;
-            else
-                p.y = lp.y;
+    if (!is_hand) {
+        if (event->pos().x() >= view.x() && event->pos().x() <= (view.x() + view.width())
+            && event->pos().y() >= view.y() && event->pos().y() <= (view.y() + view.height() + menuBar()->geometry().height())) {
+            process = not process;
+            point p = { event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height() };
+            point lp = data.lines[data.lines.size() - 1].p1;
+            Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
+            if (key == Qt::ShiftModifier && !ui->radioButton_cut->isChecked()) {
+                point d = { abs(lp.x - p.x), abs(lp.y - p.y) };
+                if (d.x < d.y)
+                    p.x = lp.x;
+                else
+                    p.y = lp.y;
+            }
+            add_draw_point(p);
         }
-        add_draw_point(p);
     }
 }
 
@@ -274,8 +276,26 @@ void MainWindow::my_mouse_move_event(QMouseEvent* event)
 bool MainWindow::eventFilter(QObject* object, QEvent* event)
 {
     if (event->type() == QEvent::MouseMove && object == ui->graphicsView->viewport()) {
-        QMouseEvent* me = static_cast<QMouseEvent*>(event);
-        my_mouse_move_event(me);
+        if (!is_hand) {
+            QMouseEvent* me = static_cast<QMouseEvent*>(event);
+            my_mouse_move_event(me);
+            return true;
+        }
+    }
+    if (event->type() == QEvent::Wheel && object == ui->graphicsView->viewport()) {
+        if (is_hand) {
+            QWheelEvent* wheel_event = static_cast<QWheelEvent*>(event);
+            ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+            double scale_factor = 1.15;
+            if (wheel_event->angleDelta().y() > 0) {
+                //                cnt++;
+                ui->graphicsView->scale(scale_factor, scale_factor);
+            } else /*if (cnt > 0)*/
+            {
+                //                cnt--;
+                ui->graphicsView->scale(1 / scale_factor, 1 / scale_factor);
+            }
+        }
         return true;
     }
     return false;
@@ -322,9 +342,9 @@ void MainWindow::on_pushButton_clear_clicked()
     ui->pushButton_cancel->setEnabled(false);
 
     ui->graphicsView->resetTransform();
-    //    ui->pushButton_hand_mode->setEnabled(true);
-    //    ui->pushButton_cursor_mode->setEnabled(false);
-    //    is_hand = false;
+    ui->pushButton_hand_mode->setEnabled(true);
+    ui->pushButton_cursor_mode->setEnabled(false);
+    is_hand = false;
     ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
 }
 
@@ -345,4 +365,26 @@ void MainWindow::on_pushButton_cut_clicked()
     req.scene = scene;
     req.view = ui->graphicsView;
     request_handle(req);
+}
+
+void MainWindow::on_pushButton_reset_scale_clicked()
+{
+    ui->graphicsView->resetTransform();
+}
+
+void MainWindow::on_pushButton_cursor_mode_clicked()
+{
+    ui->pushButton_hand_mode->setEnabled(true);
+    ui->pushButton_cursor_mode->setEnabled(false);
+    is_hand = false;
+    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
+    ui->graphicsView->resetTransform();
+}
+
+void MainWindow::on_pushButton_hand_mode_clicked()
+{
+    ui->pushButton_hand_mode->setEnabled(false);
+    ui->pushButton_cursor_mode->setEnabled(true);
+    is_hand = true;
+    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
