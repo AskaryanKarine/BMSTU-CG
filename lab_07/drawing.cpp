@@ -10,8 +10,8 @@ void draw_point(const point& dot, QPainter& paint)
 
 void draw_line(const figure& line, QPainter& paint)
 {
-    draw_point(line.p1, paint);
-    draw_point(line.p2, paint);
+    //    draw_point(line.p1, paint);
+    //    draw_point(line.p2, paint);
     paint.drawLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y);
 }
 
