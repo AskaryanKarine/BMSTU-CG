@@ -46,7 +46,8 @@ void draw_all(const content& data, canvas_t& scene, gv_t& view)
         if (data.lines[i].is_full())
             draw_line(data.lines[i], p);
 
-    figure last_fig = data.lines[data.lines.size() - 2];
+    figure last_fig = data.lines[data.lines.size() - 1];
+
     if (!last_fig.is_full() && !last_fig.p1.is_null())
         draw_point(last_fig.p1, p);
 

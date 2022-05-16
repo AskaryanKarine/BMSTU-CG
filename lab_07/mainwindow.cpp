@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QWidget>
+#include <cmath>
 
 #include <iostream>
 
@@ -44,11 +45,14 @@ MainWindow::MainWindow(QWidget* parent)
     ui->graphicsView->setMouseTracking(true);
 
     data.lines.push_back({});
+    data.number_cut = 0;
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete scene;
+    cancel = std::stack<content>();
 }
 
 // информационные функции
@@ -209,7 +213,11 @@ void MainWindow::on_pushButton_add_point_clicked()
 void MainWindow::mousePressEvent(QMouseEvent* event)
 {
     QRect view = ui->graphicsView->geometry();
-    if (view.contains(event->pos())) {
+    //    std::cout << "point " << event->pos().x() << " " << event->pos().y() << std::endl;
+    //    std::cout << view.x() << " " << view.y() << " " << (view.x() + view.width()) << " " << (view.y() + view.height() + menuBar()->geometry().height()) << std::endl;
+    if (event->pos().x() >= view.x() && event->pos().x() <= (view.x() + view.width())
+        && event->pos().y() >= view.y() && event->pos().y() <= (view.y() + view.height() + menuBar()->geometry().height())) {
+        //        std::cout << "in" << std::endl;
         process = not process;
         point p = { event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height() };
         point lp = data.lines[data.lines.size() - 1].p1;
@@ -230,7 +238,8 @@ void MainWindow::my_mouse_move_event(QMouseEvent* event)
     if (!process)
         return;
     QRect view = ui->graphicsView->geometry();
-    if (event->pos().x() >= 0 && event->pos().y() >= 0 && event->pos().x() <= view.width() && event->pos().y() <= view.height()) {
+    if (event->pos().x() >= 0 && event->pos().y() >= 0
+        && event->pos().x() <= view.width() && event->pos().y() <= view.height()) {
         //        std::cout << event->pos().x() << " " << event->pos().y() << std::endl;
         point p = { event->pos().x(), event->pos().y() };
         //        std::cout << "pos " << p.x << " " << p.y << std::endl;
@@ -284,6 +293,7 @@ void MainWindow::on_pushButton_cancel_clicked()
         req.view = ui->graphicsView;
         request_handle(req);
         cancel.pop();
+        process = not process;
     }
     if (cancel.empty())
         ui->pushButton_cancel->setEnabled(false);
