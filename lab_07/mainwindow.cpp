@@ -49,6 +49,12 @@ MainWindow::MainWindow(QWidget* parent)
 
     data.lines.push_back({});
     data.number_cut = 0;
+
+    ui->pushButton_reset_scale->setToolTip("Сброс масштабирования\n✪ ω ✪");
+    ui->pushButton_cursor_mode->setToolTip("Режим ввода точек мышкой.\nВнимание! Нельзя приближать\n(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧");
+    ui->pushButton_hand_mode->setToolTip("Режим масштабирования.\nВнимание! Нельзя вводить\nновые точки мышкой\nヽ(✿ﾟ▽ﾟ)ノ");
+    ui->statusbar->setToolTip("Примите лабу, пожалуйста, я очень старалась ( •̀ ω •́ )✧");
+    ui->graphicsView->setToolTip("Примите лабу, пожалуйста, я очень старалась ( •̀ ω •́ )✧");
 }
 
 MainWindow::~MainWindow()
