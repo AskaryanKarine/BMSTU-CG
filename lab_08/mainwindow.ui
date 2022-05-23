@@ -258,6 +258,9 @@
           <property name="text">
            <string>Ввести точку</string>
           </property>
+          <property name="shortcut">
+           <string>Enter</string>
+          </property>
          </widget>
         </item>
         <item>
