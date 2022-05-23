@@ -5,7 +5,7 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QWidget>
-#include <cmath>
+#include <math.h>
 #include "figure.h"
 
 #include <iostream>
@@ -49,13 +49,12 @@ MainWindow::MainWindow(QWidget* parent)
     is_hand = false;
 
     data.lines.push_back({});
-    data.number_cut = 0;
 
     ui->pushButton_reset_scale->setToolTip("Сброс масштабирования\n✪ ω ✪");
     ui->pushButton_cursor_mode->setToolTip("Режим ввода точек мышкой.\nВнимание! Нельзя приближать\n(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧");
     ui->pushButton_hand_mode->setToolTip("Режим масштабирования.\nВнимание! Нельзя вводить\nновые точки мышкой\nヽ(✿ﾟ▽ﾟ)ノ");
-    ui->statusbar->setToolTip("Примите лабу, пожалуйста, я очень старалась ( •̀ ω •́ )✧");
-    ui->graphicsView->setToolTip("Примите лабу, пожалуйста, я очень старалась ( •̀ ω •́ )✧");
+    ui->statusbar->setToolTip("Примите лабу, пожалуйста, я зае... заромашкалась (ﾒ` ﾛ ´)︻┳═一");
+    ui->graphicsView->setToolTip("Примите лабу, пожалуйста, я зае... заромашкалась (ﾒ` ﾛ ´)︻┳═一");
 }
 
 MainWindow::~MainWindow()
@@ -104,9 +103,9 @@ static void copy(struct content** a, struct content* b)
     (*a)->cut_color = b->cut_color;
     (*a)->line_color = b->line_color;
     (*a)->visible_color = b->visible_color;
-    (*a)->number_cut = b->number_cut;
-    for (size_t i = 0; i < b->lines.size(); i++)
-        (*a)->lines.push_back(b->lines[i]);
+    (*a)->lines = b->lines;
+//    for (size_t i = 0; i < b->lines.size(); i++)
+//        (*a)->lines.push_back(b->lines[i]);
 }
 
 void MainWindow::push_cancel()
@@ -221,32 +220,37 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
 {
     QRect view = ui->graphicsView->geometry();
     if (!is_hand) {
-        if (event->pos().x() >= view.x() && event->pos().x() <= (view.x() + view.width())
-            && event->pos().y() >= view.y() && event->pos().y() <= (view.y() + view.height() + menuBar()->geometry().height())) {
-            if (!ui->radioButton_cut->isChecked())
-                process = not process;
-            else {
-//                if (!data.cut.is_close)
-//                    process = true;
-//                else
-                    process = true;
+        if (event->button() == Qt::LeftButton) {
+            if (event->pos().x() >= view.x() && event->pos().x() <= (view.x() + view.width())
+                && event->pos().y() >= view.y() && event->pos().y() <= (view.y() + view.height() + menuBar()->geometry().height())) {
+                if (!ui->radioButton_cut->isChecked())
+                    process = not process;
+                else {
+                        process = true;
+                }
+                std::cout << "process state " << process << std::endl;
+                point p = { event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height() };
+                point lp;
+                Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
+                if (key == Qt::ShiftModifier) {
+                    if (!ui->radioButton_cut->isChecked())
+                        lp = data.lines[data.lines.size() - 1].p1;
+                    else
+                        lp = data.cut.points[data.cut.points.size() - 1];
+                    point d = { abs(lp.x - p.x), abs(lp.y - p.y) };
+                    if (d.x < d.y)
+                        p.x = lp.x;
+                    else
+                        p.y = lp.y;
+                }
+                if (key == Qt::ControlModifier && !ui->radioButton_cut->isChecked()) {
+                    find_parallel_point(p);
+                }
+                add_draw_point(p);
             }
-            std::cout << "process state " << process << std::endl;
-            point p = { event->pos().x() - view.x(), event->pos().y() - view.y() - menuBar()->geometry().height() };
-            point lp = data.lines[data.lines.size() - 1].p1;
-            Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
-            if (key == Qt::ShiftModifier && !ui->radioButton_cut->isChecked()) {
-                point d = { abs(lp.x - p.x), abs(lp.y - p.y) };
-                if (d.x < d.y)
-                    p.x = lp.x;
-                else
-                    p.y = lp.y;
-            }
-            else if (key == Qt::ControlModifier && !ui->radioButton_cut->isChecked())
-            {
-
-            }
-            add_draw_point(p);
+        }
+        else {
+            on_pushButton_close_cut_clicked();
         }
     }
 }
@@ -254,61 +258,63 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
 void MainWindow::find_parallel_point(point &p)
 {
     point lp = data.lines[data.lines.size() - 1].p1;
-    double angle = atan((lp.y - p.y) / (lp.x - p.x));
+    polygon cur_cut = data.cut;
+    if (lp.x - p.x == 0)
+        return;
+    double angle = atan(static_cast<double>(lp.y - p.y) / (lp.x - p.x));
     double min_dif = 0, rib_angle = 0;
-    size_t min_id = 0;
-    figure edge;
-    for (size_t i = 0; i < data.cut.points.size(); i++)
-    {
-        if (i == data.cut.points.size() - 1)
-            edge = {data.cut.points[i], data.cut.points[0]};
-        else
-            edge = {data.cut.points[i], data.cut.points[i + 1]};
-        rib_angle = atan((edge.p1.y - edge.p2.y) / (edge.p1.x - edge.p2.x));
-        if (i == 0 || fabs(fabs(angle - rib_angle) - M_PI_2) > min_dif)
-        {
+    int min_id = 0;
+    for (size_t i = 0; i < cur_cut.lines.size(); i++) {
+        rib_angle = atan(static_cast<double>(cur_cut.lines[i].p1.y - cur_cut.lines[i].p2.y) / (cur_cut.lines[i].p1.x - cur_cut.lines[i].p2.x));
+        if (i == 0 || (fabs(fabs(angle - rib_angle) - M_PI_2) > min_dif)) {
             min_dif = fabs(fabs(angle - rib_angle) - M_PI_2);
             min_id = i;
         }
     }
-    if (min_id == data.cut.points.size() - 1)
-        edge = {data.cut.points[min_id], data.cut.points[0]};
-    else
-        edge = {data.cut.points[min_id], data.cut.points[min_id + 1]};
+    if (cur_cut.lines[min_id].p1.x - cur_cut.lines[min_id].p2.x == 0)
+        return;
 
-    rib_angle = atan((edge.p1.y - edge.p2.y) / (edge.p1.x - edge.p2.x));
+    rib_angle = atan(static_cast<double>(cur_cut.lines[min_id].p1.y - cur_cut.lines[min_id].p2.y)
+                     / (cur_cut.lines[min_id].p1.x - cur_cut.lines[min_id].p2.x));
     min_dif = angle - rib_angle;
-    double dist = std::sqrt(std::pow(lp.x - p.x, 2) + std::pow(lp.y - p.y, 2));
+    double dist = sqrt(pow((lp.x - p.x), 2) + pow((lp.y - p.y), 2));
     dist *= cos(min_dif);
     if (p.x < lp.x)
         dist *= -1;
     p.x = lp.x + dist * cos(rib_angle);
     p.y = lp.y + dist * sin(rib_angle);
 
-    point n = {edge.p2.y - edge.p1.y, -(edge.p2.x - edge.p1.x)};
-    if (rib_angle)
+    if (cur_cut.lines[min_id].p2.y - cur_cut.lines[min_id].p1.y == 0)
+        return;
+    point n = { cur_cut.lines[min_id].p2.y - cur_cut.lines[min_id].p1.y , cur_cut.lines[min_id].p1.x - cur_cut.lines[min_id].p2.x };
+    if (min_dif)
         p.x -= (p.x - lp.x + (p.y - lp.y) * n.y / n.x);
 }
-
 
 void MainWindow::my_mouse_move_event(QMouseEvent* event)
 {
     if (!process)
         return;
+
     QRect view = ui->graphicsView->geometry();
     if (event->pos().x() >= 0 && event->pos().y() >= 0
         && event->pos().x() <= view.width() && event->pos().y() <= view.height()) {
         point p = { event->pos().x(), event->pos().y() };
+        point lp;
         Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
-        if (key == Qt::ShiftModifier && !ui->radioButton_cut->isChecked()) {
-            point lp = data.lines[data.lines.size() - 1].p1;
+        if (key == Qt::ShiftModifier) {
+            if (!ui->radioButton_cut->isChecked())
+                lp = data.lines[data.lines.size() - 1].p1;
+            else
+                lp = data.cut.points[data.cut.points.size() - 1];
             point d = { abs(lp.x - p.x), abs(lp.y - p.y) };
             if (d.x < d.y)
                 p.x = lp.x;
             else
                 p.y = lp.y;
-        } else if (key == Qt::ControlModifier && !ui->radioButton_cut->isChecked())
-        {
+        }
+
+        if (key == Qt::ControlModifier && !ui->radioButton_cut->isChecked()) {
             find_parallel_point(p);
         }
         content* c = new content;
@@ -321,7 +327,6 @@ void MainWindow::my_mouse_move_event(QMouseEvent* event)
         req.scene = scene;
         req.view = ui->graphicsView;
         int rc = request_handle(req);
-//                                        req.data.cut.points.pop_back();
         if (!rc) {
             req.operation = DRAW_ALL;
             request_handle(req);
@@ -355,7 +360,7 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
 }
 
 // отмена
-void MainWindow::on_pushButton_cancel_clicked() // переделать штуку с процессом
+void MainWindow::on_pushButton_cancel_clicked()
 {
     if (!cancel.empty()) {
         data = cancel.top();
@@ -394,10 +399,9 @@ void MainWindow::on_pushButton_clear_clicked()
 
     data.cut.is_close = false;
     data.cut.points.clear();
+    data.cut.lines.clear();
     data.lines.clear();
     data.lines.push_back({});
-
-    data.number_cut = 0;
 
     cancel = std::stack<content>();
     ui->pushButton_cancel->setEnabled(false);
@@ -421,7 +425,7 @@ void MainWindow::on_pushButton_cut_clicked()
         error_message("Замкните отсекатель");
         return;
     }
-    if (!check_cut(data.cut))
+    if (!check_convex(data.cut) || check_cross(data.cut))
     {
         error_message("Введен некорректный отсекатель");
         return;
@@ -466,6 +470,7 @@ void MainWindow::on_pushButton_close_cut_clicked()
     push_cancel();
     process = false;
     data.cut.is_close = true;
+    data.cut.update_lines(data.cut.points[0]);
     request req;
     req.data = data;
     req.scene = scene;
