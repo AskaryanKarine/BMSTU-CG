@@ -54,7 +54,13 @@ bool check_cross(const polygon &cut)
             int v2 = vector_product(p3 - p4, p3 - p2);
             int v3 = vector_product(p1 - p2, p1 - p3);
             int v4 = vector_product(p1 - p2, p1 - p4);
-            if (v1 * v2 < 0 && v3 * v4 < 0)
+            if (v1 > 0 && v2 < 0)
+                return true;
+            if (v1 < 0 && v2 > 0)
+                return true;
+            if (v3 > 0 && v4 < 0)
+                return true;
+            if (v3 < 0 && v4 > 0)
                 return true;
         }
     }
