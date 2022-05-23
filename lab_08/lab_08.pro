@@ -35,7 +35,3 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     icons.qrc
 
-DISTFILES += \
-    icons/cursor.png \
-    icons/hand.png \
-    icons/scale.png

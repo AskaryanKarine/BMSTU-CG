@@ -8,12 +8,12 @@ void draw_point(const point& dot, QPainter& paint)
     paint.drawRect(dot.x - 1, dot.y - 1, COEF, COEF);
 }
 
-void draw_line(const figure& line, QPainter& paint)
+void draw_line(const line& line, QPainter& paint)
 {
     paint.drawLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y);
 }
 
-void draw_cut(const cut_rect& cut, QPainter& paint)
+void draw_cut(const polygon& cut, QPainter& paint)
 {
     size_t size_point = cut.points.size();
     if (size_point < 2)
@@ -44,7 +44,7 @@ void draw_all(const content& data, canvas_t& scene, gv_t& view)
         if (data.lines[i].is_full())
             draw_line(data.lines[i], p);
 
-    figure last_fig = data.lines[data.lines.size() - 1];
+    line last_fig = data.lines[data.lines.size() - 1];
 
     if (!last_fig.is_full() && !last_fig.p1.is_null())
         draw_point(last_fig.p1, p);
