@@ -1,26 +1,40 @@
 #include "figure.h"
+#include <algorithm>
+
+bool find_point(const polygon& pol, const point &p)
+{
+    for (auto &point : pol.points)
+        if (point.x == p.x && point.y == p.y)
+            return true;
+
+    return false;
+}
 
 int add_point(const bool& is_cut, const point& p, content& data)
 {
-    int rc = 0;
+//    int rc = 0;
     if (is_cut) {
-        if (data.cut.is_close) {
-            data.cut.is_close = false;
-            data.cut.points.clear();
-            data.cut.lines.clear();
+        if (data.cutter.is_close) {
+            data.cutter.is_close = false;
+            data.cutter.points.clear();
+            data.cutter.lines.clear();
         }
-        data.cut.points.push_back(p);
-        data.cut.update_lines(p);
+        if (find_point(data.cutter, p))
+            return 1;
+        data.cutter.points.push_back(p);
+        data.cutter.update_lines(p);
     } else {
         if (data.firure.is_close) {
             data.firure.is_close = false;
             data.firure.points.clear();
             data.firure.lines.clear();
         }
+        if (find_point(data.firure, p))
+            return 2;
         data.firure.points.push_back(p);
         data.firure.update_lines(p);
     }
-    return rc;
+    return 0;
 }
 
 int vector_product(const point &v1, const point &v2)
@@ -38,7 +52,6 @@ int sign(int num)
 
 bool check_cross(const polygon &cut)
 {
-
     for (size_t i = 0; i < cut.lines.size() - 1; i++)
     {
         point p1 = cut.lines[i].p1;

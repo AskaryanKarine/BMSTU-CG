@@ -1,11 +1,11 @@
 #include "request.h"
-#include "cut.h"
+//#include "cut.h"
 #include "drawing.h"
 #include "figure.h"
 
 void cut_draw(content& data, canvas_t& scene, gv_t& view)
 {
-    cut(data);
+//    cut(data);
     QImage image = QImage(view->geometry().width(), view->geometry().height(), QImage::Format_ARGB32);
     QPainter p(&image);
     image.fill(Qt::transparent);

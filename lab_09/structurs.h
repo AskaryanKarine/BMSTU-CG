@@ -49,7 +49,7 @@ struct polygon {
 };
 
 struct content {
-    polygon cut;
+    polygon cutter;
     polygon firure;
     std::vector<line> visible_lines;
     QColor line_color;

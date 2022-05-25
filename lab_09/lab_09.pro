@@ -10,7 +10,6 @@ CONFIG += c++17
 
 SOURCES += \
     cut.cpp \
-    cut.cpp \
     drawing.cpp \
     figure.cpp \
     main.cpp \
@@ -35,6 +34,3 @@ RESOURCES += \
 
 FORMS += \
     mainwindow.ui
-
-DISTFILES += \
-    lab_09.pro.user

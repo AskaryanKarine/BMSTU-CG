@@ -1,5 +1,5 @@
 #include "drawing.h"
-#include "structurs.h"
+//#include "structurs.h"
 
 #define COEF 2
 
@@ -13,7 +13,7 @@ void draw_line(const line& line, QPainter& paint)
     paint.drawLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y);
 }
 
-void draw_cut(const polygon& cut, QPainter& paint)
+void draw_polygon(const polygon& cut, QPainter& paint)
 {
     size_t size_point = cut.points.size();
     if (size_point < 2)
@@ -33,21 +33,13 @@ void draw_all(const content& data, canvas_t& scene, gv_t& view)
 
     p.setBrush(data.cut_color);
     p.setPen(data.cut_color);
-    if (data.cut.points.size() > 0)
-        draw_cut(data.cut, p);
-    //    else if (!data.cut.p1.is_null())
-    //        draw_point(data.cut.p1, p);
+    if (data.cutter.points.size() > 0)
+        draw_polygon(data.cutter, p);
 
     p.setBrush(data.line_color);
     p.setPen(data.line_color);
-    for (size_t i = 0; i < data.lines.size() - 1; i++)
-        if (data.lines[i].is_full())
-            draw_line(data.lines[i], p);
-
-    line last_fig = data.lines[data.lines.size() - 1];
-
-    if (!last_fig.is_full() && !last_fig.p1.is_null())
-        draw_point(last_fig.p1, p);
+    if (data.firure.points.size() > 0)
+        draw_polygon(data.firure, p);
 
     QPixmap pixmap = QPixmap::fromImage(image);
     scene->clear();
