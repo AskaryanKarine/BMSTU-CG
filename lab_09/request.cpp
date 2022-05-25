@@ -1,18 +1,17 @@
 #include "request.h"
-//#include "cut.h"
+#include "cut.h"
 #include "drawing.h"
 #include "figure.h"
 
 void cut_draw(content& data, canvas_t& scene, gv_t& view)
 {
-//    cut(data);
+    cut(data);
     QImage image = QImage(view->geometry().width(), view->geometry().height(), QImage::Format_ARGB32);
     QPainter p(&image);
     image.fill(Qt::transparent);
     p.setPen(data.visible_color);
     p.setBrush(data.visible_color);
-    for (size_t i = 0; i < data.visible_lines.size(); i++)
-        draw_line(data.visible_lines[i], p);
+    draw_polygon(data.visible_figure, p);
     QPixmap pixmap = QPixmap::fromImage(image);
     scene->addPixmap(pixmap);
 }
