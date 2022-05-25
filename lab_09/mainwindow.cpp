@@ -65,7 +65,7 @@ MainWindow::~MainWindow()
 // информационные функции
 void MainWindow::app_info_show()
 {
-    QMessageBox::information(NULL, "О программе", "Реализация и исследование простого алгоритма отсечения отрезка регулярным отсекателем.\n\n\
+    QMessageBox::information(NULL, "О программе", "Отсечение многоугольников. Реализация и исследование алгоритма Сазерленда Ходжмена.\n\n\
 Интерфейс этой программы был разработан с использванием ресурсов с сайта Flaticon.com\n\n\
 This cover has been designed using resources from Flaticon.com");
 }
@@ -101,7 +101,7 @@ static void copy(struct content** a, struct content* b)
     (*a)->cut_color = b->cut_color;
     (*a)->line_color = b->line_color;
     (*a)->visible_color = b->visible_color;
-    (*a)->firure = b->firure;
+    (*a)->figure = b->figure;
 }
 
 void MainWindow::push_cancel()
@@ -230,7 +230,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
                 Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
                 if (key == Qt::ShiftModifier) {
                     if (!ui->radioButton_cut->isChecked())
-                        lp = data.cutter.points[data.cutter.points.size() - 1];
+                        lp = data.figure.points[data.figure.points.size() - 1];
                     else
                         lp = data.cutter.points[data.cutter.points.size() - 1];
                     point d = { abs(lp.x - p.x), abs(lp.y - p.y) };
@@ -252,7 +252,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
 
 void MainWindow::find_parallel_point(point &p)
 {
-    point lp = data.cutter.points[data.cutter.points.size() - 1];
+    point lp = data.figure.points[data.figure.points.size() - 1];/*data.cutter.points[data.cutter.points.size() - 1];*/
     polygon cur_cut = data.cutter;
     if (lp.x - p.x == 0)
         return;
@@ -266,8 +266,6 @@ void MainWindow::find_parallel_point(point &p)
             min_id = i;
         }
     }
-    if (cur_cut.lines[min_id].p1.x - cur_cut.lines[min_id].p2.x == 0)
-        return;
 
     rib_angle = atan(static_cast<double>(cur_cut.lines[min_id].p1.y - cur_cut.lines[min_id].p2.y)
                      / (cur_cut.lines[min_id].p1.x - cur_cut.lines[min_id].p2.x));
@@ -299,7 +297,7 @@ void MainWindow::my_mouse_move_event(QMouseEvent* event)
         Qt::KeyboardModifiers key = QApplication::queryKeyboardModifiers();
         if (key == Qt::ShiftModifier) {
             if (!ui->radioButton_cut->isChecked())
-                lp = data.firure.points[data.firure.points.size() - 1];
+                lp = data.figure.points[data.figure.points.size() - 1];
             else
                 lp = data.cutter.points[data.cutter.points.size() - 1];
             point d = { abs(lp.x - p.x), abs(lp.y - p.y) };
@@ -368,7 +366,7 @@ void MainWindow::on_pushButton_cancel_clicked()
         cancel.pop();
         if (!ui->radioButton_cut->isChecked())
         {
-            if (!data.firure.is_close)
+            if (!data.figure.is_close)
                 process = true;
             else
                 process = false;
@@ -388,7 +386,7 @@ void MainWindow::on_pushButton_cancel_clicked()
 void MainWindow::on_pushButton_clear_clicked()
 {
     scene->clear();
-
+    process = false;
     data.cut_color = Qt::blue;
     data.line_color = Qt::black;
     data.visible_color = QColor("#ff5500");
@@ -400,8 +398,8 @@ void MainWindow::on_pushButton_clear_clicked()
     data.cutter.is_close = false;
     data.cutter.points.clear();
     data.cutter.lines.clear();
-    data.firure.points.clear();
-    data.firure.lines.clear();
+    data.figure.points.clear();
+    data.figure.lines.clear();
 
     cancel = std::stack<content>();
     ui->pushButton_cancel->setEnabled(false);
@@ -430,12 +428,12 @@ void MainWindow::on_pushButton_cut_clicked()
         error_message("Введен некорректный отсекатель");
         return;
     }
-    if (data.firure.points.size() < 3)
+    if (data.figure.points.size() < 3)
     {
         error_message("Введите фигуру");
         return;
     }
-    if (!data.firure.is_close)
+    if (!data.figure.is_close)
     {
         error_message("Замкните фигуру");
         return;
@@ -478,8 +476,8 @@ void MainWindow::on_pushButton_close_cut_clicked()
         data.cutter.is_close = true;
         data.cutter.update_lines(data.cutter.points[0]);
     } else {
-        data.firure.is_close = true;
-        data.firure.update_lines(data.firure.points[0]);
+        data.figure.is_close = true;
+        data.figure.update_lines(data.figure.points[0]);
     }
     request req;
     req.data = data;

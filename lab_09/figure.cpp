@@ -24,15 +24,15 @@ int add_point(const bool& is_cut, const point& p, content& data)
         data.cutter.points.push_back(p);
         data.cutter.update_lines(p);
     } else {
-        if (data.firure.is_close) {
-            data.firure.is_close = false;
-            data.firure.points.clear();
-            data.firure.lines.clear();
+        if (data.figure.is_close) {
+            data.figure.is_close = false;
+            data.figure.points.clear();
+            data.figure.lines.clear();
         }
-        if (find_point(data.firure, p))
+        if (find_point(data.figure, p))
             return 2;
-        data.firure.points.push_back(p);
-        data.firure.update_lines(p);
+        data.figure.points.push_back(p);
+        data.figure.update_lines(p);
     }
     return 0;
 }

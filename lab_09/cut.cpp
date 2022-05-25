@@ -7,7 +7,7 @@ static int scalar_product(point p1, point p2)
     return p1.x * p2.x + p1.y * p2.y;
 }
 
-bool is_visivble(const line &src, const point &p, int norm)
+bool is_visivble(const line& src, const point& p, int norm)
 {
     point v1 = src.p2 - src.p1;
     point v2 = p - src.p2;
@@ -20,7 +20,7 @@ bool is_visivble(const line &src, const point &p, int norm)
     return false;
 }
 
-bool find_inter(point &p, line src, line sec, int norm)
+bool find_inter(point& p, line src, line sec, int norm)
 {
     bool vis1 = is_visivble(src, sec.p1, norm);
     bool vis2 = is_visivble(src, sec.p2, norm);
@@ -36,9 +36,9 @@ bool find_inter(point &p, line src, line sec, int norm)
         if (denomanator == 0)
             p = sec.p2;
         else {
-            double t = (double) nominator / denomanator;
+            double t = (double)nominator / denomanator;
             point tmp = sec.p2 - sec.p1;
-            tmp = {int(tmp.x * t), int(tmp.y * t)};
+            tmp = { int(tmp.x * t), int(tmp.y * t) };
             p = sec.p1 + tmp;
         }
     }
@@ -49,7 +49,7 @@ bool find_inter(point &p, line src, line sec, int norm)
 void cut(content& data)
 {
     int normal = check_convex(data.cutter);
-    data.visible_figure = data.firure;
+    data.visible_figure = data.figure;
     for (auto cut_line : data.cutter.lines) {
         polygon new_pol;
         for (auto vis_line : data.visible_figure.lines) {
@@ -59,19 +59,22 @@ void cut(content& data)
             if (is_inter) {
                 new_pol.points.push_back(inter);
                 if (new_pol.points.size() > 1)
-                    new_pol.lines.push_back({new_pol.points[new_pol.points.size() - 2],
-                                             new_pol.points[new_pol.points.size() - 1]});
+                    new_pol.lines.push_back({ new_pol.points[new_pol.points.size() - 2],
+                        new_pol.points[new_pol.points.size() - 1] });
             }
 
             bool is_vis = is_visivble(cut_line, vis_line.p2, normal);
-            if (is_vis)
-            {
+            if (is_vis) {
                 new_pol.points.push_back(vis_line.p2);
                 if (new_pol.points.size() > 1)
-                    new_pol.lines.push_back({new_pol.points[new_pol.points.size() - 2],
-                                             new_pol.points[new_pol.points.size() - 1]});
+                    new_pol.lines.push_back({ new_pol.points[new_pol.points.size() - 2],
+                        new_pol.points[new_pol.points.size() - 1] });
             }
-
         }
+
+        new_pol.is_close = true;
+        new_pol.lines.push_back({ new_pol.points[new_pol.points.size() - 1],
+            new_pol.points[0] });
+        data.visible_figure = new_pol;
     }
 }

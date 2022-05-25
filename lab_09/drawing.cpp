@@ -38,8 +38,8 @@ void draw_all(const content& data, canvas_t& scene, gv_t& view)
 
     p.setBrush(data.line_color);
     p.setPen(data.line_color);
-    if (data.firure.points.size() > 0)
-        draw_polygon(data.firure, p);
+    if (data.figure.points.size() > 0)
+        draw_polygon(data.figure, p);
 
     QPixmap pixmap = QPixmap::fromImage(image);
     scene->clear();

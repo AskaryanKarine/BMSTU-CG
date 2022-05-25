@@ -50,7 +50,7 @@ struct polygon {
 
 struct content {
     polygon cutter;
-    polygon firure;
+    polygon figure;
     polygon visible_figure;
     QColor line_color;
     QColor visible_color;
