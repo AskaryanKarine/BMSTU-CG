@@ -245,12 +245,8 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
                 add_draw_point(p);
             }
         }
-        else {
-            if (!ui->radioButton_cut->isChecked())
-                on_pushButton_close_line_clicked();
-            else
-                on_pushButton_close_cut_clicked();
-        }
+        else
+            on_pushButton_close_cut_clicked();
     }
 }
 
@@ -478,8 +474,13 @@ void MainWindow::on_pushButton_close_cut_clicked()
 {
     push_cancel();
     process = false;
-    data.cutter.is_close = true;
-    data.cutter.update_lines(data.cutter.points[0]);
+    if (ui->radioButton_cut->isChecked()) {
+        data.cutter.is_close = true;
+        data.cutter.update_lines(data.cutter.points[0]);
+    } else {
+        data.firure.is_close = true;
+        data.firure.update_lines(data.firure.points[0]);
+    }
     request req;
     req.data = data;
     req.scene = scene;
@@ -487,18 +488,3 @@ void MainWindow::on_pushButton_close_cut_clicked()
     req.operation = DRAW_ALL;
     request_handle(req);
 }
-
-void MainWindow::on_pushButton_close_line_clicked()
-{
-    push_cancel();
-    process = false;
-    data.firure.is_close = true;
-    data.firure.update_lines(data.firure.points[data.firure.points.size() - 1]);
-    request req;
-    req.data = data;
-    req.scene = scene;
-    req.view = ui->graphicsView;
-    req.operation = DRAW_ALL;
-    request_handle(req);
-}
-

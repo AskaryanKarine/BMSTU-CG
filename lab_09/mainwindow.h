@@ -48,7 +48,6 @@ private slots:
     void on_pushButton_close_cut_clicked();
 
     void find_parallel_point(point &p);
-    void on_pushButton_close_line_clicked();
 
 private:
     Ui::MainWindow* ui;

@@ -266,14 +266,7 @@
         <item>
          <widget class="QPushButton" name="pushButton_close_cut">
           <property name="text">
-           <string>Замкнуть отсекатель</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_close_line">
-          <property name="text">
-           <string>Замкнуть фигуру</string>
+           <string>Замкнуть</string>
           </property>
          </widget>
         </item>
