@@ -16,9 +16,7 @@ void draw_line(const line& line, QPainter& paint)
 void draw_polygon(const polygon& cut, QPainter& paint)
 {
     size_t size_point = cut.points.size();
-    if (size_point < 2)
-        draw_point(cut.points[0], paint);
-    else
+    if (size_point >= 2)
         for (size_t i = 0; i < size_point - 1; i++)
             draw_line({ cut.points[i], cut.points[i + 1] }, paint);
     if (cut.is_close)

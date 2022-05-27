@@ -71,10 +71,12 @@ void cut(content& data)
                         new_pol.points[new_pol.points.size() - 1] });
             }
         }
-
-        new_pol.is_close = true;
-        new_pol.lines.push_back({ new_pol.points[new_pol.points.size() - 1],
-            new_pol.points[0] });
+        new_pol.is_close = false;
+        if (new_pol.points.size() > 2) {
+            new_pol.is_close = true;
+            new_pol.lines.push_back({ new_pol.points[new_pol.points.size() - 1],
+                                 new_pol.points[0] });
+        }
         data.visible_figure = new_pol;
     }
 }
