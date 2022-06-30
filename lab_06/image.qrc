@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>icons/cursor.png</file>
+        <file>icons/hand.png</file>
+        <file>icons/scale.png</file>
+        <file>icons/keyboard.png</file>
+    </qresource>
+</RCC>
